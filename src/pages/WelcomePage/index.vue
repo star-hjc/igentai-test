@@ -64,11 +64,44 @@
                                 </div>
                             </div>
 
+                            <div class="device work-area-item">
+                                <div class="title"><span class="top">设备区</span></div>
+                                <el-radio-group v-model="state.connectionMethod" @change="onSwitchConnectionMethod"
+                                    style="margin: 15px 0 0 15px;">
+                                    <el-radio-button label="usb">USB</el-radio-button>
+                                    <el-radio-button label="wifi">WIFI</el-radio-button>
+                                    <el-radio-button label="serialport">SerialPort</el-radio-button>
+                                </el-radio-group>
+                                <div class="content">
+                                    <span v-show="['usb', 'wifi'].includes(state.connectionMethod)">设备：</span>
+                                    <span v-show="state.connectionMethod === 'serialport'">串口：</span>
+                                    <el-select v-model="state.device"
+                                        :placeholder="state.connectionMethod === 'serialport' ? '选择串口...' : '选择设备...'">
+                                        <el-option v-for="item in state.deviceList" :key="item.device_id"
+                                            :value="item.device_id">
+                                            <div style="display: flex;justify-content: space-between;gap: 20px;">
+                                                <span>{{ item.device_id }}</span>
+                                                <span style=" color: var(--el-text-color-secondary);">
+                                                    {{ item.device }}
+                                                </span>
+                                            </div>
+                                        </el-option>
+                                    </el-select>
+                                    <span v-show="state.connectionMethod === 'serialport'"
+                                        style="margin-left: 20px;">波特率：</span>
+                                    <el-select v-show="state.connectionMethod === 'serialport'" v-model="state.baudRate"
+                                        placeholder="选择波特率...">
+                                        <el-option v-for="item in state.baudRateList" :key="item" :label="item"
+                                            :value="item" />
+                                    </el-select>
+                                </div>
+                            </div>
+
                             <div class="fun work-area-item">
                                 <div class="title"><span class="top">功能区</span></div>
                                 <div class="content">
                                     <el-button>运行</el-button>
-                                    <el-button>编写</el-button>
+                                    <el-button @click="openWorkBenches">编写</el-button>
                                     <el-button type="danger" @click="removeFile">删除</el-button>
                                 </div>
                             </div>
@@ -92,7 +125,12 @@ import { Delete } from '@element-plus/icons-vue'
 const RightClickMenuRef = ref(null)
 const state = reactive({
     menuData: [],
-
+    /** usb,wifi,serialport */
+    connectionMethod: 'usb',
+    device: '',
+    deviceList: [],
+    baudRate: 115200,
+    baudRateList: [110, 300, 600, 1200, 2400, 4800, 9600, 14400, 19200, 38400, 57600, 115200, 128000, 256000],
     rightClickMenu: {
         isShow: false,
         position: []
@@ -106,12 +144,29 @@ const state = reactive({
 onMounted(async () => {
     state.caseBasePath = await appApi.getAssetsPath('case')
     getCase()
+    getDeviceList()
 })
 
 async function getCase () {
     await appApi.readdirCase().then(data => {
-        console.log(data)
         state.menuData = data
+    })
+}
+
+async function getSerialPortList () {
+    await appApi.getSerialPortList().then(data => {
+        console.log(data)
+        state.deviceList = data
+    }).catch(() => {
+        ElMessage.error('获取串口失败.')
+    })
+}
+
+async function getDeviceList () {
+    await adb.getDevices().then(data => {
+        state.deviceList = data
+    }).catch(() => {
+        ElMessage.error('获取设备失败.')
     })
 }
 
@@ -129,8 +184,27 @@ function onRightClickMenu (e, item) {
     })
 }
 
+function onSwitchConnectionMethod (val) {
+    if (['usb', 'wifi'].includes(val)) {
+        getDeviceList()
+    }
+    if (val === 'serialport') {
+        getSerialPortList()
+    }
+}
+
 function onClickFile (e, item) {
     state.file = item
+    if (['usb', 'wifi'].includes(state.connectionMethod)) {
+        getDeviceList()
+    }
+    if (state.connectionMethod === 'serialport') {
+        getSerialPortList()
+    }
+}
+
+function openWorkBenches () {
+    appApi.createWorkBenchesWindow()
 }
 
 function switchDevtools () {
@@ -295,6 +369,12 @@ function removeFile () {
                         font-size: 12px;
                     }
 
+                    .device .content {
+                        display: flex;
+                        align-items: center;
+                        white-space: nowrap;
+                    }
+
                     .work-area-item {
                         border: 1px solid #e8e8e8;
 
@@ -325,7 +405,7 @@ function removeFile () {
                         }
                     }
 
-                    .work-item+.work-item {
+                    .work-area-item+.work-area-item {
                         margin-top: 20px;
                     }
                 }

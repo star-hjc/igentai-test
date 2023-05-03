@@ -1,6 +1,7 @@
 {
   "globals": {
-    "ElMessageBox":true,
+    "ElMessageBox": true,
+    "ElMessage": true,
     "Component": true,
     "ComponentPublicInstance": true,
     "ComputedRef": true,
@@ -59,6 +60,7 @@
     "watchEffect": true,
     "watchPostEffect": true,
     "watchSyncEffect": true,
-    "appApi":true
+    "appApi": true,
+    "adb": true
   }
 }

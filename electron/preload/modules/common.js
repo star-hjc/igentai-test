@@ -11,6 +11,8 @@ module.exports = {
     getAssetsPath,
     openFileExplorer,
     renameFile,
+    getSerialPortList,
+    createRunCaseWindow,
     createWorkBenchesWindow
 }
 
@@ -46,6 +48,10 @@ function getAssetsPath (suffixPath) {
     return ipcRenderer.invoke('on-getAssetsPath-event', suffixPath)
 }
 
+function getSerialPortList () {
+    return ipcRenderer.invoke('on-getSerialPortList-event')
+}
+
 function openFileExplorer (filePath) {
     ipcRenderer.invoke('on-openFileExplorer-event', filePath)
 }
@@ -54,6 +60,10 @@ function renameFile (filePath, fileNameOrNewPath, move) {
     ipcRenderer.invoke('on-renameFile-event', filePath, fileNameOrNewPath, move)
 }
 
-function createWorkBenchesWindow (option) {
-    ipcRenderer.invoke('on-createWorkBenchesWindow-event', option)
+function createWorkBenchesWindow (data, option) {
+    ipcRenderer.invoke('on-createWorkBenchesWindow-event', data, option)
+}
+
+function createRunCaseWindow (data, option) {
+    ipcRenderer.invoke('on-createRunCaseWindow-event', data, option)
 }

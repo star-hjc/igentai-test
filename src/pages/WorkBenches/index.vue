@@ -1,8 +1,17 @@
 <template>
-    <div class="work">
+    <div class="work" ref="workRef">
         <el-container class="work-container">
             <el-header>
+                <el-popover placement="top-start" title="设备信息" :width="200" trigger="hover">
+                    <template #reference>
+                        <el-button>设备ID</el-button>
+                    </template>
+                    <div>设备ID：{{ '设备id' || 'USB12' }}</div>
+                    <div>连接方式：{{ 'wifi' || 'usb' }}</div>
+                </el-popover>
+                <el-button @click="getScreen">获取屏幕</el-button>
                 <el-button @click="getSelectRow">获取选中行</el-button>
+                <el-button @click="insertText(new Date().toLocaleTimeString(), 'before')">插入“123”文本</el-button>
             </el-header>
             <el-container>
                 <el-aside>
@@ -10,18 +19,21 @@
                         脚本列表
                     </div>
                     <el-scrollbar>
-                        <el-menu>
-                            <MenuItem :menuData="state.menuData" />
-                        </el-menu>
+                        <ApiMenu />
                     </el-scrollbar>
                 </el-aside>
                 <el-main ref="mainRef">
                     <div class="tool">
-
+                        <el-button type="success" title="上一行" :icon="Top" link />
+                        <el-button type="success" title="下一行" :icon="Bottom" link />
+                        <el-button type="danger" title="删除当前选中行" :icon="Close" link />
+                        <el-button type="danger" title="断点" :icon="WarningFilled" link />
+                        <el-divider />
+                        <MoveGuide class="move-guide-line" @move="onAsideRefreshSize" />
                     </div>
                     <div class="code-edit">
                         <el-tabs v-model="activeName" type="border-card">
-                            <el-tab-pane name="first">
+                            <el-tab-pane name="visualization">
                                 <template #label>
                                     <IconLayout>
                                         <template #icon>
@@ -30,8 +42,9 @@
                                         <span>可视化</span>
                                     </IconLayout>
                                 </template>
+                                <Visualization />
                             </el-tab-pane>
-                            <el-tab-pane name="second">
+                            <el-tab-pane name="codemirror">
                                 <template #label>
                                     <IconLayout>
                                         <template #icon>
@@ -41,14 +54,22 @@
                                     </IconLayout>
                                 </template>
                                 <Codemirror ref="codemirrorRef" v-model="code" :tab-size="4" placeholder="请输入..."
-                                    :extensions="extensions" @ready="onCodemirrorload" @focus="onCodeEditChange" autofocus
-                                    indentWithTab />
+                                    :extensions="extensions" @ready="onCodemirrorload" autofocus indentWithTab />
                             </el-tab-pane>
                         </el-tabs>
                         <div class="help">
                             <div v-show="state.moveLine.y" class="move-line"
                                 :style="{ top: `max(${state.moveLine.max} ,${state.moveLine.y}px)` }" />
                             <MoveGuide class="move-guide-line" @afterMove="onHelpRefreshSize" @move="onLinkMove" />
+                            <div class="help-container">
+                                <div class="title">
+                                    <span>帮助</span>
+                                    <el-icon @click="onHelpClose">
+                                        <Close />
+                                    </el-icon>
+                                </div>
+
+                            </div>
                         </div>
                     </div>
                 </el-main>
@@ -58,17 +79,21 @@
 </template>
 
 <script setup>
+import ApiMenu from './ApiMenu.vue'
+import Visualization from './Visualization.vue'
 import { Codemirror } from 'vue-codemirror'
-// import { Text } from '@codemirror/state'
 import { autocompletion } from '@codemirror/autocomplete'
 import { javascript } from '@codemirror/lang-javascript'
 import { oneDark } from '@codemirror/theme-one-dark'
-import { suffixData, prefixData, variableData } from './codeHintConfig'
+import { useRoute } from 'vue-router'
+import { suffixData, prefixData, variableData } from './config'
+import { Close, Top, Bottom, WarningFilled } from '@element-plus/icons-vue'
 const extensions = [javascript(), autocompletion({ override: [getOptions] }), oneDark]
 const mainRef = ref(null)
+const workRef = ref(null)
 const codemirrorRef = ref(null)
 const codemirrorView = shallowRef()
-const activeName = ref('first')
+const activeName = ref('codemirror')
 const code = ref('')
 const state = reactive({
     menuData: [
@@ -83,6 +108,8 @@ const state = reactive({
 })
 
 onMounted(() => {
+    console.log(useRoute().query)
+
     codemirrorRef.value.$el.addEventListener('keydown', ctrlAndS)
 })
 
@@ -90,21 +117,49 @@ onBeforeUnmount(() => {
     codemirrorRef.value.$el.removeEventListener('keydown', ctrlAndS)
 })
 
+function getScreen () {
+
+}
+
 function getSelectRow () {
-    // const state = codemirrorView.value.state
-    // const ranges = state.selection.ranges
-    // console.log(state.doc.line(1))
-    // codemirrorView.value.dispatch({
-    //     changes: {
-    //         from: state.doc.line(2).to,
-    //         insert: new Text(['第一行', '第二行', '第三行'].join('\n') + '\n')
-    //     }
-    // })
-    // const selected = ranges.reduce((r, range) => r + range.to - range.from, 0)
-    // const cursor = ranges[0].anchor
-    // const length = state.doc.length
-    // const lines = state.doc.lines
-    // console.log({ selected, cursor, length, lines })
+    const state = codemirrorView.value.state
+    const ranges = state.selection.ranges
+    const line = state.doc.lineAt(state.selection.main.head).number
+    const selected = ranges.reduce((r, range) => r + range.to - range.from, 0)
+    const cursor = ranges[0].anchor
+    const length = state.doc.length
+    const lines = state.doc.lines
+    console.log(state.doc.line(line))
+    console.log({ selected, cursor, length, lines, line })
+}
+
+function insertText (content = '', type = 'end') {
+    const state = codemirrorView.value.state
+    const line = state.doc.lineAt(state.selection.main.head).number
+    let from = 0
+    let insert = ''
+    switch (type) {
+        case 'before':
+            from = state.doc.line(Math.max(line - 1, 1)).to + (line < 2 ? 0 : 1)
+            insert = `${content}\n`
+            break
+        case 'after':
+            from = state.doc.line(line).to
+            insert = `\n${content}`
+            break
+        case 'begin':
+            from = 0
+            insert = `${content}\n`
+            break
+        /** end */
+        default:
+            from = state.doc.line(state.doc.lines).to
+            insert = `\n${content}`
+            break
+    }
+    codemirrorView.value.dispatch({
+        changes: { from, insert }
+    })
 }
 
 function ctrlAndS (e) {
@@ -113,8 +168,9 @@ function ctrlAndS (e) {
     }
 }
 
-function onCodeEditChange (e) {
-    // console.log(e)
+function onAsideRefreshSize ({ x }) {
+    const workDOM = workRef.value
+    workDOM.style.setProperty('--el-aside-width', `${Math.max(300, x || 0)}px`)
 }
 
 function onHelpRefreshSize ({ begin, end }) {
@@ -128,6 +184,11 @@ function onHelpRefreshSize ({ begin, end }) {
 
 function onLinkMove ({ y }) {
     state.moveLine.y = y
+}
+
+function onHelpClose () {
+    const mainDOM = mainRef.value.$el
+    mainDOM.style.setProperty('--help-height', `85px`)
 }
 
 function onCodemirrorload (payload) {
@@ -171,7 +232,7 @@ function getOptions (context) {
 
     --main-height: calc(100vh - var(--header-height));
 
-    --el-aside-width: 266px;
+    --el-aside-width: 300px;
 
     --menu-container-height: calc(var(--main-height) - var(--el-menu-item-height));
 
@@ -180,6 +241,8 @@ function getOptions (context) {
 
         .el-header {
             height: var(--header-height);
+            display: flex;
+            align-items: center;
         }
 
         .el-aside {
@@ -205,15 +268,43 @@ function getOptions (context) {
             --el-main-padding: 0;
             --help-height: 200px;
             --tool-width: 40px;
-            display: flex;
-
             --code-edit-width: calc(100vw - var(--el-aside-width) - var(--tool-width));
+            display: flex;
 
             .tool {
                 width: var(--tool-width);
                 min-width: var(--tool-width);
                 border-top: 1px solid var(--el-border-color);
                 box-sizing: border-box;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                position: relative;
+
+                .move-guide-line {
+                    box-sizing: border-box;
+                    position: absolute;
+                    left: 0;
+                    top: 0;
+                    width: 5px;
+                    height: 100%;
+                    cursor: url('@/assets/img/cursor/left-right.cur'), e-resize;
+                }
+
+                .el-button {
+                    font-size: 19px;
+                    width: 100%;
+                    height: var(--tool-width);
+                }
+
+                .el-button+.el-button {
+                    margin-left: 0;
+                }
+
+                .el-divider--horizontal {
+                    width: 66%;
+                    margin: 5px auto;
+                }
             }
 
             .code-edit {
@@ -225,11 +316,17 @@ function getOptions (context) {
 
                     .el-tabs__content {
                         --tabs-content-padding: 1px;
+                        --tabs-content-height: calc(var(--tabs-height) - var(--el-tabs-header-height) - 2 * var(--tabs-content-padding));
+                        height: var(--tabs-content-height);
                         padding: var(--tabs-content-padding);
+
+                        .el-tab-pane {
+                            height: var(--tabs-content-height);
+                        }
 
                         .cm-editor {
                             outline: none;
-                            height: calc(var(--tabs-height) - var(--el-tabs-header-height) - 2 * var(--tabs-content-padding));
+                            height: var(--tabs-content-height);
                         }
                     }
                 }
@@ -242,6 +339,24 @@ function getOptions (context) {
                     border-bottom: none;
                     box-sizing: border-box;
                     padding-top: 5px;
+
+                    .help-container {
+                        user-select: none;
+                        height: calc(var(--help-height) - 5px);
+
+                        .title {
+                            padding: 0 10px;
+                            background: var(--el-border-color);
+                            display: flex;
+                            align-items: center;
+                            justify-content: space-between;
+
+                            .el-icon {
+                                cursor: url('@/assets/img/cursor/link-select.cur'), pointer;
+                                color: var(--el-color-danger);
+                            }
+                        }
+                    }
 
                     .move-line {
                         position: fixed;

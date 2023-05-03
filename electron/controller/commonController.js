@@ -1,4 +1,6 @@
 const path = require('path')
+const { SerialPort } = require('serialport')
+const querystring = require('querystring')
 const { ipcMain, BrowserWindow, shell } = require('electron')
 const { loadURL, assetsPath } = require('../main/config')
 const { readdirAllSync, renameFileSync, createFileSync, createFolderSync, removeFileSync, openFileExplorerSync } = require('../utils/flie.js')
@@ -12,8 +14,10 @@ module.exports = {
     removeFile,
     createFolder,
     getAssetsPath,
+    getSerialPortList,
     switchDevtools,
     openFileExplorer,
+    createRunCaseWindow,
     createWorkBenchesWindow
 }
 
@@ -91,10 +95,16 @@ function renameFile () {
         renameFileSync(filePath, fileNameOrNewPath, move)
     })
 }
+/** 获取串口 */
+function getSerialPortList () {
+    ipcMain.handle('on-getSerialPortList-event', async (event) => {
+        return SerialPort.list()
+    })
+}
 
-/** 创建新的Windows窗口 */
+/** 打开代码编辑工作台 */
 function createWorkBenchesWindow () {
-    ipcMain.handle('on-createWorkBenchesWindow-event', (event, option = {}) => {
+    ipcMain.handle('on-createWorkBenchesWindow-event', (event, data = {}, option = {}) => {
         const workWin = new BrowserWindow({
             autoHideMenuBar: true,
             resizable: true,
@@ -104,7 +114,29 @@ function createWorkBenchesWindow () {
             },
             ...option
         })
-        workWin.loadURL(`${loadURL}#work`)
+        /** 最大化 */
+        workWin.maximize()
+
+        workWin.loadURL(`${loadURL}#/work?${querystring.stringify(data)}`)
+        workWin.webContents.openDevTools()
+    })
+}
+
+/** 打开运行案例窗口 */
+function createRunCaseWindow () {
+    ipcMain.handle('on-createRunCaseWindow-event', (event, data = {}, option = {}) => {
+        const workWin = new BrowserWindow({
+            autoHideMenuBar: true,
+            resizable: true,
+            width: 200,
+            height: 100,
+            webPreferences: {
+                preload: path.join(__dirname, '../preload/workBenchesPreload.js'),
+                nodeIntegration: true
+            },
+            ...option
+        })
+        workWin.loadURL(`${loadURL}#/run?${querystring.stringify(data)}`)
         workWin.webContents.openDevTools()
     })
 }
