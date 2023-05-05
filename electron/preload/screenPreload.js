@@ -1,10 +1,9 @@
-const { contextBridge, ipcRenderer } = require('electron')
+const { contextBridge } = require('electron')
 const common = require('./modules/common')
 const adb = require('./modules/adb')
 
 contextBridge.exposeInMainWorld('appApi', {
-    ...common,
-    ipcRenderer: { ...ipcRenderer, on: ipcRenderer.on.bind(ipcRenderer) }
+    ...common
 })
 
 contextBridge.exposeInMainWorld('adb', {

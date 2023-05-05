@@ -2,19 +2,24 @@ const path = require('path')
 const { app } = require('electron')
 
 const isPackaged = app.isPackaged
-
+const assetsPath = path.join(process.cwd(), `${isPackaged ? '/resources' : '/electron'}/assets`)
 module.exports = {
     /** 静态文件地址 */
-    assetsPath: path.join(process.cwd(), `${isPackaged ? '/resources' : '/electron'}/assets`),
+    assetsPath,
     /** 渲染文件入口 */
     loadURL: isPackaged ? `file://${path.join(__dirname, '../../dist/index.html')}` : `http://127.0.0.1:${process.argv.at(-1)}`,
     /** 环境 */
     env: {
-        flie: ['atx-agent', 'minicap', 'minicap.so'],
+        // 'atx-agent', 'minicap', 'minicap.so'
+        files: [
+            { name: 'atx-agent', path: path.join(assetsPath, 'package', 'atx-agent') },
+            { name: 'minicap', path: path.join(assetsPath, 'package', 'minicap') },
+            { name: 'minicap.so', path: path.join(assetsPath, 'package', 'minicap.so') }
+        ],
         packages: [
-            { name: 'app-uiautomator.apk', package: 'com.github.uiautomator' },
-            { name: 'app-uiautomator-test.apk', package: 'com.github.uiautomator.test' },
-            { name: 'ADBKeyboard.apk', package: 'package:com.android.adbkeyboard' }
+            { path: path.join(assetsPath, 'package', 'app-uiautomator.apk'), package: 'com.github.uiautomator', name: 'app-uiautomator.apk' },
+            { path: path.join(assetsPath, 'package', 'app-uiautomator-test.apk'), package: 'com.github.uiautomator.test', name: 'app-uiautomator-test.apk' },
+            { path: path.join(assetsPath, 'package', 'ADBKeyboard.apk'), package: 'package:com.android.adbkeyboard', name: 'ADBKeyboard.apk' }
         ]
     }
 }

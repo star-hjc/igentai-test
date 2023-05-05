@@ -1,0 +1,2 @@
+^C
+130|console:/ $ input tap 10 10

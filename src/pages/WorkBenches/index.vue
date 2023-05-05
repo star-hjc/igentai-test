@@ -2,12 +2,16 @@
     <div class="work" ref="workRef">
         <el-container class="work-container">
             <el-header>
-                <el-popover placement="top-start" title="设备信息" :width="200" trigger="hover">
+                <el-popover placement="top-start" title="设备信息" :width="215" trigger="hover">
                     <template #reference>
-                        <el-button>设备ID</el-button>
+                        <el-button>设备信息</el-button>
                     </template>
-                    <div>设备ID：{{ '设备id' || 'USB12' }}</div>
-                    <div>连接方式：{{ 'wifi' || 'usb' }}</div>
+                    <div v-if="state.query.method">
+                        <span>连接方式：</span>
+                        <span style="color:#409eff">{{ state.query.methodName }}</span>
+                    </div>
+                    <div>设备ID：{{ state.query.id || state.query.path }}</div>
+                    <div v-if="state.query.path">波特率：{{ state.query.baudRate }}</div>
                 </el-popover>
                 <el-button @click="getScreen">获取屏幕</el-button>
                 <el-button @click="getSelectRow">获取选中行</el-button>
@@ -16,7 +20,7 @@
             <el-container>
                 <el-aside>
                     <div class="menu-header">
-                        脚本列表
+                        命令列表
                     </div>
                     <el-scrollbar>
                         <ApiMenu />
@@ -101,6 +105,14 @@ const state = reactive({
 
         }
     ],
+    query: {
+        baudRate: undefined,
+        filePath: '',
+        methodName: '',
+        method: '',
+        id: '',
+        path: ''
+    },
     moveLine: {
         y: undefined,
         max: 'calc(var(--header-height) + 45px)'
@@ -108,7 +120,8 @@ const state = reactive({
 })
 
 onMounted(() => {
-    console.log(useRoute().query)
+    const query = useRoute().query || {}
+    state.query = { ...query, baudRate: parseInt(query.baudRate || 0) }
 
     codemirrorRef.value.$el.addEventListener('keydown', ctrlAndS)
 })
@@ -118,7 +131,7 @@ onBeforeUnmount(() => {
 })
 
 function getScreen () {
-
+    appApi.createGetScreenWindow({ ...state.query })
 }
 
 function getSelectRow () {

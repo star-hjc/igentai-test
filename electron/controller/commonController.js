@@ -2,8 +2,18 @@ const path = require('path')
 const { SerialPort } = require('serialport')
 const querystring = require('querystring')
 const { ipcMain, BrowserWindow, shell } = require('electron')
+const { exec } = require('../utils/command')
 const { loadURL, assetsPath } = require('../main/config')
-const { readdirAllSync, renameFileSync, createFileSync, createFolderSync, removeFileSync, openFileExplorerSync } = require('../utils/flie.js')
+const request = require('../utils/request')
+
+const {
+    readdirAllSync,
+    renameFileSync,
+    createFileSync,
+    createFolderSync,
+    removeFileSync,
+    openFileExplorerSync
+} = require('../utils/file')
 
 module.exports = {
     renameFile,
@@ -12,12 +22,16 @@ module.exports = {
     readdirCase,
     openBrowser,
     removeFile,
+    getIpInfo,
+    getLocalIPv4,
     createFolder,
     getAssetsPath,
+    killServerByPname,
     getSerialPortList,
     switchDevtools,
     openFileExplorer,
     createRunCaseWindow,
+    createGetScreenWindow,
     createWorkBenchesWindow
 }
 
@@ -89,6 +103,33 @@ function openFileExplorer () {
     })
 }
 
+/** 获取本机IPv4地址 */
+function getLocalIPv4 () {
+    ipcMain.handle('on-getLocalIPv4-event', async (event) => {
+        const ipStr = await exec('ipconfig | findstr IPv4') || ''
+        if (!ipStr) return []
+        return ipStr.trim()?.split('\n')?.map(v => v.split(':')[1]) || []
+    })
+}
+
+/** 获取本机网络根ip信息 */
+function getIpInfo () {
+    ipcMain.handle('on-getIpInfo-event', async (event) => {
+        return (await request.get('https://www.cz88.net/api/cz88/ip/base?ip='))?.data
+    })
+}
+
+/** 根据进程名称停止服务 默认获取adb.exe */
+function killServerByPname () {
+    ipcMain.handle('on-killServerByPname-event', async (event, pName = 'adb.exe') => {
+        const pidStr = await exec(`tasklist  | findstr /i "${pName}"`) || ''
+        if (!pidStr) return []
+        const pids = pidStr.trim()?.split('\n')?.map(v => `/pid ${v.split(/\s+/)[1]}`) || []
+        await exec(`taskkill ${pids.join(' ')} /f`)
+        return pids
+    })
+}
+
 /** 移动或重命名文件 */
 function renameFile () {
     ipcMain.handle('on-renameFile-event', (event, filePath, fileNameOrNewPath, move) => {
@@ -116,8 +157,8 @@ function createWorkBenchesWindow () {
         })
         /** 最大化 */
         workWin.maximize()
-
         workWin.loadURL(`${loadURL}#/work?${querystring.stringify(data)}`)
+        workWin.setTitle('工作台')
         workWin.webContents.openDevTools()
     })
 }
@@ -125,7 +166,7 @@ function createWorkBenchesWindow () {
 /** 打开运行案例窗口 */
 function createRunCaseWindow () {
     ipcMain.handle('on-createRunCaseWindow-event', (event, data = {}, option = {}) => {
-        const workWin = new BrowserWindow({
+        const runWin = new BrowserWindow({
             autoHideMenuBar: true,
             resizable: true,
             width: 200,
@@ -136,7 +177,27 @@ function createRunCaseWindow () {
             },
             ...option
         })
-        workWin.loadURL(`${loadURL}#/run?${querystring.stringify(data)}`)
-        workWin.webContents.openDevTools()
+        runWin.loadURL(`${loadURL}#/run?${querystring.stringify(data)}`)
+        runWin.webContents.openDevTools()
+        runWin.setTitle('运行')
+    })
+}
+
+/** 打开设备屏幕窗口 */
+function createGetScreenWindow () {
+    ipcMain.handle('on-createGetScreenWindow-event', (event, data = {}, option = {}) => {
+        const screenWin = new BrowserWindow({
+            autoHideMenuBar: true,
+            resizable: true,
+            width: 960,
+            height: 640,
+            webPreferences: {
+                preload: path.join(__dirname, '../preload/screenPreload.js'),
+                nodeIntegration: true
+            },
+            ...option
+        })
+        screenWin.loadURL(`${loadURL}#/screen?${querystring.stringify(data)}`)
+        screenWin.setTitle('设备屏幕')
     })
 }

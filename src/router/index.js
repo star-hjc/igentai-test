@@ -17,6 +17,11 @@ const router = createRouter({
             path: '/run',
             name: 'runcase',
             component: () => import('../pages/RunCase/index.vue')
+        },
+        {
+            path: '/screen',
+            name: 'screen',
+            component: () => import('../pages/ScreenPage/index.vue')
         }
     ]
 })

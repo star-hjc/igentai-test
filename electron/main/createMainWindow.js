@@ -14,6 +14,7 @@ module.exports = function createWindow () {
     win.id = 'main-win'
     /** 最大化 */
     win.maximize()
+    win.setTitle('IGENTAI-TEST')
     /** 开发者工具 */
     win.webContents.openDevTools()
     win.loadURL(loadURL)

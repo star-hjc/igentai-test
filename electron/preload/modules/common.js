@@ -6,13 +6,17 @@ module.exports = {
     readdirCase,
     switchDevtools,
     createFile,
+    getIpInfo,
+    getLocalIPv4,
     createFolder,
     removeFile,
     getAssetsPath,
     openFileExplorer,
     renameFile,
+    killServerByPname,
     getSerialPortList,
     createRunCaseWindow,
+    createGetScreenWindow,
     createWorkBenchesWindow
 }
 
@@ -52,8 +56,20 @@ function getSerialPortList () {
     return ipcRenderer.invoke('on-getSerialPortList-event')
 }
 
+function killServerByPname (pName) {
+    return ipcRenderer.invoke('on-killServerByPname-event', pName)
+}
+
 function openFileExplorer (filePath) {
     ipcRenderer.invoke('on-openFileExplorer-event', filePath)
+}
+
+function getIpInfo () {
+    return ipcRenderer.invoke('on-getIpInfo-event')
+}
+
+function getLocalIPv4 () {
+    return ipcRenderer.invoke('on-getLocalIPv4-event')
 }
 
 function renameFile (filePath, fileNameOrNewPath, move) {
@@ -66,4 +82,8 @@ function createWorkBenchesWindow (data, option) {
 
 function createRunCaseWindow (data, option) {
     ipcRenderer.invoke('on-createRunCaseWindow-event', data, option)
+}
+
+function createGetScreenWindow (data, option) {
+    ipcRenderer.invoke('on-createGetScreenWindow-event', data, option)
 }

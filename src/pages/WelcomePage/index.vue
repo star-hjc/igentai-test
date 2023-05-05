@@ -2,7 +2,7 @@
     <div class="welcome" @click="onCloseRightClickMenu">
         <el-container class="welcome-container">
             <el-header height="var(--header-height)">
-                <div class="tool">
+                <div class="tool" @click="onRefresh">
                     <el-icon size="45">
                         <House />
                     </el-icon>
@@ -36,8 +36,9 @@
                                 <RightClickMenuItem label="新建脚本文件夹" @click="createFolder" />
                                 <RightClickMenuItem label="在文件资源管理器中显示" @click="openFileExplorer()" />
                                 <RightClickMenuItemGroup />
-                                <RightClickMenuItem label="重命名" @click="renameFile" />
-                                <RightClickMenuItem label="删除" @click="removeFile" />
+                                <RightClickMenuItem label="刷新" @click="onRefresh" />
+                                <RightClickMenuItem label="重命名" @click="onRenameFile" />
+                                <RightClickMenuItem label="删除" @click="onRemoveFile" />
                             </RightClickMenu>
                         </el-menu>
                     </el-scrollbar>
@@ -64,45 +65,124 @@
                                 </div>
                             </div>
 
+                            <div class="local work-area-item">
+                                <div class="title">
+                                    <span class="top">本机：</span>
+                                    <el-button @click="getLocalIPv4">刷新</el-button>
+                                </div>
+                                <div class="content">
+                                    <div class="content-item">
+                                        <span>本机IPv4：</span>
+                                        <span> {{ state.ipv4?.join(' , ') }}</span>
+                                    </div>
+                                    <div v-if="state.ipInfo.ip" class="content-item">
+                                        <span>网络根IPv4：</span>
+                                        <span> {{ state.ipInfo.ip }}</span>
+                                    </div>
+                                    <div v-if="state.ipInfo.actionAddress?.length" class="content-item">
+                                        <span>所在地：</span>
+                                        <span> {{ state.ipInfo.actionAddress?.join(' , ') }}</span>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="device work-area-item">
-                                <div class="title"><span class="top">设备区</span></div>
+                                <div class="title">
+                                    <span class="top">设备：</span>
+                                    <el-button v-if="state.device.id || state.device.path"
+                                        @click="onLinkTest">测试连接</el-button>
+                                </div>
                                 <el-radio-group v-model="state.connectionMethod" @change="onSwitchConnectionMethod"
                                     style="margin: 15px 0 0 15px;">
-                                    <el-radio-button label="usb">USB</el-radio-button>
-                                    <el-radio-button label="wifi">WIFI</el-radio-button>
+                                    <el-radio-button label="adb">ADB</el-radio-button>
                                     <el-radio-button label="serialport">SerialPort</el-radio-button>
                                 </el-radio-group>
                                 <div class="content">
-                                    <span v-show="['usb', 'wifi'].includes(state.connectionMethod)">设备：</span>
-                                    <span v-show="state.connectionMethod === 'serialport'">串口：</span>
-                                    <el-select v-model="state.device"
-                                        :placeholder="state.connectionMethod === 'serialport' ? '选择串口...' : '选择设备...'">
-                                        <el-option v-for="item in state.deviceList" :key="item.device_id"
-                                            :value="item.device_id">
-                                            <div style="display: flex;justify-content: space-between;gap: 20px;">
-                                                <span>{{ item.device_id }}</span>
-                                                <span style=" color: var(--el-text-color-secondary);">
-                                                    {{ item.device }}
-                                                </span>
-                                            </div>
-                                        </el-option>
-                                    </el-select>
-                                    <span v-show="state.connectionMethod === 'serialport'"
-                                        style="margin-left: 20px;">波特率：</span>
-                                    <el-select v-show="state.connectionMethod === 'serialport'" v-model="state.baudRate"
-                                        placeholder="选择波特率...">
-                                        <el-option v-for="item in state.baudRateList" :key="item" :label="item"
-                                            :value="item" />
-                                    </el-select>
+                                    <div class="content-item" style="color: #E6A23C;"
+                                        v-show="state.connectionMethod === 'serialport'">(不建议使用)</div>
+                                    <div class="content-item">
+                                        <div v-show="state.connectionMethod === 'serialport'">
+                                            <span>串口：</span>
+                                            <el-select v-model="state.device.path" placeholder="选择串口..."
+                                                @visibleChange="onPathChange" :loading="serialPortListLoading"
+                                                loadingText="加载中..." @change="onSelectDevice($event, 'serialport')">
+                                                <el-option v-for="item in state.serialPortList" :key="item.path"
+                                                    :value="item.path" />
+                                            </el-select>
+                                        </div>
+                                        <div v-show="state.connectionMethod === 'serialport'">
+                                            <span style="margin-left: 20px;">波特率：</span>
+                                            <el-select v-model="state.device.baudRate" placeholder="选择波特率...">
+                                                <el-option v-for="item in state.baudRateList" :key="item" :value="item" />
+                                            </el-select>
+                                        </div>
+                                        <div v-show="state.connectionMethod === 'adb'">
+                                            <span>设备：</span>
+                                            <el-select v-model="state.device.id" placeholder="选择设备..."
+                                                @visibleChange="onDeviceIdChange" :loading="deviceListLoading"
+                                                loadingText="加载中..." @change="onSelectDevice($event, 'adb')">
+                                                <el-option v-for="item in state.deviceList" :key="item.device_id"
+                                                    :value="item.device_id">
+                                                    <div style="display: flex;justify-content: space-between;gap: 20px;">
+                                                        <span>{{ item.device_id }}</span>
+                                                        <span style="color: var(--el-text-color-secondary);">
+                                                            {{ item.device }}
+                                                        </span>
+                                                    </div>
+                                                </el-option>
+                                            </el-select>
+                                        </div>
+                                        <div v-show="state.connectionMethod === 'adb'">
+                                            <el-input style="margin-left: 20px;" v-model="state.device.port"
+                                                placeholder="输入端口..." :disabled="state.device.method === 'wifi'">
+                                                <template #prepend>服务端口：</template>
+                                            </el-input>
+                                        </div>
+                                    </div>
+                                    <div class="content-item" v-if="state.initNotExistFile.packages?.length">
+                                        <div> 未安装的包：</div>
+                                        <div>
+                                            <el-tag v-for="item in state.initNotExistFile?.packages" :key="item">
+                                                {{ item }}
+                                            </el-tag>
+                                        </div>
+                                    </div>
+                                    <div class="content-item" v-if="state.initNotExistFile.files?.length">
+                                        <div> 未安装的二进制文件：</div>
+                                        <div>
+                                            <el-tag v-for="item in state.initNotExistFile.files" :key="item">
+                                                {{ item }}
+                                            </el-tag>
+                                        </div>
+                                    </div>
+                                    <div class="content-item"
+                                        v-if="state.initNotExistFile.packages?.length || state.initNotExistFile.files?.length">
+                                        <el-button type="primary" @click="installInitExistFile">补入安装</el-button>
+                                    </div>
                                 </div>
                             </div>
 
                             <div class="fun work-area-item">
-                                <div class="title"><span class="top">功能区</span></div>
+                                <div class="title"><span class="top">功能：</span></div>
                                 <div class="content">
-                                    <el-button>运行</el-button>
-                                    <el-button @click="openWorkBenches">编写</el-button>
-                                    <el-button type="danger" @click="removeFile">删除</el-button>
+                                    <div class="content-item">
+                                        <el-button>运行</el-button>
+                                        <el-button @click="openWorkBenches">编写</el-button>
+                                        <el-button type="danger" @click="onRemoveFile">删除</el-button>
+                                    </div>
+                                    <div class="content-item">
+                                        <el-input class="wifi-port" v-model="state.wifiPort" placeholder="输入端口...">
+                                            <template #prepend>端口：</template>
+                                            <template #append>
+                                                <el-button type="primary" @click="onSwitchWiFiADB">切换WIFI-ADB</el-button>
+                                            </template>
+                                        </el-input>
+                                    </div>
+
+                                    <div class="content-item">
+                                        <el-button type="warning" @click="onKillADB">停止当前ADB服务</el-button>
+                                        <el-button type="warning" @click="onKillADB(true)">停止所有ADB服务</el-button>
+                                    </div>
                                 </div>
                             </div>
                             <!-- 判断是否运行 -->
@@ -122,20 +202,26 @@
 
 <script setup>
 import { Delete } from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'
 const RightClickMenuRef = ref(null)
+const serialPortListLoading = ref(false)
+const deviceListLoading = ref(false)
 const state = reactive({
     menuData: [],
-    /** usb,wifi,serialport */
-    connectionMethod: 'usb',
-    device: '',
+    /** adb,serialport */
+    connectionMethod: 'adb',
+    device: { id: '', path: '', ip: '', port: 6666, method: '', methodName: '', baudRate: 115200 },
+    wifiPort: 8848,
+    ipv4: [],
+    ipInfo: {},
     deviceList: [],
-    baudRate: 115200,
-    baudRateList: [110, 300, 600, 1200, 2400, 4800, 9600, 14400, 19200, 38400, 57600, 115200, 128000, 256000],
+    serialPortList: [],
+    baudRateList: [110, 300, 600, 1200, 2400, 4800, 9600, 14400, 19200, 38400, 57600, 115200, 128000, 256000, 921600],
     rightClickMenu: {
         isShow: false,
         position: []
     },
-
+    initNotExistFile: {},
     file: null,
     caseBasePath: '',
     rightFile: null
@@ -145,7 +231,36 @@ onMounted(async () => {
     state.caseBasePath = await appApi.getAssetsPath('case')
     getCase()
     getDeviceList()
+    getLocalIPv4()
 })
+
+async function getIpInfo () {
+    await appApi.getIpInfo().then(data => {
+        state.ipInfo = data
+    })
+}
+
+async function onLinkTest () {
+    ElMessage.success('连接中...')
+    const device = { ...state.device }
+    await adb.startATXService(device)
+    adb.getAtxVersion(device).then(() => {
+        ElMessage.success('连接成功...')
+    }).catch(() => {
+        ElMessage.error('连接失败...')
+    })
+}
+
+function onRefresh () {
+    location.reload()
+}
+
+async function getLocalIPv4 () {
+    await appApi.getLocalIPv4().then(data => {
+        state.ipv4 = data
+    })
+    getIpInfo()
+}
 
 async function getCase () {
     await appApi.readdirCase().then(data => {
@@ -155,8 +270,7 @@ async function getCase () {
 
 async function getSerialPortList () {
     await appApi.getSerialPortList().then(data => {
-        console.log(data)
-        state.deviceList = data
+        state.serialPortList = data
     }).catch(() => {
         ElMessage.error('获取串口失败.')
     })
@@ -173,6 +287,18 @@ async function getDeviceList () {
 function onCloseRightClickMenu () {
     state.rightClickMenu.isShow = false
 }
+async function onSwitchWiFiADB () {
+    const device = { ...state.device }
+    if (!device.id) return ElMessage.warning('请选择设备ID...')
+    const { inetaddr } = (await adb.getWiFiIP(device)) || {}
+    if (!inetaddr) return ElMessage.warning('获取设备IP失败，请检测设备是否连接WIFI...')
+    // if (state.ipv4.indexOf(inetaddr) === -1) return ElMessage.warning(`请检测与设备是否连接同一个WiFi，当前设备IPv4：${inetaddr}`)
+    const success = await adb.switchWiFiADB(device, `${inetaddr}:${state.wifiPort}`)
+    if (success) {
+        ElMessage.success('切换wifiADB成功')
+        getDeviceList()
+    }
+}
 
 function onRightClickMenu (e, item) {
     state.rightFile = item
@@ -185,26 +311,31 @@ function onRightClickMenu (e, item) {
 }
 
 function onSwitchConnectionMethod (val) {
-    if (['usb', 'wifi'].includes(val)) {
+    if (val === 'adb') {
+        state.device.path = ''
         getDeviceList()
     }
     if (val === 'serialport') {
+        state.device.id = ''
         getSerialPortList()
     }
 }
 
 function onClickFile (e, item) {
     state.file = item
-    if (['usb', 'wifi'].includes(state.connectionMethod)) {
+    if (state.connectionMethod === 'adb') {
+        state.path = ''
         getDeviceList()
     }
     if (state.connectionMethod === 'serialport') {
+        state.device.id = ''
         getSerialPortList()
     }
 }
 
 function openWorkBenches () {
-    appApi.createWorkBenchesWindow()
+    if (!state.device.id && !state.device.path) return ElMessage.warning('请选择连接的设备...')
+    appApi.createWorkBenchesWindow({ ...state.device, filePath: state.file.path })
 }
 
 function switchDevtools () {
@@ -242,7 +373,18 @@ function createFolder () {
         })
         .catch(() => { })
 }
-function renameFile () {
+
+async function onKillADB (all = false) {
+    ElMessage.success('重启ADB服务中...')
+    if (all) {
+        await appApi.killServerByPname()
+    } else {
+        await adb.killServer()
+    }
+    ElMessage.success('重启ADB服务成功.')
+}
+
+function onRenameFile () {
     ElMessageBox.prompt(
         `输入新的名称`,
         `重命名`, {
@@ -257,7 +399,7 @@ function renameFile () {
         .catch(() => { })
 }
 
-function removeFile () {
+function onRemoveFile () {
     ElMessageBox.confirm(
         '确定删除该文件?',
         '删除',
@@ -289,6 +431,57 @@ function removeFile () {
             getCase()
         }
     }).catch(() => { })
+}
+
+async function onPathChange (show) {
+    if (show) {
+        serialPortListLoading.value = true
+        await getSerialPortList()
+        serialPortListLoading.value = false
+    }
+}
+
+async function onDeviceIdChange (show) {
+    if (show) {
+        deviceListLoading.value = true
+        await getDeviceList()
+        deviceListLoading.value = false
+    }
+}
+
+async function installInitExistFile () {
+    ElMessage.success('补入安装中...')
+    const { device, initNotExistFile } = state
+    const packages = [...(initNotExistFile.packages || [])]
+    const files = [...(initNotExistFile.files || [])]
+
+    await adb.installInitExistFile({ ...device }, { packages, files })
+    adb.getInitNotExistFile({ ...state.device }).then(data => {
+        state.initNotExistFile = data
+        ElMessage.success('安装成功...')
+    }).catch(() => {
+        ElMessage.error('安装失败...')
+    })
+}
+
+function onSelectDevice (val, method) {
+    if (method === 'adb') {
+        adb.getInitNotExistFile({ ...state.device }).then(data => {
+            state.initNotExistFile = data
+        })
+        if (/^\s*\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b:\d{1,5}\s*$/.test(val)) {
+            state.device.methodName = 'WIFI'
+            state.device.method = 'wifi'
+            state.device.ip = state.device.id.split(':')[0]
+            state.device.port = '7912'
+            return
+        }
+        state.device.methodName = 'USB'
+        state.device.method = 'usb'
+        return
+    }
+    state.device.methodName = '串口'
+    state.device.method = method
 }
 </script>
 
@@ -365,14 +558,72 @@ function removeFile () {
                     padding-right: var(--el-main-padding);
                     height: calc(var(--main-height) - 2 * var(--el-main-padding));
 
-                    .info .content {
+                    .info .content,
+                    .local .content {
                         font-size: 12px;
                     }
 
                     .device .content {
-                        display: flex;
-                        align-items: center;
-                        white-space: nowrap;
+                        .content-item {
+                            display: flex;
+                            align-items: center;
+                            white-space: nowrap;
+                        }
+                    }
+
+                    .fun .content {
+                        .content-item {
+                            display: flex;
+                            gap: 15px;
+
+                            .wifi-port {
+                                width: 270px;
+                                min-width: 270px;
+
+                                :deep(.el-input-group__prepend) {
+                                    color: #ffffff;
+                                    background-color: #409eff;
+                                }
+
+                                .el-button {
+                                    display: inline-flex;
+                                    justify-content: center;
+                                    align-items: center;
+                                    line-height: 1;
+                                    height: 32px;
+                                    white-space: nowrap;
+                                    cursor: pointer;
+                                    color: var(--el-button-text-color);
+                                    text-align: center;
+                                    box-sizing: border-box;
+                                    outline: 0;
+                                    transition: .1s;
+                                    font-weight: var(--el-button-font-weight);
+                                    -webkit-user-select: none;
+                                    -moz-user-select: none;
+                                    -ms-user-select: none;
+                                    user-select: none;
+                                    vertical-align: middle;
+                                    -webkit-appearance: none;
+                                    background-color: var(--el-button-bg-color);
+                                    border: var(--el-border);
+                                    border-color: var(--el-button-border-color);
+                                    padding: 8px 15px;
+                                    font-size: var(--el-font-size-base);
+                                    border-radius: var(--el-border-radius-base);
+                                    border-top-left-radius: 0;
+                                    border-bottom-left-radius: 0;
+                                }
+
+                                .el-button:focus,
+                                .el-button:hover {
+                                    color: var(--el-button-hover-text-color);
+                                    border-color: var(--el-button-hover-border-color);
+                                    background-color: var(--el-button-hover-bg-color);
+                                    outline: 0;
+                                }
+                            }
+                        }
                     }
 
                     .work-area-item {
@@ -385,7 +636,8 @@ function removeFile () {
 
                         .title {
                             height: 36px;
-                            line-height: 36px;
+                            display: flex;
+                            align-items: center;
                             font-weight: bold;
                             border-left: 3px solid var(--el-color-primary);
                             padding: 0 20px;
@@ -407,6 +659,10 @@ function removeFile () {
 
                     .work-area-item+.work-area-item {
                         margin-top: 20px;
+                    }
+
+                    .el-button+.el-button {
+                        margin: 0;
                     }
                 }
             }

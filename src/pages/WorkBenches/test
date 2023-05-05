@@ -1,0 +1,94 @@
+要在 CodeMirror View 中删除一行，可以使用以下步骤：
+
+获取当前光标所在行的行号。
+
+javascript
+var cursorPos = view.state.selection.main.head; // 获取当前光标位置
+var lineNum = view.state.doc.lineAt(cursorPos).number; // 获取当前行号
+将光标移动到下一行或上一行。
+
+如果要删除当前行，请将光标移动到下一行。如果要删除上一行，请将光标移动到上一行。
+
+javascript
+var nextLine = lineNum + 1; // 当前行后面一行
+var prevLine = lineNum - 2; // 当前行前面一行
+
+// 移动光标到下一行
+view.dispatch(view.state.update({selection: {anchor: nextLine, head: nextLine}}));
+
+// 移动光标到上一行
+view.dispatch(view.state.update({selection: {anchor: prevLine, head: prevLine}}));
+使用 view.dispatch 方法删除行。
+
+javascript
+var lineStart = view.state.doc.line(lineNum).from; // 获取当前行的起始位置
+var lineEnd = view.state.doc.line(lineNum).to; // 获取当前行的结束位置
+var tr = view.state.update({ changes: { from: lineStart, to: lineEnd, insert: "" } }); // 删除当前行
+view.dispatch(tr);
+请注意，这里使用了一个 Transaction 对象来更新文档状态。你需要创建一个新的 Transaction 对象，并在其中设置要应用于文档的更改。
+
+完整代码示例：
+
+javascript
+var cursorPos = view.state.selection.main.head; // 获取当前光标位置
+var lineNum = view.state.doc.lineAt(cursorPos).number; // 获取当前行号
+
+var nextLine = lineNum + 1; // 当前行后面一行
+var prevLine = lineNum - 2; // 当前行前面一行
+
+// 移动光标到下一行
+view.dispatch(view.state.update({selection: {anchor: nextLine, head: nextLine}}));
+
+// 或者，移动光标到上一行
+// view.dispatch(view.state.update({selection: {anchor: prevLine, head: prevLine}}));
+
+var lineStart = view.state.doc.line(lineNum).from; // 获取当前行的起始位置
+var lineEnd = view.state.doc.line(lineNum).to; // 获取当前行的结束位置
+var tr = view.state.update({ changes: { from: lineStart, to: lineEnd, insert: "" } }); // 删除当前行
+view.dispatch(tr);
+
+
+
+2023/5/3 03:33:56
+
+codemirrorView 移动光标
+
+2023/5/3 03:33:56
+
+Network Error
+
+
+
+
+2023/5/3 03:34:15
+
+codemirrorView 移动光标
+
+2023/5/3 03:34:26
+
+要在CodeMirror编辑器中移动光标，您可以使用以下命令：
+
+editor.setCursor(line, ch): 将光标移到给定的行和字符处。例如，editor.setCursor(2, 4)将光标移到第2行，第4个字符处。
+
+editor.setCursor({line, ch}): 使用包含行号和字符数的对象作为参数来设置光标位置。例如，editor.setCursor({line: 2, ch: 4})将光标移到第2行，第4个字符处。
+
+editor.setCursor(pos): 使用Position对象作为参数来设置光标位置。例如，`editor.setCursor({line
+
+
+
+
+2023/5/3 03:34:46
+
+view.state codemirrorView 移动光标
+
+2023/5/3 03:35:23
+
+在使用 view.state 对象的情况下，要在 CodeMirror 编辑器中移动光标，您可以使用以下命令：
+
+使用 view.dispatch(view.state.update({selection: Selection.near(view.state.doc.resolve(position))})) 来将光标移动到指定位置。其中 position 是一个整数值，表示您想要将光标移动到的字符位置。
+
+使用 view.dispatch(view.state.update({selection: new Selection(from, to)})) 来设置选择区域。其中 from 和 to 都是包含行号和字符位置信息的对象，例如 {line: 0, ch: 4} 表示第一行第五个字符。
+
+如果您只是想移动光标而不更改选择区域，请使用 view.dispatch(view.state.update({selection: Selection.cursor(pos)}))，其中 pos 表示您想要将光标移动到的位置。
+
+请注意，以上方法中都使用了 view.dispatch() 方法来触发更新。这是因为在使用 view.state 对象时，必须通过调用该方法来执行任何更改。

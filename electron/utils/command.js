@@ -54,7 +54,6 @@ async function spawn (command, args, options) {
 async function shell (command, args, options) {
     return new Promise((resolve, reject) => {
         const childProcess = cp.spawn(command, args, options)
-
         let stdout = ''
         let stderr = ''
 
@@ -69,7 +68,7 @@ async function shell (command, args, options) {
         childProcess.on('error', (err) => {
             reject({
                 command: `${command} ${args.join(' ')}`,
-                data: stderr,
+                data: null,
                 success: false,
                 message: err?.message
             })
@@ -80,7 +79,8 @@ async function shell (command, args, options) {
                 return reject({
                     command: `${command} ${args.join(' ')}`,
                     data: stderr,
-                    success: false
+                    success: false,
+                    message: stderr
                 })
             }
 
