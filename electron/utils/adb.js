@@ -70,6 +70,8 @@ async function switchWiFiADB (device, host) {
 async function startATXService (device) {
     if (!device?.port || !device.id) return
     await adb(['shell', 'chmod', '755', '/data/local/tmp/atx-agent'], device.id)
+    await adb(['shell', 'chmod', '755', '/data/local/tmp/minicap'], device.id)
+    await adb(['shell', 'chmod', '755', '/data/local/tmp/minicap.so'], device.id)
     await adb(['shell', '/data/local/tmp/atx-agent', 'server -d'], device.id)
     await adb(['forward', `tcp:${device.port}`, 'tcp:7912'], device.id)
     const { success } = await adb(['forward', `tcp:${device.port}`, 'tcp:7912'], device.id)
@@ -105,15 +107,17 @@ async function getScreenInfo (device) {
 
 /** 获取所有安装包 */
 async function getPackagesList (device) {
-    const { data } = await command(device, ['pm', 'list', 'packages'])
-    return data || []
+    const { data, success } = await command(device, ['pm', 'list', 'packages'])
+    if (!success) return []
+    return data.trim().split('\n').map(v => v.trim().split(':')[1]).filter(v => v !== undefined)
 }
 
 /** 获取文件夹信息 */
 async function getDevicePathFileInfo (device, filePath = '/data/local/tmp/') {
     if (!/\/\s*$/.test(filePath)) return
-    const { data } = await command(device, ['ls', filePath])
-    return data || []
+    const { data, success } = await command(device, ['ls', filePath])
+    if (!success) return []
+    return data.trim().split('\n').map(v => v.trim()).filter(v => v !== undefined)
 }
 
 /** 获取初始化未安装成功的文件 */
@@ -121,8 +125,8 @@ async function getInitNotExistFile (device) {
     const packages = await getPackagesList(device)
     const files = await getDevicePathFileInfo(device)
     const notPackages = env.packages.filter(v => packages?.indexOf(v.package) === -1)
-    const notFlies = env.files.filter(v => files?.indexOf(v.name) === -1)
-    return { packages: notPackages.map(v => v.name), files: notFlies.map(v => v.name) }
+    const notFiles = env.files.filter(v => files?.indexOf(v.name) === -1)
+    return { packages: notPackages.map(v => v.name), files: notFiles.map(v => v.name) }
 }
 
 /** 安装未安装的初始化文件 */

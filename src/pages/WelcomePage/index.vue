@@ -335,7 +335,7 @@ function onClickFile (e, item) {
 
 function openWorkBenches () {
     if (!state.device.id && !state.device.path) return ElMessage.warning('请选择连接的设备...')
-    appApi.createWorkBenchesWindow({ ...state.device, filePath: state.file.path })
+    view.createWorkBenchesWindow({ ...state.device, filePath: state.file.path })
 }
 
 function switchDevtools () {

@@ -14,10 +14,7 @@ module.exports = {
     openFileExplorer,
     renameFile,
     killServerByPname,
-    getSerialPortList,
-    createRunCaseWindow,
-    createGetScreenWindow,
-    createWorkBenchesWindow
+    getSerialPortList
 }
 
 async function setTitle (title) {
@@ -74,16 +71,4 @@ function getLocalIPv4 () {
 
 function renameFile (filePath, fileNameOrNewPath, move) {
     ipcRenderer.invoke('on-renameFile-event', filePath, fileNameOrNewPath, move)
-}
-
-function createWorkBenchesWindow (data, option) {
-    ipcRenderer.invoke('on-createWorkBenchesWindow-event', data, option)
-}
-
-function createRunCaseWindow (data, option) {
-    ipcRenderer.invoke('on-createRunCaseWindow-event', data, option)
-}
-
-function createGetScreenWindow (data, option) {
-    ipcRenderer.invoke('on-createGetScreenWindow-event', data, option)
 }

@@ -19,7 +19,7 @@ module.exports = {
         packages: [
             { path: path.join(assetsPath, 'package', 'app-uiautomator.apk'), package: 'com.github.uiautomator', name: 'app-uiautomator.apk' },
             { path: path.join(assetsPath, 'package', 'app-uiautomator-test.apk'), package: 'com.github.uiautomator.test', name: 'app-uiautomator-test.apk' },
-            { path: path.join(assetsPath, 'package', 'ADBKeyboard.apk'), package: 'package:com.android.adbkeyboard', name: 'ADBKeyboard.apk' }
+            { path: path.join(assetsPath, 'package', 'ADBKeyboard.apk'), package: 'com.android.adbkeyboard', name: 'app-uiautomator-test.apk' }
         ]
     }
 }

@@ -4,6 +4,7 @@ module.exports = {
     getDevices,
     getWiFiIP,
     pushFile,
+    getUI,
     killServer,
     switchWiFiADB,
     getPackagesList,
@@ -71,3 +72,6 @@ async function getScreenshot (device) {
     return ipcRenderer.invoke('on-getScreenshot-event', device)
 }
 
+async function getUI (device, json) {
+    return await ipcRenderer.invoke('on-getUI-event', device, json)
+}

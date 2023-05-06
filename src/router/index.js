@@ -22,6 +22,11 @@ const router = createRouter({
             path: '/screen',
             name: 'screen',
             component: () => import('../pages/ScreenPage/index.vue')
+        },
+        {
+            path: '/node',
+            name: 'node',
+            component: () => import('../pages/NodePage/index.vue')
         }
     ]
 })

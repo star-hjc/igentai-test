@@ -14,6 +14,7 @@
                     <div v-if="state.query.path">波特率：{{ state.query.baudRate }}</div>
                 </el-popover>
                 <el-button @click="getScreen">获取屏幕</el-button>
+                <el-button @click="getUiNode">获取UI节点</el-button>
                 <el-button @click="getSelectRow">获取选中行</el-button>
                 <el-button @click="insertText(new Date().toLocaleTimeString(), 'before')">插入“123”文本</el-button>
             </el-header>
@@ -131,7 +132,11 @@ onBeforeUnmount(() => {
 })
 
 function getScreen () {
-    appApi.createGetScreenWindow({ ...state.query })
+    view.createGetScreenWindow({ ...state.query })
+}
+
+function getUiNode () {
+    view.createUiNodeWindow({ ...state.query })
 }
 
 function getSelectRow () {

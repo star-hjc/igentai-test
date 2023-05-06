@@ -1,9 +1,8 @@
 const path = require('path')
 const { SerialPort } = require('serialport')
-const querystring = require('querystring')
 const { ipcMain, BrowserWindow, shell } = require('electron')
 const { exec } = require('../utils/command')
-const { loadURL, assetsPath } = require('../main/config')
+const { assetsPath } = require('../main/config')
 const request = require('../utils/request')
 
 const {
@@ -29,10 +28,7 @@ module.exports = {
     killServerByPname,
     getSerialPortList,
     switchDevtools,
-    openFileExplorer,
-    createRunCaseWindow,
-    createGetScreenWindow,
-    createWorkBenchesWindow
+    openFileExplorer
 }
 
 /**
@@ -143,61 +139,3 @@ function getSerialPortList () {
     })
 }
 
-/** 打开代码编辑工作台 */
-function createWorkBenchesWindow () {
-    ipcMain.handle('on-createWorkBenchesWindow-event', (event, data = {}, option = {}) => {
-        const workWin = new BrowserWindow({
-            autoHideMenuBar: true,
-            resizable: true,
-            webPreferences: {
-                preload: path.join(__dirname, '../preload/workBenchesPreload.js'),
-                nodeIntegration: true
-            },
-            ...option
-        })
-        /** 最大化 */
-        workWin.maximize()
-        workWin.loadURL(`${loadURL}#/work?${querystring.stringify(data)}`)
-        workWin.setTitle('工作台')
-        workWin.webContents.openDevTools()
-    })
-}
-
-/** 打开运行案例窗口 */
-function createRunCaseWindow () {
-    ipcMain.handle('on-createRunCaseWindow-event', (event, data = {}, option = {}) => {
-        const runWin = new BrowserWindow({
-            autoHideMenuBar: true,
-            resizable: true,
-            width: 200,
-            height: 100,
-            webPreferences: {
-                preload: path.join(__dirname, '../preload/workBenchesPreload.js'),
-                nodeIntegration: true
-            },
-            ...option
-        })
-        runWin.loadURL(`${loadURL}#/run?${querystring.stringify(data)}`)
-        runWin.webContents.openDevTools()
-        runWin.setTitle('运行')
-    })
-}
-
-/** 打开设备屏幕窗口 */
-function createGetScreenWindow () {
-    ipcMain.handle('on-createGetScreenWindow-event', (event, data = {}, option = {}) => {
-        const screenWin = new BrowserWindow({
-            autoHideMenuBar: true,
-            resizable: true,
-            width: 960,
-            height: 640,
-            webPreferences: {
-                preload: path.join(__dirname, '../preload/screenPreload.js'),
-                nodeIntegration: true
-            },
-            ...option
-        })
-        screenWin.loadURL(`${loadURL}#/screen?${querystring.stringify(data)}`)
-        screenWin.setTitle('设备屏幕')
-    })
-}

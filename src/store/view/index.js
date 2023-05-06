@@ -5,7 +5,7 @@ export default defineStore({
     id: 'view',
     state: () => {
         return {
-            assetsPath: ''
+            position: []
         }
     },
     actions: {

@@ -2,6 +2,7 @@
 const { ipcMain } = require('electron')
 const adb = require('../utils/adb')
 const request = require('../utils/request')
+const xml2js = require('xml2js')
 
 module.exports = {
     getDevices,
@@ -10,6 +11,7 @@ module.exports = {
     killServer,
     startATXService,
     pushFile,
+    getUI,
     switchWiFiADB,
     getAtxVersion,
     getScreenshot,
@@ -100,19 +102,33 @@ async function getInitNotExistFile () {
     })
 }
 
+function atxHost (port = '6666', ip) {
+    return `http://${ip || '127.0.0.1'}:${port}`
+}
+
 /** 获取atx版本 */
 async function getAtxVersion () {
     ipcMain.handle('on-getAtxVersion-event', async (event, device) => {
         if (!device?.port) return
-        return await request.get(`http://127.0.0.1:${device.port}/version`)
+        return await request.get(`${atxHost(device.port, device.ip)}/version`)
     })
 }
 
-/** 获取atx版本 */
+/** 获取设备截图 */
 async function getScreenshot () {
     ipcMain.handle('on-getScreenshot-event', async (event, device) => {
         if (!device?.port) return
-        const arraybufferData = await request(`http://127.0.0.1:${device.port}/screenshot`, { responseType: 'arraybuffer' })
+        const arraybufferData = await request(`${atxHost(device.port, device.ip)}/screenshot`, { responseType: 'arraybuffer' })
         return `data:image/png;base64,${arraybufferData ? Buffer.from(arraybufferData, 'binary').toString('base64') : '11'}`
+    })
+}
+
+/** 获取XML-UI */
+async function getUI () {
+    ipcMain.handle('on-getUI-event', async (event, device, all = false) => {
+        if (!device?.port) return
+        const data = await request(`${atxHost(device.port, device.ip)}/dump/hierarchy`)
+        if (!all) return data.result || ''
+        return [await xml2js.parseStringPromise(data?.result, ''), data?.result || '']
     })
 }

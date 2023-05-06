@@ -2,8 +2,9 @@ const { BrowserWindow } = require('electron')
 const path = require('path')
 const { loadURL } = require('./config.js')
 
+let win = null
 module.exports = function createWindow () {
-    const win = new BrowserWindow({
+    win = new BrowserWindow({
         /** 隐藏菜单 */
         autoHideMenuBar: true,
         webPreferences: {
@@ -18,4 +19,9 @@ module.exports = function createWindow () {
     /** 开发者工具 */
     win.webContents.openDevTools()
     win.loadURL(loadURL)
+    win.setAppDetails({
+        appId: 'com.star.igentai-test.main'
+    })
 }
+
+global.mainWindow = win
