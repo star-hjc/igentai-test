@@ -1,6 +1,6 @@
 const { contextBridge } = require('electron')
 const common = require('./modules/common')
-const adb = require('./modules/adb')
+const adbApi = require('./modules/adb')
 const view = require('./modules/window')
 
 contextBridge.exposeInMainWorld('appApi', {
@@ -8,26 +8,17 @@ contextBridge.exposeInMainWorld('appApi', {
 })
 
 contextBridge.exposeInMainWorld('adb', {
-    ...adb
+    ...adbApi
 })
 
 contextBridge.exposeInMainWorld('view', {
     ...view
 })
 
-contextBridge.exposeInMainWorld('deviceCase', {
-    run: async (code) => {
-        return new Promise((resolve, reject) => {
-            try {
-                // eslint-disable-next-line no-eval
-                eval(`(async()=>{${code}})()`).then(res => {
-                    resolve(true)
-                })
-            } catch (err) {
-                // eslint-disable-next-line no-console
-                console.error(err)
-                reject(false)
-            }
-        })
-    }
+const adb = {}
+
+contextBridge.exposeInMainWorld('run', (code,device)=>{
+    for (const key in adbApi) { adb[key] = adbApi[key].bind(this, device) }
+    // eslint-disable-next-line no-eval
+    return eval(`(async()=>{try {${code}} catch (error) {return false}})()`)
 })

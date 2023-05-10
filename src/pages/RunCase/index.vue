@@ -61,8 +61,15 @@ function onSelectDevice (val, method) {
     return
 }
 
-function onRunCase () {
-
+async function onRunCase () {
+    let result = true
+    try {await run(`console.log(await adb.getUI();)`,{...state.device}).then(()=>{ result = true })}
+    catch (error) {
+        // eslint-disable-next-line no-console
+        console.error(error)
+        result = false
+    }
+return result
 }
 </script>
 

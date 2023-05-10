@@ -213,7 +213,7 @@ const state = reactive({
     device: { id: '', path: '', ip: '', port: 6666, method: '', methodName: '', baudRate: 115200 },
     wifiPort: 8848,
     ipv4: [],
-    ipInfo: {},
+    ipInfo: { ip:'', actionAddress:[] },
     deviceList: [],
     serialPortList: [],
     baudRateList: [110, 300, 600, 1200, 2400, 4800, 9600, 14400, 19200, 38400, 57600, 115200, 128000, 256000, 921600],
@@ -236,6 +236,7 @@ onMounted(async () => {
 
 async function getIpInfo () {
     await appApi.getIpInfo().then(data => {
+        console.log(data);
         state.ipInfo = data
     })
 }

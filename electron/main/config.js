@@ -6,8 +6,8 @@ const assetsPath = path.join(process.cwd(), `${isPackaged ? '/resources' : '/ele
 module.exports = {
     /** 静态文件地址 */
     assetsPath,
-    /** 渲染文件入口 */
-    loadURL: isPackaged ? `file://${path.join(__dirname, '../../dist/index.html')}` : `http://127.0.0.1:${process.argv.at(-1)}`,
+    /** 渲染文件入口  127.0.0.1 */
+    loadURL: isPackaged ? `file://${path.join(__dirname, '../../dist/index.html')}` : `http://localhost:${process.argv.at(-1)}`,
     /** 环境 */
     env: {
         // 'atx-agent', 'minicap', 'minicap.so'

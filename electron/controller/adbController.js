@@ -103,7 +103,6 @@ async function getInitNotExistFile () {
 }
 
 function atxHost (port = '6666', ip) {
-    console.log(`http://${ip || '127.0.0.1'}:${port}`)
     return `http://${ip || '127.0.0.1'}:${port}`
 }
 
