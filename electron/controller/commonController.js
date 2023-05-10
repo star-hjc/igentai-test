@@ -132,6 +132,7 @@ function renameFile () {
         renameFileSync(filePath, fileNameOrNewPath, move)
     })
 }
+
 /** 获取串口 */
 function getSerialPortList () {
     ipcMain.handle('on-getSerialPortList-event', async (event) => {

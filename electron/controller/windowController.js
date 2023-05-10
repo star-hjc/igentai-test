@@ -44,7 +44,7 @@ function createRunCaseWindow () {
             width: 200,
             height: 100,
             webPreferences: {
-                preload: path.join(__dirname, '../preload/workBenchesPreload.js'),
+                preload: path.join(__dirname, '../preload/runCasePreload.js'),
                 nodeIntegration: true
             },
             ...option
@@ -70,7 +70,7 @@ function createGetScreenWindow () {
             ...option
         })
         screenWin.loadURL(`${loadURL}#/screen?${querystring.stringify(data)}`)
-        screenWin.webContents.openDevTools()
+        // screenWin.webContents.openDevTools()
         screenWin.on('closed', () => {
             screenWin = null
         })
@@ -94,7 +94,7 @@ function createUiNodeWindow () {
             ...option
         })
         uiNodeWin.loadURL(`${loadURL}#/node?${querystring.stringify(data)}`)
-        uiNodeWin.webContents.openDevTools()
+        // uiNodeWin.webContents.openDevTools()
         uiNodeWin.on('closed', () => {
             uiNodeWin = null
         })

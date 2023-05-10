@@ -143,9 +143,17 @@
 
 <script setup>
 import { keyevent } from './config'
+const { insertText } = inject('work')
+const props = defineProps({
+    activeName: {
+        type: String,
+        required: true
+    }
+})
 const state = reactive({
     keyevent: {
         value: '',
+        type: String,
         option: [
 
         ]
@@ -163,7 +171,17 @@ onMounted(() => {
 })
 
 function insert (type = '') {
-    console.log(type)
+    if (props.activeName === 'codemirror') {
+        const config = state[type]
+        if (config) {
+            const args = Object.entries(config).filter(v => ['option', 'type'].indexOf(v[0]) === -1).map(v => v[1]).join(',')
+            insertText(`adb.${type}(${config.type === String ? JSON.stringify(args) : args})`, 'after')
+        }
+    }
+    if (props.activeName === 'visualization') {
+        state[type]
+    }
+    // console.log(, props.activeName)
 }
 </script>
 

@@ -16,6 +16,7 @@
                 <el-button @click="getScreen">获取屏幕</el-button>
                 <el-button @click="getUiNode">获取UI节点</el-button>
                 <el-button @click="getSelectRow">获取选中行</el-button>
+                <el-button @click="runCode">获取屏幕</el-button>
                 <el-button @click="insertText(new Date().toLocaleTimeString(), 'before')">插入“123”文本</el-button>
             </el-header>
             <el-container>
@@ -24,7 +25,7 @@
                         命令列表
                     </div>
                     <el-scrollbar>
-                        <ApiMenu />
+                        <ApiMenu :activeName="activeName" />
                     </el-scrollbar>
                 </el-aside>
                 <el-main ref="mainRef">
@@ -100,6 +101,8 @@ const codemirrorRef = ref(null)
 const codemirrorView = shallowRef()
 const activeName = ref('codemirror')
 const code = ref('')
+provide('work', { insertText })
+
 const state = reactive({
     menuData: [
         {
@@ -149,6 +152,10 @@ function getSelectRow () {
     const lines = state.doc.lines
     console.log(state.doc.line(line))
     console.log({ selected, cursor, length, lines, line })
+}
+
+function runCode () {
+    view.createRunCaseWindow({ ...state.query })
 }
 
 function insertText (content = '', type = 'end') {
