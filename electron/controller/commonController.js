@@ -11,11 +11,13 @@ const {
     createFileSync,
     createFolderSync,
     removeFileSync,
+    readFileSync,
     openFileExplorerSync
 } = require('../utils/file')
 
 module.exports = {
     renameFile,
+    readFile,
     setTitle,
     createFile,
     readdirCase,
@@ -130,6 +132,13 @@ function killServerByPname () {
 function renameFile () {
     ipcMain.handle('on-renameFile-event', (event, filePath, fileNameOrNewPath, move) => {
         renameFileSync(filePath, fileNameOrNewPath, move)
+    })
+}
+
+/** 读取文件文件 */
+function readFile () {
+    ipcMain.handle('on-readFile-event', async (event, filePath) => {
+        return await readFileSync(filePath)
     })
 }
 

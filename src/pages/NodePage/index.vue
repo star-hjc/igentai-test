@@ -62,8 +62,7 @@ const state = reactive({
 })
 
 onMounted(() => {
-    const device = { ...(useRoute().query) || {}, baudRate: parseInt(useRoute()?.query?.baudRate || 0) }
-    state.device = device
+    state.device = { ...(useRoute().query) }
     onRefresh()
 })
 

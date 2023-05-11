@@ -166,7 +166,7 @@
                                 <div class="title"><span class="top">功能：</span></div>
                                 <div class="content">
                                     <div class="content-item">
-                                        <el-button>运行</el-button>
+                                        <el-button @click="openRunCase" :disabled="!isLink">运行</el-button>
                                         <el-button @click="openWorkBenches">编写</el-button>
                                         <el-button type="danger" @click="onRemoveFile">删除</el-button>
                                     </div>
@@ -202,10 +202,10 @@
 
 <script setup>
 import { Delete } from '@element-plus/icons-vue'
-import { ElMessage } from 'element-plus'
 const RightClickMenuRef = ref(null)
 const serialPortListLoading = ref(false)
 const deviceListLoading = ref(false)
+const isLink = ref(false)
 const state = reactive({
     menuData: [],
     /** adb,serialport */
@@ -213,7 +213,7 @@ const state = reactive({
     device: { id: '', path: '', ip: '', port: 6666, method: '', methodName: '', baudRate: 115200 },
     wifiPort: 8848,
     ipv4: [],
-    ipInfo: { ip:'', actionAddress:[] },
+    ipInfo: { ip: '', actionAddress: [] },
     deviceList: [],
     serialPortList: [],
     baudRateList: [110, 300, 600, 1200, 2400, 4800, 9600, 14400, 19200, 38400, 57600, 115200, 128000, 256000, 921600],
@@ -236,7 +236,7 @@ onMounted(async () => {
 
 async function getIpInfo () {
     await appApi.getIpInfo().then(data => {
-        console.log(data);
+        console.log(data)
         state.ipInfo = data
     })
 }
@@ -282,6 +282,7 @@ async function getDeviceList () {
         state.deviceList = data
     }).catch(() => {
         ElMessage.error('获取设备失败.')
+        isLink.value = false
     })
 }
 
@@ -333,10 +334,14 @@ function onClickFile (e, item) {
         getSerialPortList()
     }
 }
+function openRunCase () {
+    if (!state.device.id && !state.device.path) return ElMessage.warning('请选择连接的设备...')
+    viewApi.createRunCaseWindow({ ...state.device, filePath: state.file.path, title: state.file?.title })
+}
 
 function openWorkBenches () {
     if (!state.device.id && !state.device.path) return ElMessage.warning('请选择连接的设备...')
-    view.createWorkBenchesWindow({ ...state.device, filePath: state.file.path })
+    viewApi.createWorkBenchesWindow({ ...state.device, filePath: state.file.path })
 }
 
 function switchDevtools () {
@@ -455,9 +460,7 @@ async function installInitExistFile () {
     const { device, initNotExistFile } = state
     const packages = [...(initNotExistFile.packages || [])]
     const files = [...(initNotExistFile.files || [])]
-
-    await adb.installInitExistFile({ ...device }, { packages, files })
-    adb.getInitNotExistFile({ ...state.device }).then(data => {
+    await adb.installInitExistFile({ ...device }, { packages, files }).then(data => {
         state.initNotExistFile = data
         ElMessage.success('安装成功...')
     }).catch(() => {
@@ -466,9 +469,18 @@ async function installInitExistFile () {
 }
 
 function onSelectDevice (val, method) {
+    const device = { ...state.device }
     if (method === 'adb') {
-        adb.getInitNotExistFile({ ...state.device }).then(data => {
-            state.initNotExistFile = data
+        adb.getInitNotExistFile(device).then(data => {
+            if (data.files?.length && data.packages?.length) {
+                state.initNotExistFile = data
+                isLink.value = true
+                return
+            }
+            adb.installInitExistFile(device, data).then((notExistFile) => {
+                state.initNotExistFile = notExistFile
+                isLink.value = true
+            })
         })
         if (/^\s*\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b:\d{1,5}\s*$/.test(val)) {
             state.device.methodName = 'WIFI'

@@ -1,75 +1,58 @@
 <template>
     <div class="run-case-container">
-        <el-select v-model="state.device.id" placeholder="选择设备..." @visibleChange="onDeviceIdChange"
-            :loading="deviceListLoading" loadingText="加载中..." @change="onSelectDevice($event, 'adb')">
-            <el-option v-for="item in state.deviceList" :key="item.device_id" :value="item.device_id">
-                <div style="display: flex;justify-content: space-between;gap: 20px;">
-                    <span>{{ item.device_id }}</span>
-                    <span style="color: var(--el-text-color-secondary);">
-                        {{ item.device }}
-                    </span>
-                </div>
-            </el-option>
-        </el-select>
-        <el-input-number v-model="runNum" :min="1" />
-        <el-button @click="onRunCase">运行</el-button>
+        <div>
+            <span>脚本：</span>
+            <span>{{ state.device.title }}</span>
+        </div>
+        <el-input style="width: 150px;" v-model="state.device.id" placeholder="无设备..." disabled />
+        <el-input-number v-model="runNum" :min="1" :disabled="isRun.value" />
+        <el-button @click="onRunCase" :disabled="isRun.value">运行</el-button>
+        <div class="state" v-show="runs > 0">
+            <el-tag>已运行数：{{ runs }}</el-tag>
+            <el-tag type="success">成功次数：{{ runs - errNum }}</el-tag>
+            <el-tag type="danger">失败次数：{{ errNum }}</el-tag>
+        </div>
     </div>
 </template>
 
 <script setup>
-const deviceListLoading = ref(false)
+import { useRoute } from 'vue-router'
 const runNum = ref(1)
-onMounted(() => {
-    getDeviceList()
-})
+const errNum = ref(0)
+const runs = ref(0)
+const isRun = ref(false)
 
 const state = reactive({
     menuData: [],
     connectionMethod: 'adb',
     device: { id: '', path: '', ip: '', port: 6666, method: '', methodName: '', baudRate: 115200 }
 })
-
-async function getDeviceList () {
-    await adb.getDevices().then(data => {
-        state.deviceList = data
-    }).catch(() => {
-        ElMessage.error('获取设备失败.')
-    })
-}
-
-async function onDeviceIdChange (show) {
-    if (show) {
-        deviceListLoading.value = true
-        await getDeviceList()
-        deviceListLoading.value = false
-    }
-}
-
-function onSelectDevice (val, method) {
-    adb.getInitNotExistFile({ ...state.device }).then(data => {
-        state.initNotExistFile = data
-    })
-    if (/^\s*\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b:\d{1,5}\s*$/.test(val)) {
-        state.device.methodName = 'WIFI'
-        state.device.method = 'wifi'
-        state.device.ip = state.device.id.split(':')[0]
-        state.device.port = '7912'
-        return
-    }
-    state.device.methodName = 'USB'
-    state.device.method = 'usb'
-    return
-}
+onMounted(() => {
+    state.device = { ...(useRoute().query) || {} }
+})
 
 async function onRunCase () {
+    errNum.value = 0
+    runs.value = 0
+    const code = await appApi.readFile(state.device.filePath) || ''
+    for (let i = 0; i < runNum.value; i++) {
+        runs.value += 1
+        ElMessage.success(`运行第${runs.value}次...`)
+        await onRunOneCase(code).then(v => { if (!v) errNum.value += 1 })
+    }
+    ElMessage.success('运行完成...')
+}
+
+async function onRunOneCase (code) {
     let result = true
-    try {await run(`console.log(await adb.getUI();)`,{...state.device}).then(()=>{ result = true })}
-    catch (error) {
+    try {
+        await run(code, { ...state.device }).then(() => { result = true })
+    } catch (error) {
         // eslint-disable-next-line no-console
         console.error(error)
         result = false
     }
-return result
+    return result
 }
 </script>
 
@@ -81,5 +64,13 @@ return result
     align-items: center;
     flex-direction: column;
     gap: 15px;
+
+    .state {
+        height: 25xp;
+        display: flex;
+        gap: 15px;
+        align-items: center;
+        justify-content: space-between;
+    }
 }
 </style>

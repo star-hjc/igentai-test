@@ -2,6 +2,7 @@ const { ipcRenderer } = require('electron')
 
 module.exports = {
     setTitle,
+    readFile,
     openBrowser,
     readdirCase,
     switchDevtools,
@@ -71,4 +72,8 @@ function getLocalIPv4 () {
 
 function renameFile (filePath, fileNameOrNewPath, move) {
     ipcRenderer.invoke('on-renameFile-event', filePath, fileNameOrNewPath, move)
+}
+
+function readFile (filePath) {
+    return ipcRenderer.invoke('on-readFile-event', filePath)
 }

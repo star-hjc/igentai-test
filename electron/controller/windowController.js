@@ -41,8 +41,8 @@ function createRunCaseWindow () {
         const runWin = new BrowserWindow({
             autoHideMenuBar: true,
             resizable: true,
-            width: 200,
-            height: 100,
+            width: 450,
+            height: 300,
             webPreferences: {
                 preload: path.join(__dirname, '../preload/runCasePreload.js'),
                 nodeIntegration: true

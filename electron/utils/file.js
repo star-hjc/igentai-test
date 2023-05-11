@@ -2,7 +2,7 @@ const fs = require('fs')
 const path = require('path')
 const { exec } = require('./command')
 
-module.exports = { isDirectory, renameFileSync, readdirAllSync, createFileSync, createFolderSync, removeFileSync, openFileExplorerSync }
+module.exports = { isDirectory, renameFileSync, readdirAllSync, createFileSync, createFolderSync, removeFileSync, openFileExplorerSync, readFileSync }
 
 /**
  * 是否是文件夹
@@ -118,4 +118,18 @@ function renameFileSync (filePath, fileNameOrNewPath, move = false) {
     } else {
         fs.renameSync(filePath, path.join(getBasePath(filePath), fileNameOrNewPath))
     }
+}
+
+/**
+ * 读取文件
+ * @param {String} filePath 文件路径
+ * @returns
+ */
+function readFileSync (filePath) {
+    return new Promise((resolve, reject) => {
+        fs.readFile(filePath, { encoding: 'utf-8' }, (err, data) => {
+            if (err) return reject('读取错误...')
+            resolve(data)
+        })
+    })
 }

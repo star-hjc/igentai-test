@@ -27,7 +27,7 @@ function command (device, args) {
     if (device.id) {
         return adb(['shell', ...args], device.id)
     }
-    return new Serial(device.path, device.baudRate).shell(args)
+    return new Serial(device.path, parseInt(device.baudRate || 0)).shell(args)
 }
 
 /** 获取设备信息  */
@@ -140,5 +140,6 @@ async function installInitExistFile (device, initNotExistFile = { packages: [], 
         const { path } = env.files.find(v => v.name === item) || {}
         await adb(['push', path, '/data/local/tmp/'], device.id)
     }
+    return await getInitNotExistFile(device)
 }
 

@@ -61,7 +61,8 @@
     "watchPostEffect": true,
     "watchSyncEffect": true,
     "appApi": true,
+    "run":true,
     "adb": true,
-    "view":true
+    "viewApi":true
   }
 }

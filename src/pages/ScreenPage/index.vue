@@ -1,8 +1,7 @@
 <template>
     <div class="screen-container">
         <div class="screen-tool">
-            <el-button @click="onRefresh">刷新</el-button>
-            <el-button @click="getScreenshot({ ...state.device })" :loading="loading">刷新屏幕</el-button>
+            <el-button @click="getScreenshot({ ...state.device })" :loading="loading" type="primary">刷新屏幕</el-button>
             <el-select v-if="state.imgBase64s?.length > 1" v-model="imgIndex" placeholder="选择" @change="onSelectImg">
                 <el-option v-for="item, index in state.imgBase64s" :key="item.id" :label="`第${index + 1}张`"
                     :value="index" />
@@ -15,7 +14,7 @@
                 <el-input-number style="width: 75px;" v-model="num" :min="1" :max="10" controls-position="right"
                     @change="onSelectNum" />
             </div>
-
+            <el-button @click="onRefresh">清空</el-button>
         </div>
         <el-scrollbar class="img-container" view-class="img-center">
             <img ref="imgRef" :src="imgBase64" @click="onImgClick" />
@@ -66,7 +65,7 @@ onresize = function () {
 }
 
 onMounted(async () => {
-    const device = { ...(useRoute().query) || {}, baudRate: parseInt(useRoute()?.query?.baudRate || 0) }
+    const device = { ...(useRoute().query) || {} }
     state.device = device
     const { width, height } = await adb.getScreenInfo(device)
     if (width > height) {

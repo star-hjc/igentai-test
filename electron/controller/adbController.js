@@ -54,7 +54,7 @@ async function pushFile () {
 /** 添加缺失文件 */
 async function installInitExistFile () {
     ipcMain.handle('on-installInitExistFile-event', async (event, device, initNotExistFile) => {
-        await adb.installInitExistFile(device, initNotExistFile)
+        return await adb.installInitExistFile(device, initNotExistFile)
     })
 }
 

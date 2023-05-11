@@ -16,7 +16,7 @@
                 <el-button @click="getScreen">获取屏幕</el-button>
                 <el-button @click="getUiNode">获取UI节点</el-button>
                 <el-button @click="getSelectRow">获取选中行</el-button>
-                <el-button @click="runCode">获取屏幕</el-button>
+                <el-button @click="runCode">运行</el-button>
                 <el-button @click="insertText(new Date().toLocaleTimeString(), 'before')">插入“123”文本</el-button>
             </el-header>
             <el-container>
@@ -126,20 +126,27 @@ const state = reactive({
 onMounted(() => {
     const query = useRoute().query || {}
     state.query = { ...query, baudRate: parseInt(query.baudRate || 0) }
-
     codemirrorRef.value.$el.addEventListener('keydown', ctrlAndS)
+    getCode()
 })
+
+function getCode () {
+    if (!state.query?.filePath) return
+    appApi.readFile(state.query?.filePath).then((data) => {
+        code.value = data
+    })
+}
 
 onBeforeUnmount(() => {
     codemirrorRef.value.$el.removeEventListener('keydown', ctrlAndS)
 })
 
 function getScreen () {
-    view.createGetScreenWindow({ ...state.query })
+    viewApi.createGetScreenWindow({ ...state.query })
 }
 
 function getUiNode () {
-    view.createUiNodeWindow({ ...state.query })
+    viewApi.createUiNodeWindow({ ...state.query })
 }
 
 function getSelectRow () {
@@ -155,7 +162,7 @@ function getSelectRow () {
 }
 
 function runCode () {
-    view.createRunCaseWindow({ ...state.query })
+    viewApi.createRunCaseWindow({ ...state.query })
 }
 
 function insertText (content = '', type = 'end') {
