@@ -2,7 +2,7 @@ const fs = require('fs')
 const path = require('path')
 const { exec } = require('./command')
 
-module.exports = { isDirectory, renameFileSync, readdirAllSync, createFileSync, createFolderSync, removeFileSync, openFileExplorerSync, readFileSync }
+module.exports = { isDirectory, renameFileSync, readdirAllSync, createFileSync, createFolderSync, removeFileSync, openFileExplorerSync, readFileSync, writeFileSync }
 
 /**
  * 是否是文件夹
@@ -10,7 +10,7 @@ module.exports = { isDirectory, renameFileSync, readdirAllSync, createFileSync, 
  * @param {String} filePath 文件路径
  * @returns {Boolean}
  */
-function isDirectory (filePath) {
+function isDirectory(filePath) {
     try {
         const stat = fs.lstatSync(filePath)
         return stat.isDirectory()
@@ -24,7 +24,7 @@ function isDirectory (filePath) {
  * @param {String} filePath 文件路径
  * @returns {String}
  */
-function getBasePath (filePath) {
+function getBasePath(filePath) {
     return isDirectory(filePath) ? filePath : path.join(filePath, '..')
 }
 
@@ -33,7 +33,7 @@ function getBasePath (filePath) {
  * @param {String} folderBasePath 文件夹路径
  * @returns {Arrer}
  */
-function readdirAllSync (folderBasePath) {
+function readdirAllSync(folderBasePath) {
     if (!isDirectory(folderBasePath)) return []
     return fs.readdirSync(folderBasePath).map(item => {
         const childrenPath = path.join(folderBasePath, item)
@@ -58,7 +58,7 @@ function readdirAllSync (folderBasePath) {
  * @param {String} content 文件内容
  * @param {Boolean} content 是否覆盖同名文件
  */
-function createFileSync (filePath, fileName, content = '', cover = false) {
+function createFileSync(filePath, fileName, content = '', cover = false) {
     if (!(/\.case$/.test(fileName))) return
     const baseFilePath = getBasePath(filePath)
     /** 不覆盖同名文件 存在同名文件 */
@@ -73,7 +73,7 @@ function createFileSync (filePath, fileName, content = '', cover = false) {
  * @param {String} filePath 文件路径
  * @param {String} fileName 文件名称
  */
-function createFolderSync (filePath, FolderName) {
+function createFolderSync(filePath, FolderName) {
     const baseFilePath = getBasePath(filePath)
     fs.mkdirSync(path.join(baseFilePath, FolderName))
 }
@@ -83,7 +83,7 @@ function createFolderSync (filePath, FolderName) {
  * @param {String} filePath 文件路径
  * @param {Boolean} recursive 强制删除带文件的文件夹
  */
-function removeFileSync (filePath, recursive = false) {
+function removeFileSync(filePath, recursive = false) {
     if (isDirectory(filePath)) {
         try {
             fs.rmdirSync(filePath, { recursive })
@@ -99,7 +99,7 @@ function removeFileSync (filePath, recursive = false) {
  * 打开文件资源管理器
  * @param {String} filePath 文件路径
  */
-async function openFileExplorerSync (filePath) {
+async function openFileExplorerSync(filePath) {
     const baseFilePath = getBasePath(filePath)
     await exec(`start ${baseFilePath}`)
 }
@@ -111,7 +111,7 @@ async function openFileExplorerSync (filePath) {
  * @param {Boolean} move 是否移动文件
  * @returns
  */
-function renameFileSync (filePath, fileNameOrNewPath, move = false) {
+function renameFileSync(filePath, fileNameOrNewPath, move = false) {
     if (!filePath || !fileNameOrNewPath) return
     if (move) {
         fs.renameSync(filePath, fileNameOrNewPath)
@@ -125,11 +125,25 @@ function renameFileSync (filePath, fileNameOrNewPath, move = false) {
  * @param {String} filePath 文件路径
  * @returns
  */
-function readFileSync (filePath) {
+function readFileSync(filePath) {
     return new Promise((resolve, reject) => {
         fs.readFile(filePath, { encoding: 'utf-8' }, (err, data) => {
             if (err) return reject('读取错误...')
             resolve(data)
         })
     })
+}
+
+
+function writeFileSync(filePath, data, cover = false) {
+    try {
+        if (fs.existsSync(filePath) && cover) {
+            fs.appendFileSync(filePath, data)
+            return true
+        }
+        fs.writeFileSync(filePath, data)
+        return true
+    } catch (err) {
+        return false
+    }
 }

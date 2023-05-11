@@ -66,6 +66,10 @@ onMounted(() => {
     onRefresh()
 })
 
+appApi.ipcRenderer.on('call-onRefreshScreenshot-event', (event, data) => {
+    onRefresh()
+})
+
 function getProp (node) {
     if (!node) return {}
     if (node.length) node = node[0]
@@ -87,6 +91,7 @@ async function onRefresh () {
     xmlStr.value = xml
     state.nodeData = [terrNode(json?.hierarchy || '')]
     treeScrollbarRef.value.scrollTo(0, 0)
+    
 }
 
 async function onSearch () {

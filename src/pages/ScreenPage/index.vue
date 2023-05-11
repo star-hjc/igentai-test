@@ -108,6 +108,7 @@ function getScreenshot (device) {
         state.imgBase64s.push({ id, data })
         imgIndex.value = (state.imgBase64s.length || 1) - 1
         loading.value = false
+        appApi.onRefreshScreenshot()
     }).catch(() => {
         loading.value = false
     })
@@ -118,6 +119,8 @@ function getScreenshot (device) {
 .screen-container {
     height: 100vh;
     width: 100%;
+    background: #f1f1f1;
+    overflow: hidden;
 
     .screen-tool {
         height: 50px;
@@ -133,10 +136,11 @@ function getScreenshot (device) {
     .img-container {
         box-sizing: border-box;
         height: calc(100vh - 50px);
-
         :deep(.img-center) {
             height: calc(100vh - 50px);
             display: flex;
+            padding: 10px;
+            box-sizing: border-box;
             align-items: center;
             justify-content: center;
         }
@@ -148,6 +152,7 @@ function getScreenshot (device) {
         .content-border {
             position: fixed;
             z-index: 999;
+            filter: invert(0.7);
             border: 1px solid red;
             top: -99999px;
             left: -99999px;

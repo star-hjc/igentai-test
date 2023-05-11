@@ -2,6 +2,8 @@
     <div class="work" ref="workRef">
         <el-container class="work-container">
             <el-header>
+                <el-tag :type="runStateEnum[runState][1]" style="margin-right: 15px;">{{ runStateEnum[runState][0]
+                }}</el-tag>
                 <el-popover placement="top-start" title="设备信息" :width="215" trigger="hover">
                     <template #reference>
                         <el-button>设备信息</el-button>
@@ -16,7 +18,7 @@
                 <el-button @click="getScreen">获取屏幕</el-button>
                 <el-button @click="getUiNode">获取UI节点</el-button>
                 <el-button @click="getSelectRow">获取选中行</el-button>
-                <el-button @click="runCode">运行</el-button>
+                <el-button @click="runCode" :disabled="runState === 3">运行</el-button>
                 <el-button @click="insertText(new Date().toLocaleTimeString(), 'before')">插入“123”文本</el-button>
             </el-header>
             <el-container>
@@ -99,6 +101,8 @@ const mainRef = ref(null)
 const workRef = ref(null)
 const codemirrorRef = ref(null)
 const codemirrorView = shallowRef()
+const runState = ref(2)
+const runStateEnum = ref([['失败', 'danger'], ['成功', 'success'], ['待运行', 'info'], ['运行中', '']])
 const activeName = ref('codemirror')
 const code = ref('')
 provide('work', { insertText })
@@ -130,26 +134,38 @@ onMounted(() => {
     getCode()
 })
 
-function getCode () {
+function getCode() {
     if (!state.query?.filePath) return
     appApi.readFile(state.query?.filePath).then((data) => {
         code.value = data
     })
 }
 
+async function saveCode() {
+    ElMessageBox.confirm('是否保存该案例？', '保存', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+    }).then(() => {
+        appApi.writeFile(state.query.filePath, code.value).then(result => {
+            if (result) return ElMessage.success('保存成功...')
+            ElMessage.error('保存失败...')
+        })
+    }).catch(() => { })
+}
+
 onBeforeUnmount(() => {
     codemirrorRef.value.$el.removeEventListener('keydown', ctrlAndS)
 })
 
-function getScreen () {
+function getScreen() {
     viewApi.createGetScreenWindow({ ...state.query })
 }
 
-function getUiNode () {
+function getUiNode() {
     viewApi.createUiNodeWindow({ ...state.query })
 }
 
-function getSelectRow () {
+function getSelectRow() {
     const state = codemirrorView.value.state
     const ranges = state.selection.ranges
     const line = state.doc.lineAt(state.selection.main.head).number
@@ -161,11 +177,19 @@ function getSelectRow () {
     console.log({ selected, cursor, length, lines, line })
 }
 
-function runCode () {
-    viewApi.createRunCaseWindow({ ...state.query })
+async function runCode() {
+    // 运行中
+    runState.value = 3
+    try {
+        await run(code.value, { ...state.query }).then(() => { runState.value = 1 })
+    } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error(error)
+        runState.value = 0
+    }
 }
 
-function insertText (content = '', type = 'end') {
+function insertText(content = '', type = 'end') {
     const state = codemirrorView.value.state
     const line = state.doc.lineAt(state.selection.main.head).number
     let from = 0
@@ -194,18 +218,16 @@ function insertText (content = '', type = 'end') {
     })
 }
 
-function ctrlAndS (e) {
-    if (e.ctrlKey && e.key === 's') {
-        console.log('保存')
-    }
+function ctrlAndS(e) {
+    if (e.ctrlKey && e.key === 's') saveCode()
 }
 
-function onAsideRefreshSize ({ x }) {
+function onAsideRefreshSize({ x }) {
     const workDOM = workRef.value
     workDOM.style.setProperty('--el-aside-width', `${Math.max(300, x || 0)}px`)
 }
 
-function onHelpRefreshSize ({ begin, end }) {
+function onHelpRefreshSize({ begin, end }) {
     const mainDOM = mainRef.value.$el
     const helpStyleIsHeight = getComputedStyle(mainDOM).getPropertyValue('--help-height')
     /** end.y 最小值为 var(--header-height)【40】 加 var(--el-tabs-header-height)【40】 加 5px自定义边距 = 85 */
@@ -214,21 +236,21 @@ function onHelpRefreshSize ({ begin, end }) {
     state.moveLine.y = undefined
 }
 
-function onLinkMove ({ y }) {
+function onLinkMove({ y }) {
     state.moveLine.y = y
 }
 
-function onHelpClose () {
+function onHelpClose() {
     const mainDOM = mainRef.value.$el
     mainDOM.style.setProperty('--help-height', `85px`)
 }
 
-function onCodemirrorload (payload) {
+function onCodemirrorload(payload) {
     console.log(payload)
     codemirrorView.value = payload.view
 }
 
-function getOptions (context) {
+function getOptions(context) {
     const prefix = context.matchBefore(/\w+\.\.\w*/)
     const suffix = context.matchBefore(/\w+\.\w*/)
     const variable = context.matchBefore(/\s*\w*\s*/)

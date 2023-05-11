@@ -9,7 +9,8 @@ module.exports = {
     createWorkBenchesWindow,
     createUiNodeWindow,
     getAppInfo,
-    onNodeClick
+    onNodeClick,
+    onRefreshScreenshot
 }
 
 let screenWin = null
@@ -57,7 +58,10 @@ function createRunCaseWindow () {
 /** 打开设备屏幕窗口 */
 function createGetScreenWindow () {
     ipcMain.handle('on-createGetScreenWindow-event', (event, data = {}, option = {}) => {
-        if (screenWin !== null) return
+        if (screenWin !== null) {
+            screenWin.focus()
+            return
+        }
         screenWin = new BrowserWindow({
             autoHideMenuBar: true,
             resizable: true,
@@ -81,7 +85,10 @@ function createGetScreenWindow () {
 /** 打开设备屏幕窗口 */
 function createUiNodeWindow () {
     ipcMain.handle('on-createUiNodeWindow-event', (event, data = {}, option = {}) => {
-        if (uiNodeWin !== null) return
+        if (uiNodeWin !== null) {
+            uiNodeWin.focus()
+            return
+        }
         uiNodeWin = new BrowserWindow({
             autoHideMenuBar: true,
             resizable: true,
@@ -112,6 +119,16 @@ function getAppInfo () {
 function onNodeClick () {
     ipcMain.handle('on-onNodeClick-event', (event, data = {}) => {
         if (!screenWin) return
+        screenWin.focus()
         screenWin.webContents.send('call-onNodeClick-event', data)
+    })
+}
+
+
+function onRefreshScreenshot () {
+    ipcMain.handle('on-onRefreshScreenshot-event', (event, data = {}) => {
+        if (!uiNodeWin) return
+        uiNodeWin.focus()
+        uiNodeWin.webContents.send('call-onRefreshScreenshot-event', data)
     })
 }
