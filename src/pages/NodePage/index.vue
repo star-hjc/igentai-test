@@ -17,19 +17,24 @@
                 <div class="title">
                     <span>结果：</span>
                     <span v-if="state.selectNodes?.length">{{ state.selectNodes.length }}个</span>
+                    <el-select v-if="state.selectNodes?.length && state.node?.length" v-model="selectProp" placeholder="属性"
+                        size="small" style="width: 110px;margin: 0 15px;">
+                        <el-option v-for="item in state.node" :key="item[0]" :label="item[0]" :value="item[0]" />
+                    </el-select>
+                    <el-button v-if="state.selectNodes?.length" @click="onExport" size="small">导出结果</el-button>
                 </div>
                 <el-scrollbar class="node-prop">
                     <template v-if="state.selectNodes?.length">
                         <div class="font" v-for="item, index in state.selectNodes.node" :key="index"
                             @click="onClickResult(item)">
-                            {{ item[state.selectNodes.content] }}
+                            {{ item[selectProp] }}
                         </div>
                     </template>
                 </el-scrollbar>
                 <div v-if="state.node.length" class="title">属性：</div>
                 <el-scrollbar v-if="state.node.length" class="node-prop">
-                    <div class="font" v-for="item in state.node" :key="item[0]" @click="onPropClick(item)">{{ item[0] }}：{{
-                        item[1] }}</div>
+                    <div class="font" v-for="item in state.node" :key="item[0]" @click="onPropClick(item)">{{ item[0]
+                    }}：{{ item[1] }}</div>
                 </el-scrollbar>
 
             </div>
@@ -38,12 +43,14 @@
 </template>
 
 <script setup>
+import { ElMessage } from 'element-plus'
 import { onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 
 const treeRef = ref(null)
 const treeScrollbarRef = ref(null)
 const selectValue = ref('')
+const selectProp = ref('text')
 const xmlStr = ref('')
 const state = reactive({
     device: {
@@ -91,17 +98,21 @@ async function onRefresh () {
     xmlStr.value = xml
     state.nodeData = [terrNode(json?.hierarchy || '')]
     treeScrollbarRef.value.scrollTo(0, 0)
-    
 }
 
 async function onSearch () {
-    if (!state.item?.[1]) return
-    const node = getProps(new DOMParser().parseFromString(xmlStr.value, 'text/xml').querySelectorAll(`*[${state.item[0]}='${state.item[1]}']`))
+    if (!selectValue.value) return
+    const node = getProps(new DOMParser().parseFromString(xmlStr.value, 'text/xml').querySelectorAll(selectValue.value))
     state.selectNodes = {
         length: node.length,
         node,
         content: state.item[0]
     }
+}
+
+function onExport () {
+    const jg = state.selectNodes.node.map(v => v[selectProp.value])
+    ElMessage.success(JSON.stringify(jg).replaceAll(`"`, `'`))
 }
 
 function nodeClick (dataNode) {
@@ -116,7 +127,7 @@ function onClickResult (item) {
 function onPropClick (item) {
     if (!item[1]) return
     state.item = item
-    selectValue.value = `*[${item[0]}='${item[1]}']`
+    selectValue.value = `[${item[0]}='${item[1]}']`
 }
 
 function terrNode (node) {

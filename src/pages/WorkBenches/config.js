@@ -38,7 +38,7 @@ export const variableData = () => {
         { label: 'while', detail: 'loop', other: ` () {\n\n}\n` },
         { label: 'JSON', detail: 'JSON对象' },
         { label: 'Array', detail: 'Array对象' },
-        { label: 'consonle', detail: '控制台' },
+        { label: 'console', detail: '控制台' },
         { label: 'function', detail: 'definition', other: ` name(){\n\n}\n` },
         { label: 'querySelector', detail: '根据属性获取屏幕节点', other: `()` },
         { label: 'querySelectorAll', detail: '根据属性获取屏幕节点', other: `()` },

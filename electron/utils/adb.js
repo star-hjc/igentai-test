@@ -7,7 +7,6 @@ const { assetsPath } = require('../main/config')
 const request = require('../utils/request')
 const { env } = require('../main/config')
 
-
 module.exports = {
     atxHost,
     getDevices,
@@ -32,11 +31,11 @@ module.exports = {
     getRunAppisActivity
 }
 
-function adb(args, deviceId) {
+function adb (args, deviceId) {
     return shell('adb', [...(deviceId ? ['-s', deviceId] : []), ...args], { cwd: path.join(assetsPath, 'exe') })
 }
 
-function command(device, args) {
+function command (device, args) {
     if (device.id) {
         return adb(['shell', ...args], device.id)
     }
@@ -44,7 +43,7 @@ function command(device, args) {
 }
 
 /** 获取设备信息  */
-async function getDevices() {
+async function getDevices () {
     const { data, success } = await adb(['devices'])
     if (!success) return []
     return data.split('\r\n')?.filter(v => v.indexOf('\t') !== -1)?.map(v => {
@@ -54,7 +53,7 @@ async function getDevices() {
 }
 
 /** 停止ADB服务 */
-async function killServer() {
+async function killServer () {
     await adb(['killServer'])
 }
 
@@ -64,14 +63,14 @@ async function killServer() {
  * @param {*} toPath 上传文件位置
  * @returns {Boolean}
  */
-async function pushFile(device, localPath, toPath = '/data/local/tmp/') {
+async function pushFile (device, localPath, toPath = '/data/local/tmp/') {
     if (localPath) return
     const { success } = await adb(['push', localPath, toPath], device.id)
     return success
 }
 
 /** 切换WiFiADB */
-async function switchWiFiADB(device, host) {
+async function switchWiFiADB (device, host) {
     if (!device.id) return
     const { success: tcpip } = await adb(['tcpip', host.split(':')[1]], device.id)
     if (!tcpip) return
@@ -80,7 +79,7 @@ async function switchWiFiADB(device, host) {
 }
 
 /** 启动atx服务 */
-async function startATXService(device) {
+async function startATXService (device) {
     if (!device?.port || !device.id) return
     await adb(['shell', 'chmod', '755', '/data/local/tmp/atx-agent'], device.id)
     await adb(['shell', 'chmod', '755', '/data/local/tmp/minicap'], device.id)
@@ -92,7 +91,7 @@ async function startATXService(device) {
 }
 
 /** 获取wifi端口wifi */
-async function getWiFiIP(device) {
+async function getWiFiIP (device) {
     const { data, success } = await command(device, ['ifconfig', 'wlan0', '|', 'grep', `"inet addr"`])
     if (!success) return
     return data?.trim()?.split(/\s\s+/)?.reduce((a, b) => {
@@ -103,7 +102,7 @@ async function getWiFiIP(device) {
 }
 
 /** 获取屏幕信息 */
-async function getScreenInfo(device) {
+async function getScreenInfo (device) {
     let width, height, DPI
     await command(device, ['wm', 'size']).then(({ data, success }) => {
         if (success) {
@@ -119,14 +118,14 @@ async function getScreenInfo(device) {
 }
 
 /** 获取所有安装包 */
-async function getPackagesList(device) {
+async function getPackagesList (device) {
     const { data, success } = await command(device, ['pm', 'list', 'packages'])
     if (!success) return []
     return data.trim().split('\n').map(v => v.trim().split(':')[1]).filter(v => v !== undefined)
 }
 
 /** 获取文件夹信息 */
-async function getDevicePathFileInfo(device, filePath = '/data/local/tmp/') {
+async function getDevicePathFileInfo (device, filePath = '/data/local/tmp/') {
     if (!/\/\s*$/.test(filePath)) return
     const { data, success } = await command(device, ['ls', filePath])
     if (!success) return []
@@ -134,7 +133,7 @@ async function getDevicePathFileInfo(device, filePath = '/data/local/tmp/') {
 }
 
 /** 获取初始化未安装成功的文件 */
-async function getInitNotExistFile(device) {
+async function getInitNotExistFile (device) {
     const packages = await getPackagesList(device)
     const files = await getDevicePathFileInfo(device)
     const notPackages = env.packages.filter(v => packages?.indexOf(v.package) === -1)
@@ -143,7 +142,7 @@ async function getInitNotExistFile(device) {
 }
 
 /** 安装未安装的初始化文件 */
-async function installInitExistFile(device, initNotExistFile = { packages: [], files: [] }) {
+async function installInitExistFile (device, initNotExistFile = { packages: [], files: [] }) {
     const { packages, files } = initNotExistFile
     for (const item of packages) {
         const { path } = env.packages.find(v => v.name === item) || {}
@@ -156,64 +155,63 @@ async function installInitExistFile(device, initNotExistFile = { packages: [], f
     return await getInitNotExistFile(device)
 }
 
-function atxHost(port = '6666', ip) {
+function atxHost (port = '6666', ip) {
     return `http://${ip || '127.0.0.1'}:${port}`
 }
 
 /** 获取设备截图 */
-async function getScreenshot(device) {
+async function getScreenshot (device) {
     if (!device?.port) return
     const arraybufferData = await request(`${atxHost(device.port, device.ip)}/screenshot`, { responseType: 'arraybuffer' })
     return `data:image/png;base64,${arraybufferData ? Buffer.from(arraybufferData, 'binary').toString('base64') : '11'}`
 }
 
 /** 获取XML-UI */
-async function getUI(device, all = false) {
+async function getUI (device, all = false) {
     if (!device?.port) return
     const data = await request(`${atxHost(device.port, device.ip)}/dump/hierarchy`)
-    if (!all) return data.result || ''
+    if (!all) return data?.result || ''
     return [await xml2js.parseStringPromise(data?.result, ''), data?.result || '']
 }
 
-
 /** 点击触屏事件  */
-function tap(device, x, y) {
+function tap (device, x, y) {
     return command(device, ['input', 'tap', `${x}`, `${y}`])
 }
 
 /** 拖动触屏事件 */
-function swipe(device, x = 0, y = 0, toX, toY, tiem) {
+function swipe (device, x = 0, y = 0, toX, toY, tiem) {
     return command(device, ['input', 'swipe', `${x}`, `${y}`, `${toX}`, `${toY}`, `${tiem}`])
 }
 
 /** 长按 */
-function longpress(device, x, y, tiem) {
+function longpress (device, x, y, tiem) {
     return command(device, ['input', 'touchscreen', 'longpress', `${x}`, `${y}`, `${tiem}`])
 }
 
 /** 多指 */
-function multitouch(device, touch) {
+function multitouch (device, touch) {
     return command(device, ['input', 'touchscreen', 'multitouch', `${touch}`])
 }
 
 /** 根据<package_name/activity_name>启动APP  */
-function startApp(device, name) {
+function startApp (device, name) {
     return command(device, ['am', 'start', '-n', `${name}`])
 }
 
 /** 获取运行在窗口的软件的Activity */
-async function getRunAppisActivity(device) {
+async function getRunAppisActivity (device) {
     const { data, success } = await command(device, ['dumpsys', 'activity', 'top', '|', 'grep', '"ACTIVITY"'])
     if (success) return data.trim()?.split(' ')?.[1]
     return null
 }
 
 /** 文本输入事件  */
-async function input(device) {
-    console.log(await command(device, ['settings', 'get', 'secure', 'default_input_method']));
+async function input (device) {
+    console.log(await command(device, ['settings', 'get', 'secure', 'default_input_method']))
 
     // await adb(['shell', 'settings', 'put', 'secure', 'default_input_method', 'com.android.adbkeyboard/.AdbIME'])
-    await delay(1000)
+    // await delay(1000)
     // const data = await adb(['shell', 'am', 'broadcast', '-a', 'ADB_INPUT_TEXT', '--es', 'msg', `"${content}"`])
     // await adb(['shell', 'settings', 'put', 'secure', 'default_input_method', 'com.kika.car.inputmethod/com.android.inputmethod.latin.LatinIME'])
     // return data

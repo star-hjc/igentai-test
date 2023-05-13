@@ -124,7 +124,6 @@ function onNodeClick () {
     })
 }
 
-
 function onRefreshScreenshot () {
     ipcMain.handle('on-onRefreshScreenshot-event', (event, data = {}) => {
         if (!uiNodeWin) return
