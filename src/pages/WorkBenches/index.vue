@@ -134,14 +134,14 @@ onMounted(() => {
     getCode()
 })
 
-function getCode () {
+function getCode() {
     if (!state.query?.filePath) return
     appApi.readFile(state.query?.filePath).then((data) => {
         code.value = data
     })
 }
 
-async function saveCode () {
+async function saveCode() {
     ElMessageBox.confirm('是否保存该案例？', '保存', {
         confirmButtonText: '确定',
         cancelButtonText: '取消'
@@ -157,15 +157,15 @@ onBeforeUnmount(() => {
     codemirrorRef.value.$el.removeEventListener('keydown', ctrlAndS)
 })
 
-function getScreen () {
+function getScreen() {
     viewApi.createGetScreenWindow({ ...state.query })
 }
 
-function getUiNode () {
+function getUiNode() {
     viewApi.createUiNodeWindow({ ...state.query })
 }
 
-function getSelectRow () {
+function getSelectRow() {
     const state = codemirrorView.value.state
     const ranges = state.selection.ranges
     const line = state.doc.lineAt(state.selection.main.head).number
@@ -177,7 +177,7 @@ function getSelectRow () {
     console.log({ selected, cursor, length, lines, line })
 }
 
-async function runCode () {
+async function runCode() {
     // 运行中
     runState.value = 3
     try {
@@ -189,9 +189,12 @@ async function runCode () {
     }
 }
 
-function insertText (content = '', type = 'end') {
+function insertText(content = '', type = 'end') {
     const state = codemirrorView.value.state
     const line = state.doc.lineAt(state.selection.main.head).number
+    const ranges = state.selection.ranges
+    const cursor = ranges[0].anchor
+    const lineInfo =  state.doc.line(line)
     let from = 0
     let insert = ''
     switch (type) {
@@ -200,8 +203,8 @@ function insertText (content = '', type = 'end') {
             insert = `${content}\n`
             break
         case 'after':
-            from = state.doc.line(line).to
-            insert = `\n${content}`
+            from = lineInfo.to
+            insert = `${cursor !== lineInfo.from ? '\n' : ''}${content}`
             break
         case 'begin':
             from = 0
@@ -218,16 +221,16 @@ function insertText (content = '', type = 'end') {
     })
 }
 
-function ctrlAndS (e) {
+function ctrlAndS(e) {
     if (e.ctrlKey && e.key === 's') saveCode()
 }
 
-function onAsideRefreshSize ({ x }) {
+function onAsideRefreshSize({ x }) {
     const workDOM = workRef.value
     workDOM.style.setProperty('--el-aside-width', `${Math.max(300, x || 0)}px`)
 }
 
-function onHelpRefreshSize ({ begin, end }) {
+function onHelpRefreshSize({ begin, end }) {
     const mainDOM = mainRef.value.$el
     const helpStyleIsHeight = getComputedStyle(mainDOM).getPropertyValue('--help-height')
     /** end.y 最小值为 var(--header-height)【40】 加 var(--el-tabs-header-height)【40】 加 5px自定义边距 = 85 */
@@ -236,21 +239,21 @@ function onHelpRefreshSize ({ begin, end }) {
     state.moveLine.y = undefined
 }
 
-function onLinkMove ({ y }) {
+function onLinkMove({ y }) {
     state.moveLine.y = y
 }
 
-function onHelpClose () {
+function onHelpClose() {
     const mainDOM = mainRef.value.$el
     mainDOM.style.setProperty('--help-height', `85px`)
 }
 
-function onCodemirrorload (payload) {
+function onCodemirrorload(payload) {
     console.log(payload)
     codemirrorView.value = payload.view
 }
 
-function getOptions (context) {
+function getOptions(context) {
     const prefix = context.matchBefore(/\w+\.\.\w*/)
     const suffix = context.matchBefore(/\w+\.\w*/)
     const variable = context.matchBefore(/\s*\w*\s*/)

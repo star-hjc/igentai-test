@@ -20,6 +20,7 @@ module.exports = {
     swipe,
     multitouch,
     input,
+    keyevent,
     startApp,
     getRunAppisActivity
 }
@@ -110,6 +111,11 @@ async function startApp(device, name) {
 /** 获取运行在窗口的软件的Activity */
 async function getRunAppisActivity(device) {
     return await ipcRenderer.invoke('on-getRunAppisActivity-event', device)
+}
+
+/** 文本输入事件  */
+async function keyevent(device, keycode) {
+    return await ipcRenderer.invoke('on-keyevent-event', device, keycode)
 }
 
 /** 文本输入事件  */

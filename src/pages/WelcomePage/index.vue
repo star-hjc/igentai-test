@@ -75,7 +75,7 @@
                                         <span>本机IPv4：</span>
                                         <span> {{ state.ipv4?.join(' , ') }}</span>
                                     </div>
-                                    <div v-if="state.ipInfo.ip" class="content-item">
+                                    <div v-if="state.ipInfo?.ip" class="content-item">
                                         <span>网络根IPv4：</span>
                                         <span> {{ state.ipInfo.ip }}</span>
                                     </div>
@@ -89,6 +89,7 @@
                             <div class="device work-area-item">
                                 <div class="title">
                                     <span class="top">设备：</span>
+                                    <el-button @click="onCloseDevice">清空设备</el-button>
                                     <el-button v-if="state.device.id || state.device.path"
                                         @click="onLinkTest">测试连接</el-button>
                                 </div>
@@ -239,6 +240,12 @@ async function getIpInfo () {
         console.log(data)
         state.ipInfo = data
     })
+}
+
+async function onCloseDevice(){
+    state.device.path = ''
+    state.device.id = ''
+    ElMessage.success('清空成功')
 }
 
 async function onLinkTest () {
@@ -485,7 +492,7 @@ function onSelectDevice (val, method) {
         if (/^\s*\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b:\d{1,5}\s*$/.test(val)) {
             state.device.methodName = 'WIFI'
             state.device.method = 'wifi'
-            state.device.ip = state.device.id.split(':')[0]
+            state.device.ip = val.split(':')[0]
             state.device.port = '7912'
             return
         }
@@ -652,6 +659,7 @@ function onSelectDevice (val, method) {
                             display: flex;
                             align-items: center;
                             font-weight: bold;
+                            gap: 10px;
                             border-left: 3px solid var(--el-color-primary);
                             padding: 0 20px;
                             border-bottom: 1px solid #e8e8e8;

@@ -28,8 +28,10 @@
                 <div class="left-container">
                     <span class="title">屏幕点击</span>
                     <div class="parallel">
-                        <span>X,Y：</span>
-                        <el-input v-model="state.tap.value" />
+                        <span>x：</span>
+                        <el-input v-model.number="state.tap.x" />
+                        <span>y：</span>
+                        <el-input v-model.number="state.tap.y" />
                     </div>
                 </div>
                 <el-button @click="insert('tap')">插入</el-button>
@@ -38,12 +40,14 @@
                 <div class="left-container">
                     <span class="title">屏幕长按</span>
                     <div class="parallel">
-                        <span>X,Y：</span>
-                        <el-input v-model="state.longpress.value" />
+                        <span>x：</span>
+                        <el-input v-model.number="state.longpress.x" />
+                        <span>y：</span>
+                        <el-input v-model.number="state.longpress.y" />
                     </div>
                     <div class="parallel">
                         <span>时间：</span>
-                        <el-input v-model="state.longpress.time" />
+                        <el-input v-model.number="state.longpress.time" />
                         <span>ms</span>
                     </div>
                 </div>
@@ -53,16 +57,20 @@
                 <div class="left-container">
                     <span class="title">屏幕拖动</span>
                     <div class="parallel">
-                        <span>X,Y：</span>
-                        <el-input v-model="state.swipe.value" />
+                        <span>x：</span>
+                        <el-input v-model.number="state.swipe.x" />
+                        <span>y：</span>
+                        <el-input v-model.number="state.swipe.y" />
                     </div>
                     <div class="parallel">
-                        <span>To X,Y：</span>
-                        <el-input v-model="state.swipe.to" />
+                        <span>to-x：</span>
+                        <el-input v-model.number="state.swipe.toX" />
+                        <span>to-y：</span>
+                        <el-input v-model.number="state.swipe.toY" />
                     </div>
                     <div class="parallel">
                         <span>时间：</span>
-                        <el-input v-model="state.swipe.tiem" />
+                        <el-input v-model.number="state.swipe.time" />
                         <span>ms</span>
                     </div>
                 </div>
@@ -73,10 +81,10 @@
                     <span class="title">屏幕输入</span>
                     <div class="parallel">
                         <span>内容：</span>
-                        <el-input v-model="state.text.value" />
+                        <el-input v-model="state.input.value" placeholder="测试文字" />
                     </div>
                 </div>
-                <el-button @click="insert('text')">插入</el-button>
+                <el-button @click="insert('input')">插入</el-button>
             </el-menu-item>
         </el-sub-menu>
         <el-sub-menu index="2">
@@ -91,7 +99,7 @@
                     <span class="title">等待</span>
                     <div class="parallel">
                         <span>时间：</span>
-                        <el-input v-model="state.delay.value" />
+                        <el-input v-model.number="state.delay.value" />
                         <span>ms</span>
                     </div>
                 </div>
@@ -151,31 +159,25 @@ const props = defineProps({
     }
 })
 const state = reactive({
-    keyevent: {
-        value: '',
-        type: String,
-        option: [
-
-        ]
-    },
-    tap: { value: '' },
-    longpress: { value: '', time: '' },
-    swipe: { value: '', to: '', time: '' },
-    text: { value: '' },
-    delay: { value: '' },
-    loopByNum: { value: 0 },
-    loopByTime: { value: '' }
+    keyevent: { value: 'KEYCODE_HOME', before: 'adb.', after: '' },
+    tap: { x: '', y: '', before: 'adb.' },
+    longpress: { x: '', y: '', time: 1000, before: 'adb.', },
+    swipe: { x: '', y: '', toX: '', toY: '', time: 1000, before: 'adb.', },
+    input: { value: '', before: 'adb.', },
+    delay: { value: 1000 },
+    loopByNum: { value: 1 },
+    loopByTime: { value: 8000 }
 })
 onMounted(() => {
 
 })
 
-function insert (type = '') {
+function insert(type = '') {
     if (props.activeName === 'codemirror') {
         const config = state[type]
         if (config) {
-            const args = Object.entries(config).filter(v => ['option', 'type'].indexOf(v[0]) === -1).map(v => v[1]).join(',')
-            insertText(`adb.${type}(${config.type === String ? JSON.stringify(args) : args})`, 'after')
+            const args = Object.entries(config).filter(v => ['type', 'before', 'after'].indexOf(v[0]) === -1).map(v => JSON.stringify(v[1])).join(',')
+            insertText(`${config.before}${type}(${args})`, 'after')
         }
     }
     if (props.activeName === 'visualization') {
@@ -196,6 +198,7 @@ function insert (type = '') {
         gap: 10px;
         border-bottom: 1px solid var(--el-border-color-hover);
         min-height: var(--el-menu-sub-item-height);
+        user-select: none;
 
         .parallel {
             display: flex;

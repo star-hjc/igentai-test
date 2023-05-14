@@ -17,10 +17,11 @@ export const prefixData = () => {
     const data = [
         { label: 'JSON.parse', detail: 'JSON字符串转换JS对象' },
         { label: 'JSON.stringify', detail: 'JS对象转换JSON字符串' },
-        { label: 'consonle.log', detail: '控制台打印' },
+        { label: 'console.log', detail: '控制台打印' },
         { label: 'adb.tap', detail: '屏幕点击(x, y)' },
         { label: 'adb.swipe', detail: '屏幕拖动(x, y, toX, toY, time)' },
-        { label: 'adb.keyevent', detail: '手机按键(key)' }
+        { label: 'adb.keyevent', detail: '手机按键(key)' },
+        { label: 'adb.input', detail: '手机输入' }
     ]
     return data.map(v => {
         return { label: `${v.label}`, type: 'text', apply: `${v.label}${v.other || '()'}`, detail: v.detail }
@@ -62,7 +63,7 @@ export const keyevent = [
     },
     {
         key: 'KEYCODE_HOME',
-        label: `按键Home`
+        label: `Home`
     },
     {
         key: 'KEYCODE_MENU',
