@@ -242,7 +242,7 @@ async function getIpInfo () {
     })
 }
 
-async function onCloseDevice(){
+async function onCloseDevice () {
     state.device.path = ''
     state.device.id = ''
     ElMessage.success('清空成功')
