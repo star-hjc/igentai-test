@@ -1,0 +1,5 @@
+/* 编辑器代码字符 */
+@font-face {
+    font-family: 'CascadiaCode';
+    src: url('@/assets/font/CascadiaCode.ttf') format('truetype');
+}

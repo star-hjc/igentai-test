@@ -2,10 +2,11 @@
 const path = require('path')
 const xml2js = require('xml2js')
 const Serial = require('../modules/Serial')
-const { shell } = require('../utils/command')
-const { assetsPath } = require('../main/config')
-const request = require('../utils/request')
 const { env } = require('../main/config')
+const { assetsPath } = require('../main/config')
+const { shell } = require('./command')
+const request = require('./request')
+const { delay } = require('./common')
 
 module.exports = {
     atxHost,
@@ -170,8 +171,9 @@ async function getScreenshot (device) {
 async function getUI (device, all = false) {
     if (!device?.port) return
     const data = await request(`${atxHost(device.port, device.ip)}/dump/hierarchy`)
-    if (!all) return data?.result || ''
-    return [await xml2js.parseStringPromise(data?.result, ''), data?.result || '']
+    const result = data?.result || ''
+    if (!all) return result
+    return [await xml2js.parseStringPromise(result), result]
 }
 
 /** 点击触屏事件  */
@@ -210,9 +212,9 @@ async function keyevent (device, keycode) {
 async function input (device, content) {
     const { data: keyName, success } = await command(device, ['settings', 'get', 'secure', 'default_input_method'])
     if (!success) return
-    await command(['settings', 'put', 'secure', 'default_input_method', 'com.android.adbkeyboard/.AdbIME'])
-    // await delay(1000)
-    const data = await adb(['shell', 'am', 'broadcast', '-a', 'ADB_INPUT_TEXT', '--es', 'msg', `"${content}"`])
-    await command(['settings', 'put', 'secure', 'default_input_method', keyName])
+    await command(device, ['settings', 'put', 'secure', 'default_input_method', 'com.android.adbkeyboard/.AdbIME'])
+    await delay(800)
+    const data = await command(device, ['am', 'broadcast', '-a', 'ADB_INPUT_TEXT', '--es', 'msg', content])
+    await command(device, ['settings', 'put', 'secure', 'default_input_method', keyName.trim()])
     return data
 }

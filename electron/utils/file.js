@@ -140,7 +140,7 @@ function writeFileSync (filePath, data, cover = false) {
             fs.appendFileSync(filePath, data)
             return true
         }
-        fs.writeFileSync(filePath, data)
+        fs.writeFileSync(filePath, data, { flag: 'a' })
         return true
     } catch (err) {
         return false

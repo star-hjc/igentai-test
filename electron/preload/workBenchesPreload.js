@@ -1,7 +1,8 @@
 const { contextBridge, ipcRenderer } = require('electron')
-const adbApi = require('./modules/adb')
 const common = require('./modules/common')
-const view = require('./modules/window')
+const viewApi = require('./modules/window')
+const adbApi = require('./modules/adb')
+const run = require('../utils/run')
 
 contextBridge.exposeInMainWorld('appApi', {
     ...common,
@@ -9,26 +10,11 @@ contextBridge.exposeInMainWorld('appApi', {
 })
 
 contextBridge.exposeInMainWorld('viewApi', {
-    ...view
+    ...viewApi
 })
 
 contextBridge.exposeInMainWorld('adb', {
     ...adbApi
 })
 
-contextBridge.exposeInMainWorld('run', (code, device) => {
-    const adb = {}
-    if (/.*require\(.*/.test(code)) return
-    for (const key in adbApi) { adb[key] = adbApi[key].bind(this, device) }
-    // eslint-disable-next-line no-unused-vars
-    async function DOM () {
-        return new DOMParser().parseFromString(await adb.getUI(), 'text/xml')
-    }
-    // eslint-disable-next-line no-unused-vars
-    async function querySelector (str, num) {
-        if (!isNaN(num / 1)) return (await DOM()).querySelectorAll(str)[num]
-        return (await DOM()).querySelectorAll(str)
-    }
-    // eslint-disable-next-line no-eval
-    return eval(`(async()=>{${code}})()`)
-})
+contextBridge.exposeInMainWorld('run', (code, device) => { return run(code, device) })

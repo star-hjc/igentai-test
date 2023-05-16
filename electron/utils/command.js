@@ -1,4 +1,8 @@
 const cp = require('child_process')
+const path = require('path')
+const { assetsPath } = require('../main/config')
+const file = require('./file')
+const logPath = path.join(assetsPath, 'log/adb.log')
 
 module.exports = { exec, spawn, shell }
 
@@ -6,8 +10,10 @@ async function exec (command, options) {
     return new Promise((resolve, reject) => {
         cp.exec(command, { ...options }, (err, stdout) => {
             if (err) {
+                file.writeFileSync(logPath, `${new Date().toLocaleString()}\ncmd:${command}\nerr:${err}\n`)
                 return reject(err)
             }
+            file.writeFileSync(logPath, `${new Date().toLocaleString()}\ncmd:${command}\ndata:${stdout}\n`)
             resolve(stdout)
         })
     }).catch(() => null)
@@ -66,6 +72,7 @@ async function shell (command, args, options) {
         })
 
         childProcess.on('error', (err) => {
+            file.writeFileSync(logPath, `${new Date().toLocaleString()}\ncmd:${command} ${args.join(' ')}\nerr:${err?.message}\n`)
             reject({
                 command: `${command} ${args.join(' ')}`,
                 data: null,
@@ -76,6 +83,7 @@ async function shell (command, args, options) {
 
         childProcess.on('close', code => {
             if (code !== 0) {
+                file.writeFileSync(logPath, `${new Date().toLocaleString()}\ncmd:${command} ${args.join(' ')}\nerr:${stderr}\n`)
                 return reject({
                     command: `${command} ${args.join(' ')}`,
                     data: stderr,
@@ -83,7 +91,7 @@ async function shell (command, args, options) {
                     message: stderr
                 })
             }
-
+            file.writeFileSync(logPath, `${new Date().toLocaleString()}\ncmd:${command} ${args.join(' ')}\ndata:${stdout}\n`)
             resolve({
                 command: `${command} ${args.join(' ')}`,
                 data: stdout,

@@ -182,7 +182,7 @@ async function getRunAppisActivity () {
 
 /** 文本输入事件  */
 async function input () {
-    ipcMain.handle('on-input-event', async (event, device) => {
-        return await adb.input(device)
+    ipcMain.handle('on-input-event', async (event, device, content) => {
+        return await adb.input(device, content)
     })
 }

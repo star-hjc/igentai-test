@@ -5,6 +5,8 @@ import store from './store'
 import directives from './directives'
 import myCustomComponents from './components'
 import './style/index.css'
+/** font字体 */
+import './style/font.css'
 /** element 消息组件样式 */
 import 'element-plus/es/components/message/style/css'
 import 'element-plus/es/components/message-box/style/css'

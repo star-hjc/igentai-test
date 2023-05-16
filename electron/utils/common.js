@@ -1,5 +1,5 @@
 
-module.exports = { delay, arrayMatched }
+module.exports = { delay, sleep, rand, arrayMatched, loopByTime }
 
 /**
  * 等待
@@ -9,6 +9,14 @@ function delay (timeout = 1000) {
     return new Promise(resolve => {
         setTimeout(() => { resolve() }, timeout)
     })
+}
+
+/**
+ * 等待
+ * @param {Number} timeout 等待时间
+ */
+function sleep (timeout = 1000) {
+    for (var time = new Date(); new Date() - time <= timeout;);
 }
 
 /**
@@ -34,4 +42,27 @@ function arrayMatched (arrOne, arrTwo, callback) {
     const lackIsOne = arrOne.filter(v => !arrTwo.includes(v))
     const lackIsTwo = arrTwo.filter(v => !arrOne.includes(v))
     return { lackIsOne, lackIsTwo }
+}
+
+/**
+ * 生成一个随机数
+ * @param {Number} max 最大值
+ * @param {Number} min 最小值
+ * @returns {Number}
+ */
+function rand (max = 100, min = 0) {
+    return Math.floor(Math.random() * (max - min + 1)) + min
+}
+
+/**
+ * 限时循环
+ * @param {Function} callback 循环体
+ * @param {Number} timeout 循环时间
+ */
+async function loopByTime (callback, timeout) {
+    const start = new Date()
+    while (new Date() - start < timeout) {
+        await callback()
+        sleep(100)
+    }
 }

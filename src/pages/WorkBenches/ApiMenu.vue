@@ -63,9 +63,9 @@
                         <el-input v-model.number="state.swipe.y" />
                     </div>
                     <div class="parallel">
-                        <span>to-x：</span>
+                        <span>x：</span>
                         <el-input v-model.number="state.swipe.toX" />
-                        <span>to-y：</span>
+                        <span>y：</span>
                         <el-input v-model.number="state.swipe.toY" />
                     </div>
                     <div class="parallel">
@@ -74,7 +74,9 @@
                         <span>ms</span>
                     </div>
                 </div>
-                <el-button @click="insert('swipe')">插入</el-button>
+                <div class="parallel">
+                    <el-button @click="insert('swipe')">插入</el-button>
+                </div>
             </el-menu-item>
             <el-menu-item index="1-5">
                 <div class="left-container">
@@ -134,18 +136,24 @@
                 <el-button @click="insert('loopByTime')">插入</el-button>
             </el-menu-item>
         </el-sub-menu>
-        <!-- <el-sub-menu index="3">
-                <template #title>
-                    <el-icon>
-                        <location />
-                    </el-icon>
-                    <span>按键命令</span>
-                </template>
-                <el-menu-item index="2-1">
-
-                    <el-button>插入</el-button>
-                </el-menu-item>
-            </el-sub-menu> -->
+        <el-sub-menu index="3">
+            <template #title>
+                <el-icon>
+                    <location />
+                </el-icon>
+                <span>高级命令</span>
+            </template>
+            <el-menu-item index="3-1">
+                <div class="left-container">
+                    <span class="title">单击</span>
+                    <div class="parallel">
+                        <span>资源ID</span>
+                        <el-input v-model="state.clickId.id" />
+                    </div>
+                </div>
+                <el-button @click="insert('clickId')">插入</el-button>
+            </el-menu-item>
+        </el-sub-menu>
     </el-menu>
 </template>
 
@@ -159,25 +167,28 @@ const props = defineProps({
     }
 })
 const state = reactive({
-    keyevent: { value: 'KEYCODE_HOME', before: 'adb.', after: '' },
-    tap: { x: '', y: '', before: 'adb.' },
-    longpress: { x: '', y: '', time: 1000, before: 'adb.', },
-    swipe: { x: '', y: '', toX: '', toY: '', time: 1000, before: 'adb.', },
-    input: { value: '', before: 'adb.', },
-    delay: { value: 1000 },
-    loopByNum: { value: 1 },
-    loopByTime: { value: 8000 }
+    keyevent: { value: 'KEYCODE_HOME', code: (value) => `await adb.keyevent(${value})` },
+    tap: { x: '', y: '', code: (x, y) => `await adb.tap(${x},${y})` },
+    longpress: { x: '', y: '', time: 1000, code: (x, y, time) => `await adb.longpress(${x},${y},${time})` },
+    swipe: { x: '', y: '', toX: '', toY: '', time: 1000, code: (x, y, toX, toY, time) => `await adb.swipe(${x},${y},${toX},${toY},${time})` },
+    input: { value: '', code: (value) => `await adb.input(${value})` },
+    delay: { value: 1000, code: (value) => `await delay(${value})` },
+    loop: { code: () => `while(true){\n\n}` },
+    loopByNum: { value: 1, code: (value) => `for(const i = 0; i < ${value}; i++;){\n\n}` },
+    loopByTime: { value: 8000, code: (value) => `await loopByTime(async()=>{\n\n},${value})` },
+    clickId: { id: '', code: (value) => `await clickId(${value})` }
 })
 onMounted(() => {
 
 })
 
-function insert(type = '') {
+function insert (type = '') {
     if (props.activeName === 'codemirror') {
         const config = state[type]
         if (config) {
-            const args = Object.entries(config).filter(v => ['type', 'before', 'after'].indexOf(v[0]) === -1).map(v => JSON.stringify(v[1])).join(',')
-            insertText(`${config.before}${type}(${args})`, 'after')
+            const { code } = config
+            const args = Object.entries(config).filter(v => ['code'].indexOf(v[0]) === -1).map(v => JSON.stringify(v[1]))
+            insertText(`${code(...args)}`, 'after')
         }
     }
     if (props.activeName === 'visualization') {
