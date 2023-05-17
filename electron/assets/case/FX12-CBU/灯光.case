@@ -1,0 +1,88 @@
+// 检测进入驾驶
+while (true) {
+    // Home键
+    await adb.keyevent('3')
+    // 等待
+    await delay(1000)
+    // 点击汽车控制
+    await adb.tap(60, 214)
+    await delay(1000)
+    const jg = await byText('灯光', async (xy, node) => {
+        await adb.tap(xy)
+    })
+    if (jg) break
+}
+
+while (true) {
+    var jg = await querySelector("*[text='30S']")
+    var prop = getProp(jg)
+    if (prop.selected==='true') break
+    await adb.tap(getXY(jg))
+    await delay(500)
+}
+console.log('伴我回家30开关')
+
+while (true) {
+    var jg = await querySelector("*[text='关 闭']")
+    var prop = getProp(jg)
+    if (prop.selected==='true') break
+    await adb.tap(getXY(jg))
+    await delay(500)
+}
+console.log('伴我回家关闭开关')
+
+
+while (true) {
+    var jg = await querySelector("*[text='15S']")
+    var prop = getProp(jg)
+    if (prop.selected==='true') break
+    await adb.tap(getXY(jg))
+    await delay(500)
+}
+console.log('伴我回家15开关')
+
+while (true) {
+    var jg = await querySelector("*[text='60S']")
+    var prop = getProp(jg)
+    if (prop.selected==='true') break
+    await adb.tap(getXY(jg))
+    await delay(500)
+}
+console.log('伴我回家60开关')
+
+while (true) {
+    var jg = await querySelector("*[text='90S']")
+    var prop = getProp(jg)
+    if (prop.selected==='true') break
+    await adb.tap(getXY(jg))
+    await delay(500)
+}
+console.log('伴我回家90开关')
+
+while (true) {
+    var jg = await querySelector("*[text='30S']")
+    var prop = getProp(jg)
+    if (prop.selected==='true') break
+    await adb.tap(getXY(jg))
+    await delay(500)
+}
+console.log('伴我回家30开关')
+
+// 点击
+adb.tap(1098,584)
+// 等待
+await delay(1000)
+// 点击
+adb.tap(1098,584)
+console.log('迎宾功能开关')
+// 等待
+await delay(1000)
+
+// 点击
+adb.tap(1100,804)
+
+// 等待
+await delay(1000)
+// 点击
+adb.tap(1100,804)
+console.log('灯语开关')

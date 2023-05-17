@@ -51,14 +51,19 @@ module.exports = async (code, device) => {
         })
     }
     async function click (str, index = 0) {
-        const node = querySelectorAll(str)?.[index]
+        const node = (await querySelectorAll(str))?.[index]
+        console.log(node)
         if (!node) return
         await adb.tap(...getXY(node))
         return node
     }
     // eslint-disable-next-line no-unused-vars
     async function clickId (resourceId, index) {
-        return click(`*[resource-id*='"${resourceId}"']`, index)
+        return click(`*[resource-id*='${resourceId}']`, index)
+    }
+    // eslint-disable-next-line no-unused-vars
+    async function clickText (text, index) {
+        return click(`*[text='${text}']`, index)
     }
     let childProcess = null
     if (device.id) {

@@ -1,0 +1,310 @@
+// 连接两台蓝牙设备 一条已经连接成功
+var langKey = 'Chinese'
+const languageConfig = {
+    'Chinese': {
+        home: [ '电话', '相册', '行车记录', 'DAB', '360全景', '导航', '蓝牙音乐', '收音机', '视频', 'USB音乐','设置','多媒体','手机互联','蓝牙'],
+        home_one_longpress:['请选择三个常用的应用', '完成', '取消'],
+        settingMenu:['蓝牙', '网络', '声音', '显示','车辆', '系统'],
+        rb:['蓝牙', '本机名称', '我的设备', '未连接', '已连接', '其它设备'],
+        rb_NameEdit:['保存','取消'],
+        rb_device:['断开连接', '忽略此设备', '连接设备'],
+        wifi:['网络','其它网络','已连接','未连接'],
+        openWiFiMgs:'正在打开WiFi…',
+        closeWiFiMgs:'正在关闭WiFi…',
+        linkWiFi:['请输入密码','确认'],
+        sound:['音量调节','音效','按键音'],
+        sound_rl:['音量调节','多媒体','蓝牙电话'],
+        eq_rl:['音效', '风格', '自定义音效', '低音', '中音', '高音'],
+        style:['标准','流行','摇滚','爵士','古典','自定义'],
+        light:['屏幕亮度', '夜间模式', '氛围灯', '语言选择'],
+        vehicle:['转向力度调节','伴我回家时间设置','车道偏离预警','前方碰撞预警','后方盲区检测','移动物体预警','开门预警','主题联动开关'],
+        forceAdjustment:['转向力度调节','舒适型','运动型'],
+        walkMeHomeTime:['伴我回家时间设置','关闭','15秒','30秒','45秒','60秒'],
+        laneDepartureWarning:['车道偏离预警','关闭','灵敏度高','灵敏度中','灵敏度低'],
+        forwardCollisionWarning:['前方碰撞预警','关闭','灵敏度高','灵敏度中','灵敏度低'],
+        system:['时间设置','关于本机','恢复出厂设置'],
+        time:['时间设置','时间格式','12小时制','24小时制','手动校准时间','自动校准时间'],
+        msg_rl:['关于本机','MPU','00.00.04','MCU','00.00.02','硬件版本','unknown'],
+        recover_rl:['是否确定恢复到出厂设置?','恢复出厂设置时，请不要断电和行车，否则会造成系统损坏','确定','取消'],
+        // 蓝牙电话
+        rb_phone:['联系人','通话记录','拨号'],
+        rb_phone_update:'更新',
+        rb_phone_delete:['全选','已选择','0','项','确认删除','取消'],
+        tvAllCallLog:'所有通话',
+        tvMissCallLog:'未接通话',
+        llSearchData:['暂无匹配联系人','匹配联系人'],
+        contacts:[],
+    }
+}
+const beginTime = new Date()
+await clickId('com.semisky.autolauncher:id/canle_tv')
+const lang = languageConfig[langKey]
+await adb.keyevent('3')
+await clickId('com.semisky.autolauncher:id/canle_tv')
+await delay(1000)
+await adb.swipe(300,100,800,100,200)
+await delay(1000)
+var texts = await querySelectorAll("[class*='TextView']:not([resource-id*='tvTime'])")
+var homeText = getProps(texts)?.filter(v => v.text)?.map(v => v.text)
+arrF(lang.home, homeText, (item) => { console.log(`${langKey} 首页-最左 ${item}`) })
+adb.longpress(514,277,2000)
+await delay(1500)
+var texts = await querySelectorAll("[class*='TextView']:not([resource-id*='tvTime'])")
+var home_one_longpressText = getProps(texts)?.filter(v => v.text)?.map(v => v.text)
+arrF( home_one_longpressText,lang.home_one_longpress, (item) => { console.log(`${langKey} 首页-长按卡片后Ui界面 ${item}`) })
+await delay(500)
+await adb.keyevent('3')
+await clickId('com.semisky.autolauncher:id/canle_tv')
+await delay(1000)
+await adb.swipe(800,100,300,100,200)
+await delay(1000)
+var texts = await querySelectorAll("[class*='TextView']:not([resource-id*='tvTime'])")
+var homeText = getProps(texts)?.filter(v => v.text)?.map(v => v.text)
+arrF(lang.home, homeText, (item) => { console.log(`${langKey} 首页-最右 ${item}`) })
+// 打开设置
+await adb.startApp("com.semisky.autosetting/.SettingActivity")
+await delay(1000)
+await adb.swipe(100,100,100,300,100)
+await delay(500)
+var texts = await querySelectorAll("[resource-id*='down_tab'] [class*='TextView']")
+var settingMenuText1 = getProps(texts)?.filter(v => v.text)?.map(v => v.text)
+await adb.swipe(100,300,100,100,100)
+await delay(500)
+var texts = await querySelectorAll("[resource-id*='down_tab'] [class*='TextView']")
+var settingMenuText2 = getProps(texts)?.filter(v => v.text)?.map(v => v.text)
+var settingMenuText =[...new Set([...settingMenuText1,...settingMenuText2])]
+arrF(lang.settingMenu, settingMenuText, (item) => { console.log(`${langKey} 设置菜单 ${item}`) })
+await adb.swipe(100,100,100,300,100)
+await delay(500)
+// 点击蓝牙
+await clickId('com.semisky.autosetting:id/btTextView')
+await delay(1000)
+await adb.swipe(430,200,430,450,100)
+await delay(500)
+var texts = await querySelectorAll("[resource-id*='page_fl'] [class*='TextView']:not([resource-id*='tv_carbtname']):not([resource-id*='device_item_name']")
+var rbText1 = getProps(texts)?.filter(v => v.text)?.map(v => v.text)
+await adb.swipe(430,450,430,200,100)
+await delay(500)
+var texts = await querySelectorAll("[resource-id*='page_fl'] [class*='TextView']:not([resource-id*='tv_carbtname']):not([resource-id*='device_item_name']")
+var rbText2 = getProps(texts)?.filter(v => v.text)?.map(v => v.text)
+var rbText =[...new Set([...rbText1,...rbText2])]
+arrF(lang.rb, rbText, (item) => { console.log(`${langKey} 设置-蓝牙 ${item}`) })
+await adb.swipe(430,200,430,450,100)
+await delay(500)
+await adb.swipe(430,420,430,200,500)
+await delay(500)
+await clickId('com.semisky.autosetting:id/device_iv_connect')
+await delay(1000)
+var texts = await querySelectorAll("[resource-id*='device_dv_depair'] [class*='TextView']")
+var rbDeviceText = getProps(texts)?.filter(v => v.text)?.map(v => v.text)
+arrF(lang.rb_device, rbDeviceText, (item) => { console.log(`${langKey}设置-蓝牙-我的设备 ${item}`) })
+await clickId('com.semisky.autosetting:id/device_iv_connect')
+await delay(1000)
+await clickId('com.semisky.autosetting:id/device_iv_connect',1)
+var texts = await querySelectorAll("[resource-id*='device_dv_depair'] [class*='TextView']")
+var rbDeviceText = getProps(texts)?.filter(v => v.text)?.map(v => v.text)
+arrF(lang.rb_device, rbDeviceText, (item) => { console.log(`${langKey}设置-蓝牙-我的设备 ${item}`) })
+await clickId('com.semisky.autosetting:id/device_iv_connect',1)
+await adb.swipe(430,450,430,200,100)
+// !!! 蓝牙搜索异常（连接配对提示）后续补写
+await adb.swipe(430,200,430,450,100)
+await delay(1000)
+// 点击网络
+await clickId('com.semisky.autosetting:id/wifiTextView')
+await delay(3000)
+// 判断wifi是否打开
+const isOpenWiFi = await querySelector("[resource-id='com.semisky.autosetting:id/btnWifiRefresh']")
+// 初始化打开wifi
+if(!isOpenWiFi) {
+  await clickId('com.semisky.autosetting:id/ivWifiSwitch')
+  await delay(8000)
+}
+var texts = await querySelectorAll("[resource-id*='page_fl'] [class*='TextView']:not([resource-id*='tvWifiName'])")
+var wifiText = getProps(texts)?.filter(v => v.text)?.map(v => v.text)
+arrF(lang.wifi, wifiText, (item) => { console.log(`${langKey}设置-网络 ${item}`) })
+// 关闭wifi
+await clickId('com.semisky.autosetting:id/ivWifiSwitch')
+var wifiMgs = getProp(await querySelector("[resource-id*='tv_dialog_message']")).text
+if(wifiMgs!=lang.closeWiFiMgs) console.log(`${langKey}设置-网络-关闭wifi消息 ${wifiMgs}`)
+await delay(8000)
+// 打开wifi
+await clickId('com.semisky.autosetting:id/ivWifiSwitch')
+var wifiMgs = getProp(await querySelector("[resource-id*='tv_dialog_message']")).text
+if(wifiMgs!=lang.openWiFiMgs) console.log(`${langKey}设置-网络-打开wifi消息 ${wifiMgs}`)
+await delay(8000)
+// 是否存在wifi
+let isExitWiFi = await querySelector("[resource-id='com.semisky.autosetting:id/tvWifiName']")
+if(!isExitWiFi){
+  console.log('当前不存在WiFi，刷新一次')
+  await clickId('com.semisky.autosetting:id/ivWifiSwitch')
+  await delay(7000)
+  isExitWiFi = await querySelector("[resource-id='com.semisky.autosetting:id/tvWifiName']")
+}
+if(isExitWiFi){
+   await clickId('com.semisky.autosetting:id/tvWifiName')
+   await delay(1000)
+   var texts = await querySelectorAll("[resource-id*='content'] [text]:not([text=''])")
+   var linkWiFiText = getProps(texts)?.filter(v => v.text)?.map(v => v.text)
+  arrF(lang.linkWiFi, linkWiFiText, (item) => { console.log(`${langKey}设置-网络-点击要连接热点 ${item}`) })
+  await adb.keyevent('4')
+  await delay(1000)
+}else{
+  console.log('WiFi刷新不成功，跳过连接wifi连接步骤...')
+}
+// 打开声音
+await clickId('com.semisky.autosetting:id/soundTextView')
+await delay(1000)
+var texts = await querySelectorAll("[resource-id*='page_fl'] [class*='TextView']")
+var soundText = getProps(texts)?.filter(v => v.text)?.map(v => v.text)
+arrF(lang.sound, soundText, (item) => { console.log(`${langKey}设置-声音 ${item}`) })
+// 点击声音
+await clickId('com.semisky.autosetting:id/sound_rl')
+await delay(1000)
+var texts = await querySelectorAll("[resource-id*='page_fl'] [class*='TextView']")
+var soundText = getProps(texts)?.filter(v => v.text && isNaN(v.text/1))?.map(v => v.text)
+arrF(lang.sound_rl, soundText, (item) => { console.log(`${langKey}设置-声音-音量调节 ${item}`) })
+await clickId('com.semisky.autosetting:id/soundTextView')
+await delay(1000)
+// 单击音效
+await clickId('com.semisky.autosetting:id/eq_rl')
+await delay(1000)
+await adb.swipe(430,200,430,450,100)
+var texts = await querySelectorAll("[class*='Button']")
+var styleText = getProps(texts)?.filter(v => v.text)?.map(v => v.text)
+arrF(lang.style, styleText, (item) => { console.log(`${langKey}设置-声音-音效-风格 ${item}`) })
+var texts = await querySelectorAll("[resource-id*='page_fl'] [class*='TextView']")
+var eq_rlText1 = getProps(texts)?.filter(v => v.text && isNaN(v.text/1))?.map(v => v.text)
+await adb.swipe(430,450,430,200,100)
+await delay(500)
+var texts = await querySelectorAll("[resource-id*='page_fl'] [class*='TextView']")
+var eq_rlText2 = getProps(texts)?.filter(v => v.text && isNaN(v.text/1))?.map(v => v.text)
+var eq_rlText =[...new Set([...eq_rlText1,...eq_rlText2])]
+arrF(lang.eq_rl, eq_rlText, (item) => { console.log(`${langKey}设置-声音-音效 ${item}`) })
+await adb.swipe(430,200,430,450,100)
+await delay(1000)
+// 打开显示
+await clickId('com.semisky.autosetting:id/lightTextView')
+await delay(1000)
+var texts = await querySelectorAll("[resource-id*='page_fl'] [class*='TextView']")
+var lightText = getProps(texts)?.filter(v => v.text && isNaN(v.text/1))?.map(v => v.text)
+arrF(lang.light, lightText, (item) => { console.log(`${langKey}设置-显示 ${item}`) })
+await delay(1000)
+
+// 打开车辆
+await clickId('com.semisky.autosetting:id/vehicleTextView')
+await delay(1000)
+await adb.swipe(430,200,430,450,100)
+await delay(500)
+var texts = await querySelectorAll("[resource-id*='page_fl'] [class*='TextView']")
+var vehicleText1 = getProps(texts)?.filter(v => v.text && isNaN(v.text/1))?.map(v => v.text)
+await adb.swipe(430,450,430,200,100)
+await delay(500)
+var texts = await querySelectorAll("[resource-id*='page_fl'] [class*='TextView']")
+var vehicleText2 = getProps(texts)?.filter(v => v.text && isNaN(v.text/1))?.map(v => v.text)
+var vehicleText =[...new Set([...vehicleText1,...vehicleText2])]
+arrF(lang.vehicle, vehicleText, (item) => { console.log(`${langKey}设置-车辆 ${item}`) })
+await adb.swipe(430,200,430,450,100)
+await delay(500)
+// 单击转向力度调节
+await clickId('com.semisky.autosetting:id/steeringForceAdjustmentRelativeLayout')
+await delay(1000)
+var texts = await querySelectorAll("[resource-id*='page_fl'] [class*='TextView']")
+var forceAdjustmentText = getProps(texts)?.filter(v => v.text && isNaN(v.text/1))?.map(v => v.text)
+arrF(lang.forceAdjustment, forceAdjustmentText, (item) => { console.log(`${langKey}设置-车辆-转向力度调节 ${item}`) })
+await clickId('com.semisky.autosetting:id/vehicleTextView')
+// 单击伴我回家时间设置
+await clickId('com.semisky.autosetting:id/vehicleWalkMeHomeTimeRelativeLayout')
+await delay(1000)
+var texts = await querySelectorAll("[resource-id*='page_fl'] [class*='TextView']")
+var walkMeHomeTimeText = getProps(texts)?.filter(v => v.text && isNaN(v.text/1))?.map(v => v.text)
+arrF(lang.walkMeHomeTime, walkMeHomeTimeText, (item) => { console.log(`${langKey}设置-车辆-伴我回家时间设置 ${item}`) })
+await clickId('com.semisky.autosetting:id/vehicleTextView')
+// 单击车道偏离预警
+await clickId('com.semisky.autosetting:id/vehicleLaneDepartureWarningRelativeLayout')
+await delay(1000)
+var texts = await querySelectorAll("[resource-id*='page_fl'] [class*='TextView']")
+var laneDepartureWarningText = getProps(texts)?.filter(v => v.text && isNaN(v.text/1))?.map(v => v.text)
+arrF(lang.laneDepartureWarning, laneDepartureWarningText, (item) => { console.log(`${langKey}设置-车辆-车道偏离预警 ${item}`) })
+await clickId('com.semisky.autosetting:id/vehicleTextView')
+// 单击前方碰撞预警
+await clickId('com.semisky.autosetting:id/vehicleForwardCollisionWarningRelativeLayout')
+await delay(1000)
+var texts = await querySelectorAll("[resource-id*='page_fl'] [class*='TextView']")
+var forwardCollisionWarningText = getProps(texts)?.filter(v => v.text && isNaN(v.text/1))?.map(v => v.text)
+arrF(lang.forwardCollisionWarning, forwardCollisionWarningText, (item) => { console.log(`${langKey}设置-车辆-车道偏离预警 ${item}`) })
+// 打开系统
+await adb.swipe(100,300,100,100,100)
+await delay(500)
+await clickId('com.semisky.autosetting:id/systemTextView')
+await delay(1000)
+var texts = await querySelectorAll("[resource-id*='page_fl'] [class*='TextView']")
+var systemText = getProps(texts)?.filter(v => v.text)?.map(v => v.text)
+arrF(lang.system, systemText, (item) => { console.log(`${langKey}设置-系统 ${item}`)})
+await clickId('com.semisky.autosetting:id/tv_time')
+await delay(1000)
+var texts = await querySelectorAll("[resource-id*='page_fl'] [class*='TextView']")
+var timeText = getProps(texts)?.filter(v => v.text)?.map(v => v.text)
+arrF(lang.time, timeText, (item) => { console.log(`${langKey}设置-系统-时间设置 ${item}`) })
+await clickId('com.semisky.autosetting:id/systemTextView')
+await delay(1000)
+await clickId('com.semisky.autosetting:id/msg_rl')
+var texts = await querySelectorAll("[resource-id*='page_fl'] [class*='TextView']")
+var msg_rlText = getProps(texts)?.filter(v => v.text)?.map(v => v.text)
+arrF(lang.msg_rl, msg_rlText, (item) => { console.log(`${langKey}设置-系统-关于本机 ${item}`) })
+await clickId('com.semisky.autosetting:id/systemTextView')
+await delay(1000)
+await clickId('com.semisky.autosetting:id/recover_rl')
+var texts = await querySelectorAll("[resource-id*='layoutContent'] [class*='TextView']")
+var recover_rlText = getProps(texts)?.filter(v => v.text)?.map(v => v.text)
+arrF(lang.recover_rl, recover_rlText, (item) => { console.log(`${langKey}设置-系统-恢复出厂设置 ${item}`) })
+await clickId('com.semisky.autosetting:id/dialog_cancel_btn')
+// 返回首页
+await adb.keyevent('3')
+// 打开蓝牙电话
+await adb.startApp("com.semisky.bluetooth/.ui.activity.MainActivity")
+await delay(1000)
+// 点联系人
+await clickId('com.semisky.bluetooth:id/tv_title')
+await delay(1000)
+// 排除语句
+var texts = await querySelectorAll("[resource-id*='tv_title']")
+var rb_phoneText = getProps(texts)?.filter(v => v.text)?.map(v => v.text)
+arrF(lang.rb_phone, rb_phoneText, (item) => { console.log(`${langKey}设置-蓝牙电话 ${item}`) })
+// 更新
+const rb_phone_update = await querySelector("[resource-id='com.semisky.bluetooth:id/tvUpdateContact']")
+if(getText(rb_phone_update)!==lang.rb_phone_update) console.log(`${langKey}设置-蓝牙电话-更新 ${lang.rb_phone}`)
+// 单击删除图标
+await clickId('com.semisky.bluetooth:id/ivDeleteContact')
+await delay(1000)
+var texts = await querySelectorAll("[resource-id*='deleteView'] [class*='TextView']")
+var rb_phone_deleteText = getProps(texts)?.filter(v => v.text)?.map(v => v.text)
+arrF(lang.rb_phone_delete, rb_phone_deleteText, (item) => { console.log(`${langKey}设置-蓝牙电话-删除 ${item}`) })
+// 取消删除
+await clickId('com.semisky.bluetooth:id/btnCancelDelete')
+
+// 点击通话记录
+await clickId('com.semisky.bluetooth:id/tv_title',1)
+await delay(1000)
+const tvAllCallLog = await querySelector("[resource-id='com.semisky.bluetooth:id/tvAllCallLog']")
+const  tvMissCallLog = await querySelector("[resource-id='com.semisky.bluetooth:id/tvMissCallLog']")
+if(getText(tvAllCallLog)!==lang.tvAllCallLog) console.log(`${langKey}设置-蓝牙电话-通话记录-所有通话 ${lang.tvAllCallLog}`)
+if(getText(tvMissCallLog)!==lang.tvMissCallLog) console.log(`${langKey}设置-蓝牙电话-通话记录-未接通话 ${lang.tvMissCallLog}`)
+
+// 点击拨号
+await clickId('com.semisky.bluetooth:id/tv_title',2)
+// 删除文本
+await  adb.longpress(736,111,1500)
+await delay(1500)
+var texts = await querySelectorAll("[resource-id*='llSearchData'] [class*='TextView']:not([resource-id*='recycleViewSearch'] [class*='TextView'])")
+var llSearchData1 = getProps(texts)?.filter(v => v.text)?.map(v => v.text)
+//单击数字1
+await clickId('com.semisky.bluetooth:id/tvKeyboardItem')
+await delay(500)
+var texts = await querySelectorAll("[resource-id*='llSearchData'] [class*='TextView']:not([resource-id*='recycleViewSearch'] [class*='TextView'])")
+var llSearchData2 = getProps(texts)?.filter(v => v.text)?.map(v => v.text)
+var llSearchData =[...new Set([...llSearchData1,...llSearchData2])]
+arrF(lang.llSearchData, llSearchData, (item) => { console.log(`${langKey} 设置-蓝牙电话-拨号 ${item}`) })
+
+console.log(`本次案例执行${(new Date()- beginTime) / 1000}秒`)
+
+

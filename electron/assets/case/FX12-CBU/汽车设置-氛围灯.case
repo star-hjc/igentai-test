@@ -1,0 +1,71 @@
+// 检测进入驾驶
+while (true) {
+    // Home键
+    await adb.keyevent('3')
+    // 等待
+    await delay(1000)
+    // 点击汽车控制
+    await adb.tap(60, 214)
+    await delay(1000)
+    const jg = await byText('氛围灯', async (xy, node) => {
+        await adb.tap(xy)
+    })
+    if (jg) break
+}
+
+while (true){
+	var jg = await querySelector("*[resource-id='com.igentai.vehiclesettings:id/imgAmbientColor']")
+    if(jg) break
+  // 点击
+  adb.tap(516,166)
+  // 等待
+  await delay(500)
+}
+console.log('氛围灯功能打开')
+// 拖动
+await adb.swipe(760,922,598,934,1000)
+await adb.swipe(598,934,912,922,1500)
+await adb.swipe(912,922,760,922,1000)
+
+console.log('亮度测试')
+
+
+// 拖动
+await adb.swipe(1316,924,1088,918,1000)
+await adb.swipe(1088,918,1774,924,1500)
+await adb.swipe(1774,924,1316,924,1000)
+
+console.log('色彩测试')
+
+
+while (true) {
+	var jg = await querySelector("*[resource-id='com.igentai.vehiclesettings:id/imgAmbientColor']")
+	if(!jg) await adb.tap(520,162)
+	var jg1 = await querySelector("*[text='迎宾模式']")
+	if (getProp(jg1).selected === 'true') await adb.tap(getXY(jg1))
+	var jg2 = await querySelector("*[text='关联驾驶模式']")
+	if (getProp(jg2).selected === 'true') await adb.tap(getXY(jg2))
+	var jg3 = await querySelector("*[text='音乐律动']")
+	if (getProp(jg3).selected === 'true') await adb.tap(getXY(jg3))
+	var jg = await querySelector("*[resource-id='com.igentai.vehiclesettings:id/imgAmbientColor']")
+	var titles = getProps((await querySelector("*[text='迎宾模式']")).parentNode.querySelectorAll('node'))
+	if(titles.filter(v=>{v.selected === 'true'}).length===0 && jg) break
+}
+
+await adb.tap(844,162)
+await adb.tap(1130,164)
+await adb.tap(1406,166)
+await adb.tap(1406,166)
+await adb.tap(1130,164)
+await adb.tap(844,162)
+var titles = getProps((await querySelector("*[text='迎宾模式']")).parentNode.querySelectorAll('node'))
+if(titles) console.log(titles.filter(v=>{v.selected === 'true'}).map(a=>a.text).join(','),'点击错误')
+
+while (true){
+	var jg = await querySelector("*[resource-id='com.igentai.vehiclesettings:id/imgAmbientColor']")
+    if(!jg) break
+  // 点击
+  adb.tap(516,166)
+  // 等待
+  await delay(500)
+}

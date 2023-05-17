@@ -1,0 +1,132 @@
+// 打开WIFI模块
+while (true) {
+   await adb.startApp('com.semisky.autosetting/.MainActivity')
+    await delay(1000)
+    var jg = await byText('声音', async (xy, node) => {
+        await adb.tap(xy)
+    })
+    if (jg) break
+}
+
+// 滑动到最上方
+await adb.swipe(766, 125, 766, 150, 10)
+await delay(1000)
+
+// 点击
+await adb.tap(1060,240)
+// 点击
+await adb.tap(972,244)
+// 点击
+await adb.tap(850,246)
+// 点击
+await adb.tap(756,242)
+// 点击
+await adb.tap(652,236)
+// 点击
+await adb.tap(534,240)
+
+
+// 点击自定义
+await adb.tap(1060,240)
+// 拖动
+await adb.swipe(800,378,506,378,1500)
+// 拖动
+await adb.swipe(506,378,1104,378,2000)
+// 拖动
+await adb.swipe(1104,378,800,378,1500)
+console.log('高音测试完毕...')
+// 等待
+await delay(1000)
+// 拖动
+await adb.swipe(800,512,506,512,1500)
+// 拖动
+await adb.swipe(506,512,1104,512,2000)
+// 拖动
+await adb.swipe(1104,512,800,512,1500)
+console.log('中音测试完毕...')
+// 等待
+await delay(1000)
+// 拖动
+await adb.swipe(800,644,506,644,1500)
+// 拖动
+await adb.swipe(506,644,1104,644,2000)
+// 拖动
+await adb.swipe(1104,644,800,644,1500)
+console.log('低音测试完毕...')
+
+// 拖动
+await adb.swipe(928,938,506,938,1500)
+// 拖动
+await adb.swipe(506,938,1104,938,2000)
+// 拖动
+await adb.swipe(1104,938,928,938,1500)
+console.log('多媒体声音测试完毕...')
+
+// 滑动到最下方
+await adb.swipe(766, 150, 766, 125,  10)
+
+// 等待
+await delay(3000)
+
+// 拖动
+await adb.swipe(1104,194,506,194,2000)
+// 拖动
+await adb.swipe(506,194,1104,194,2000)
+console.log('电话声音测试完毕...')
+
+// 拖动
+await adb.swipe(816,326,506,326,2000)
+// 拖动
+await adb.swipe(506,326,1104,326,2000)
+// 拖动
+await adb.swipe(1104,326,816,326,2000)
+console.log('导航声音测试完毕...')
+
+// 拖动
+await adb.swipe(888,462,506,462,2000)
+// 拖动
+await adb.swipe(506,462,1104,462,2000)
+// 拖动
+await adb.swipe(1104,462,888,462,2000)
+console.log('导航声音测试完毕...')
+
+// 点击
+await adb.tap(570,696)
+// 点击
+await adb.tap(732,692)
+// 点击
+await adb.tap(886,698)
+// 点击
+await adb.tap(1042,698)
+// 点击
+await adb.tap(728,694)
+
+console.log('身量随速测试完毕...')
+
+await adb.tap(1090,820)
+// 等待
+await delay(1500)
+await adb.tap(1090,820)
+console.log('按键音测试完毕...')
+
+await adb.tap(1094,950)
+// 等待
+await delay(1500)
+await adb.tap(1094,950)
+console.log('来电语音播报测试完毕...')
+
+await adb.tap(1522,876)
+// 拖动
+await adb.swipe(1524,556,1460,458,1500)
+// 拖动
+await adb.swipe(1460,458,1576,474,1500)
+// 拖动
+await adb.swipe(1576,474,1574,640,1500)
+// 拖动
+await adb.swipe(1574,640,1466,642,1500)
+// 拖动
+await adb.swipe(1460,458,1524,556,1500)
+
+console.log('声车平衡测试完毕...')
+// 等待
+await delay(1500)

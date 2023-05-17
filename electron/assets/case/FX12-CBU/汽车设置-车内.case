@@ -1,0 +1,181 @@
+fs.log('\n')
+// Home键
+await adb.keyevent('3')
+// 等待
+await delay(1500)
+// 点击
+adb.tap(62, 1012)
+// 等待
+await delay(2000)
+// 进入系统设置
+var data = (await querySelector("*[text='系统设置']"))
+await adb.tap(...getXY(data, 0, -20))
+// 等待
+await delay(1000)
+while (true) {
+	const wifi = await querySelector("*[resource-id='com.semisky.autosetting:id/rbWifi']")
+	if (wifi) {
+		await adb.tap(...getXY(wifi))
+		await delay(1500)
+		break
+	}
+	await adb.swipe(296, 150, 268, 520, 10)
+	await delay(500)
+}
+// 获取手机WIFI开关状态
+var wifiState = await adb.getWiFiOn()
+// 滑动到最上方
+await adb.swipe(766, 125, 766, 150, 10)
+await delay(2000)
+// 日志
+fs.log(`进入WiFi时，wifi打开状态为:${wifiState}`)
+// 如果进入为wifi为关打开wifi
+if (!wifiState) {
+	// 打开-WIFI
+	await adb.tap(1100, 228)
+	// 等待
+	await delay(2000)
+}
+// 打开-WIFI
+await adb.tap(1100, 228)
+// 等待
+await delay(1000)
+// 获取手机WIFI开关状态
+var wifiState0 = await adb.getWiFiOn()
+// 关闭-WIFI
+await adb.tap(1100, 228)
+// 等待
+await delay(1000)
+// 获取手机WIFI开关状态
+var wifiState1 = await adb.getWiFiOn()
+// 日志
+fs.log(`WIFI开关切换：${wifiState0 !== wifiState1}`)
+
+var wifiRBtn = (await querySelector("*[resource-id='com.semisky.autosetting:id/fsvWifiAp']"))?.querySelector("*[resource-id='com.semisky.autosetting:id/swOpen']")
+await adb.tap(...getXY(wifiRBtn))
+// 等待
+await delay(2000)
+// 获取手机WIFI开关状态
+var wifiState = await adb.getWiFiOn()
+// 关闭-WIFI
+await adb.tap(1100, 228)
+// 等待
+await delay(2000)
+var wifiRBtn = (await querySelector("*[resource-id='com.semisky.autosetting:id/fsvWifiAp']"))?.querySelector("*[resource-id='com.semisky.autosetting:id/swOpen']")
+fs.log(`WIFI热点与wifi切换：${wifiRBtn?.getAttribute('text') === '关闭' && wifiState}`)
+// 等待
+await delay(1000)
+// 关闭-WIFI
+await adb.tap(1100, 228)
+await delay(2000)
+var data1 = (await querySelector("*[resource-id='com.semisky.autosetting:id/tvSubtitle']"))
+var data2 = (await querySelector("*[resource-id='com.semisky.autosetting:id/llMyNet']"))
+var data3 = (await querySelector("*[resource-id='com.semisky.autosetting:id/ll_usable_net']"))
+fs.log(`wifi:关闭,显示上次连接wifi：${!!data1}，显示可用网络${!!data3}，显示连接过的网络列表${!!data2}`)
+await adb.tap(1100, 228)
+await delay(2000)
+var data1 = (await querySelector("*[resource-id='com.semisky.autosetting:id/tvSubtitle']"))
+var data2 = (await querySelector("*[resource-id='com.semisky.autosetting:id/llMyNet']"))
+var data3 = (await querySelector("*[resource-id='com.semisky.autosetting:id/ll_usable_net']"))
+fs.log(`wifi:开启,显示上次连接wifi：${!!data1}，显示可用网络${!!data3}，显示连接过的网络列表${!!data2}`)
+await delay(1500)
+// 拖动
+adb.swipe(762, 518, 776, 116, 1000)
+await delay(2000)
+var myWiFi = (await querySelector("*[resource-id='com.semisky.autosetting:id/tv_wifi_name'][text='iGentai-5G-WiFi5']"))
+await adb.tap(...getXY(myWiFi))
+// 等待
+await delay(2500)
+const isMyWIFI = (await querySelector("*[resource-id='com.semisky.autosetting:id/tv_title'][text='iGentai-5G-WiFi5']"))
+console.log(isMyWIFI)
+if (isMyWIFI) {
+	const pwd = '18811883535'
+	await delay(1000)
+	await adb.text(`"${pwd}"`)
+	const show = (await querySelector("*[resource-id='com.semisky.autosetting:id/ivPwdShowHide']"))
+	if (show) {
+		await adb.tap(...getXY(show))
+		await delay(1000)
+		const input = (await querySelector("*[resource-id='com.semisky.autosetting:id/et_input']"))
+		fs.log(`输入密码，可以加密查看密码：${input?.getAttribute('text') === pwd}`)
+	}
+	// 等待
+	await delay(2000)
+	// 确定连接
+	await adb.tap(824, 528)
+} else {
+	// 取消连接
+	await adb.tap(1226, 524)
+}
+while (true) {
+	await adb.swipe(766, 125, 766, 150, 10)
+	const xy = getXY(await querySelector("*[text='取消']"))
+	if (xy) await adb.tap(...xy)
+	await delay(1000)
+	if (await querySelector("*[resource-id='com.semisky.autosetting:id/tv_title_wifi']")) break
+}
+var wifiLike = (await querySelector("*[resource-id='com.semisky.autosetting:id/tvSubtitle']"))
+fs.log(`wifi是否正常连接：${!!wifiLike}`)
+// 等待
+await delay(1500)
+await adb.tap(1062, 448)
+// 等待
+await delay(1500)
+await adb.tap(1056, 618)
+await delay(1500)
+for (let i = 0; i < 32; i++) {
+	if ((await querySelector("*[resource-id='com.semisky.autosetting:id/et_input']"))?.getAttribute('text') === '') break
+	await adb.tap(1776, 936)
+}
+const wifiName = '88888888888'
+const wifiPwd = '1234567890'
+await adb.text(`${wifiName}`)
+await adb.tap(808, 528)
+var cancel = (await querySelector("*[text='取消']"))
+// 判断可以点热点密码
+while (true) {
+	if (await querySelector("*[text='热点密码']")) break
+	await delay(500)
+}
+await delay(1000)
+await adb.tap(1000, 712)
+await delay(1500)
+for (let i = 0; i < 32; i++) {
+	if ((await querySelector("*[resource-id='com.semisky.autosetting:id/et_input']"))?.getAttribute('text') === '') break
+	await adb.tap(1776, 936)
+}
+await adb.text(`"12345678"`)
+await adb.tap(808, 528)
+var cancel = (await querySelector("*[text='取消']"))
+if (cancel) {
+	adb.tap(...getXY(cancel))
+}
+// 判断可以点热点密码
+while (true) {
+	if (await querySelector("*[text='热点密码']")) break
+	await delay(500)
+}
+var wifi = await querySelectorAll("*[resource-id='com.semisky.autosetting:id/tvSubtitle']")
+fs.log(`wiFi名称修改:${wifi[0]?.getAttribute('text')},wiFi密码修改:${wifi[1]?.getAttribute('text')}`)
+// 打开wifi
+await adb.tap(1066, 230)
+// 等待
+await delay(1500)
+// 判断可以点热点密码
+var time = new Date().getTime()
+while (((new Date().getTime() - time) / 1000) < 30) {
+	var likeWifi = await querySelector("*[text='已连接']")
+	if (likeWifi) {
+		await adb.tap(...getXY(likeWifi))
+		// 等待
+		await delay(1500)
+		await adb.tap(658, 562)
+		await delay(1500)
+		await adb.tap(750, 716)
+		await delay(2500)
+		fs.log(`wifi断开连接：${await querySelector("*[text='已连接']")}`)
+		break
+	}
+	await delay(500)
+}
+

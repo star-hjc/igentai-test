@@ -3,6 +3,7 @@ const common = require('./modules/common')
 const viewApi = require('./modules/window')
 const adbApi = require('./modules/adb')
 const run = require('../utils/run')
+const cpuApi = require('./modules/cpu')
 
 contextBridge.exposeInMainWorld('appApi', {
     ...common,
@@ -15,6 +16,10 @@ contextBridge.exposeInMainWorld('viewApi', {
 
 contextBridge.exposeInMainWorld('adb', {
     ...adbApi
+})
+
+contextBridge.exposeInMainWorld('cpuApi', {
+    ...cpuApi
 })
 
 contextBridge.exposeInMainWorld('run', (code, device) => { return run(code, device) })

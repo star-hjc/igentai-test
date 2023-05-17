@@ -1,0 +1,8 @@
+for(let i = 0; i < 10; i++){
+// 执行代码
+// 等待
+await delay(1000)
+// 弹出消息框
+showMessage('内容')
+}
+

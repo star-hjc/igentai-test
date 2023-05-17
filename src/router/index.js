@@ -27,6 +27,11 @@ const router = createRouter({
             path: '/node',
             name: 'node',
             component: () => import('../pages/NodePage/index.vue')
+        },
+        {
+            path: '/cpu',
+            name: 'cpu',
+            component: () => import('../pages/CPUPage/index.vue')
         }
     ]
 })

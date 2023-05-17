@@ -2,7 +2,7 @@ const fs = require('fs')
 const path = require('path')
 const { exec } = require('./command')
 
-module.exports = { isDirectory, renameFileSync, readdirAllSync, createFileSync, createFolderSync, removeFileSync, openFileExplorerSync, readFileSync, writeFileSync }
+module.exports = { isDirectorySync, renameFileSync, readdirAllSync, createFileSync, createFolderSync, removeFileSync, openFileExplorerSync, readFileSync, writeFileSync }
 
 /**
  * 是否是文件夹
@@ -10,7 +10,7 @@ module.exports = { isDirectory, renameFileSync, readdirAllSync, createFileSync, 
  * @param {String} filePath 文件路径
  * @returns {Boolean}
  */
-function isDirectory (filePath) {
+function isDirectorySync (filePath) {
     try {
         const stat = fs.lstatSync(filePath)
         return stat.isDirectory()
@@ -25,7 +25,7 @@ function isDirectory (filePath) {
  * @returns {String}
  */
 function getBasePath (filePath) {
-    return isDirectory(filePath) ? filePath : path.join(filePath, '..')
+    return isDirectorySync(filePath) ? filePath : path.join(filePath, '..')
 }
 
 /**
@@ -34,10 +34,10 @@ function getBasePath (filePath) {
  * @returns {Arrer}
  */
 function readdirAllSync (folderBasePath) {
-    if (!isDirectory(folderBasePath)) return []
+    if (!isDirectorySync(folderBasePath)) return []
     return fs.readdirSync(folderBasePath).map(item => {
         const childrenPath = path.join(folderBasePath, item)
-        if (isDirectory(childrenPath)) {
+        if (isDirectorySync(childrenPath)) {
             return { type: 'folder', title: item, children: readdirAllSync(childrenPath), path: childrenPath }
         }
         if (/\.case$/.test(item)) {
@@ -84,7 +84,7 @@ function createFolderSync (filePath, FolderName) {
  * @param {Boolean} recursive 强制删除带文件的文件夹
  */
 function removeFileSync (filePath, recursive = false) {
-    if (isDirectory(filePath)) {
+    if (isDirectorySync(filePath)) {
         try {
             fs.rmdirSync(filePath, { recursive })
         } catch (err) {
@@ -112,11 +112,12 @@ async function openFileExplorerSync (filePath) {
  * @returns
  */
 function renameFileSync (filePath, fileNameOrNewPath, move = false) {
+    console.log(fileNameOrNewPath)
     if (!filePath || !fileNameOrNewPath) return
     if (move) {
         fs.renameSync(filePath, fileNameOrNewPath)
     } else {
-        fs.renameSync(filePath, path.join(getBasePath(filePath), fileNameOrNewPath))
+        fs.renameSync(filePath, path.join(getBasePath(filePath), isDirectorySync(filePath) ? '../' : '', fileNameOrNewPath))
     }
 }
 

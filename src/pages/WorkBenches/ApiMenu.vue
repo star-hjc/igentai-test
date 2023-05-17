@@ -148,10 +148,20 @@
                     <span class="title">单击</span>
                     <div class="parallel">
                         <span>资源ID</span>
-                        <el-input v-model="state.clickId.id" />
+                        <el-input v-model="state.clickId.value" />
                     </div>
                 </div>
                 <el-button @click="insert('clickId')">插入</el-button>
+            </el-menu-item>
+            <el-menu-item index="3-2">
+                <div class="left-container">
+                    <span class="title">单击</span>
+                    <div class="parallel">
+                        <span>文本</span>
+                        <el-input v-model="state.clickText.value" />
+                    </div>
+                </div>
+                <el-button @click="insert('clickText')">插入</el-button>
             </el-menu-item>
         </el-sub-menu>
     </el-menu>
@@ -176,7 +186,8 @@ const state = reactive({
     loop: { code: () => `while(true){\n\n}` },
     loopByNum: { value: 1, code: (value) => `for(const i = 0; i < ${value}; i++;){\n\n}` },
     loopByTime: { value: 8000, code: (value) => `await loopByTime(async()=>{\n\n},${value})` },
-    clickId: { id: '', code: (value) => `await clickId(${value})` }
+    clickId: { value: '', code: (value) => `await clickId(${value})` },
+    clickText: { value: '', code: (value) => `await clickText(${value})` }
 })
 onMounted(() => {
 

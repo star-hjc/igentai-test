@@ -8,7 +8,7 @@
                     </el-icon>
                     <span>首页</span>
                 </div>
-                <div class="tool">
+                <div class="tool" @click="openCpuView">
                     <el-icon size="45">
                         <Cpu />
                     </el-icon>
@@ -351,6 +351,10 @@ function openWorkBenches () {
     viewApi.createWorkBenchesWindow({ ...state.device, filePath: state.file.path })
 }
 
+function openCpuView () {
+    viewApi.createCPUWindow({ ...state.device })
+}
+
 function switchDevtools () {
     appApi.switchDevtools()
 }
@@ -405,7 +409,9 @@ function onRenameFile () {
             cancelButtonText: '取消'
         })
         .then(async ({ value }) => {
-            await appApi.renameFile(state.rightFile?.path || state.caseBasePath, `${value}.case`)
+            const filePath = state.rightFile?.path || state.caseBasePath
+            const isDirectory = await appApi.isDirectory(filePath)
+            await appApi.renameFile(filePath, `${value}${isDirectory ? '' : '.case'}`)
             state.file = null
             getCase()
         })

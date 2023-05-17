@@ -4,6 +4,7 @@ module.exports = {
     setTitle,
     writeFile,
     readFile,
+    isDirectory,
     openBrowser,
     readdirCase,
     switchDevtools,
@@ -81,4 +82,8 @@ function readFile (filePath) {
 
 function writeFile (filePath, data) {
     return ipcRenderer.invoke('on-writeFile-event', filePath, data)
+}
+
+function isDirectory (filePath) {
+    return ipcRenderer.invoke('on-isDirectory-event', filePath)
 }

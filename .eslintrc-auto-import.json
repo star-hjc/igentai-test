@@ -63,6 +63,7 @@
     "appApi": true,
     "run":true,
     "adb": true,
-    "viewApi":true
+    "viewApi":true,
+    "cpuApi":true
   }
 }

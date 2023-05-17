@@ -1,0 +1,120 @@
+var themes ={1:'流光之翼',2:'未来视窗',3:'凯旋之翼'}
+async function getTheme (){
+  var selTheme = await querySelector("*[resource-id^='com.semisky.autosetting:id/ivThemeSel']")
+  var str = selTheme?.getAttribute('resource-id')
+  return themes[str.substring(str.length-1,str.length) || '0'] || '未知'
+}
+
+// 打开WIFI模块
+while (true) {
+    await adb.startApp('com.semisky.autosetting/.MainActivity')
+    await delay(1000)
+    var jg = await byText('显示', async (xy, node) => {
+        await adb.tap(xy)
+    })
+    if (jg) break
+}
+console.log(`当前主题为: ${await getTheme()}`)
+// 滑动到最上方
+await adb.swipe(766, 125, 766, 150, 10)
+await delay(1000)
+
+
+// 拖动
+await adb.swipe(642,336,506,336,1500)
+// 拖动
+await adb.swipe(506,336,1104,336,2000)
+// 拖动
+await adb.swipe(1104,336,642,336,1500)
+console.log('中控亮度测试完毕...')
+// 拖动
+await adb.swipe(506,470,1104,470,2000)
+// 拖动
+await adb.swipe(1104,470,506,470,2000)
+console.log('仪表亮度测试完毕...')
+// 点击
+await adb.tap(618,664)
+// 点击
+await adb.tap(806,666)
+// 点击
+await adb.tap(996,666)
+// 点击
+await adb.tap(618,664)
+console.log('中控屏显示模式测试完毕...')
+
+await byText('流光之翼',async(xy)=>{
+	await adb.tap(xy)
+  	await delay(1000)
+  	await byText('设置为当前主题',async (xy)=>{ await adb.tap(xy) })
+})
+// 等待
+await delay(1500)
+while (true){
+	var wait = await querySelector("*[text^='主题切换中']")
+    await delay(500)
+	if(!wait) break 
+}
+console.log(`当前主题为: ${await getTheme()}`)
+await delay(30000)
+
+await byText('未来视窗',async(xy)=>{
+	await adb.tap(xy)
+  	await delay(1000)
+  	await byText('设置为当前主题',async (xy)=>{ await adb.tap(xy) })
+})
+
+// 等待
+await delay(1500)
+while (true){
+	var wait = await querySelector("*[text^='主题切换中']")
+    await delay(500)
+	if(!wait) break 
+}
+console.log(`当前主题为: ${await getTheme()}`)
+await delay(30000)
+
+await byText('凯旋之翼',async(xy)=>{
+	await adb.tap(xy)
+  	await delay(1000)
+  	await byText('设置为当前主题',async (xy)=>{ await adb.tap(xy) })
+})
+// 等待
+await delay(1500)
+while (true){
+	var wait = await querySelector("*[text^='主题切换中']")
+    await delay(500)
+	if(!wait) break 
+}
+console.log(`当前主题为: ${await getTheme()}`)
+await delay(30000)
+
+
+await byText('流光之翼',async(xy)=>{
+	await adb.tap(xy)
+  	await delay(1000)
+  	await byText('设置为当前主题',async (xy)=>{ await adb.tap(xy) })
+})
+// 等待
+await delay(1500)
+while (true){
+	var wait = await querySelector("*[text^='主题切换中']")
+    await delay(500)
+	if(!wait) break 
+}
+console.log(`当前主题为: ${await getTheme()}`)
+
+// 等待
+await delay(1500)
+// 滑动到最上方
+await adb.swipe(766, 150, 766, 125, 10)
+await delay(1000)
+// 点击
+await adb.tap(1098,786)
+await delay(1000)
+await adb.tap(1098,786)
+console.log('天气换肤测试完毕...')
+await delay(1000)
+await adb.tap(1080,906)
+await delay(1000)
+await adb.tap(1080,906)
+console.log('行车视频播放测试完毕...')

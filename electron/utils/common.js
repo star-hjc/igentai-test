@@ -1,5 +1,5 @@
 
-module.exports = { delay, sleep, rand, arrayMatched, loopByTime }
+module.exports = { bw, delay, sleep, rand, arrayMatched, loopByTime }
 
 /**
  * 等待
@@ -65,4 +65,20 @@ async function loopByTime (callback, timeout) {
         await callback()
         sleep(100)
     }
+}
+
+/** 算报文 */
+function bw (num, lsb, size, binary = 16, length = 8) {
+    const result = parseInt(num, binary).toString(2).slice(-size).padStart(size, '0')
+    const byteArr = Array(length).fill().map(() => Array(length).fill(0))
+    let x = 7 - parseInt(lsb % 8)
+    let y = parseInt(lsb / 8)
+    for (let i = 0; i < size; i++) {
+        if (y > length - 1 || y < 0) break
+        byteArr[y][x] = parseInt(result.charAt(size - i - 1))
+        x -= 1
+        if (x < 0) { y -= 1; x = 7 }
+    }
+    console.log(byteArr)
+    return byteArr.map(v => parseInt(v.slice(0, 4).join(''), 2).toString(16) + parseInt(v.slice(4, 8).join(''), 2).toString(16)).join('')
 }

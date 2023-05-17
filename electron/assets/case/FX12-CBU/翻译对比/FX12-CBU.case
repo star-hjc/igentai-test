@@ -1,0 +1,528 @@
+var langKey = 'English'
+const languageConfig = {
+    'Chinese': {
+        home: {
+            rb_normal: '舒适模式',
+            rb_eco: '经济模式',
+            rb_spt: '运动模式',
+            tv_loading: '加载中...',
+            seat_adjustment: ['座椅加热', '座椅通风'],
+            seat_heating: '座椅加热',
+            seat_ventilation: '座椅通风',
+            tv_edit_car: '编辑卡片'
+        },
+        appList: ['蓝牙电话', '车辆设置', '系统设置', '用户手册', '多媒体', 'USB图片', 'USB视频'],
+        multimedia: {
+            tv_radio: '收音机',
+            FM: 'FM',
+            AM: 'AM',
+            units: ['MHz', 'KHz'],
+            rbNormal: '标准',
+            rbPopular: '流行',
+            rbRock: '摇滚',
+            rbJazz: '爵士',
+            rbClassical: '古典',
+            rbCustom: '自定义',
+            soundList: ['高音', '中音', '低音'],
+            mgs: ['正在刷新电台', '电台更新已取消'],
+            tv_cancel: '取 消',
+            play_list: '电台列表',
+            collect_list: '收藏电台',
+            no_radio_state: ['电台列表为空', '暂无收藏'],
+            removeCollectMgs: '请确定是否删除当前的收藏电台？',
+            tv_sure: '确 定',
+            tv_bt: '蓝牙音乐',
+            notConnectRelative: '蓝牙音频服务未连接',
+            btnStartSetting: '立即连接',
+            tv_usb: 'USB音乐',
+            usb_state_text: '请插入USB设备'
+        },
+        bluetoothPhone: ['未连接蓝牙', '立即连接'],
+        usbPhoto: ['全部', '文件夹', '请插入USB设备'],
+        usbvideo: ['全部', '文件夹', '请插入USB设备'],
+        vehicleSetting: {
+            rbMeter: '仪表',
+            rbMeterTexts: ['仪表导航', '关闭', '局部', '全屏', '超速报警', '超速报警开关', '超速报警速度', '疲劳驾驶', '疲劳驾驶提醒时间', '2h', '3h', '4h', '关 闭'],
+            rbIntelligentDriving: '智能驾驶',
+            rbIntelligentDrivingTexts: ['行车安全', '自动紧急制动', '前方有碰撞危险时，辅助驾驶员进行紧急制动', '自动远近光灯', '根据环境光线，自动切换远近光灯', '前碰撞预警', '前方有碰撞危险时，发出警报提醒，并可设置报警时机', '盲区监测', '并线时监测到两侧视野盲区内车辆时，将报警提醒', '行车辅助', '车道辅助模式', '车道辅助模式', '当车速大于60km/h，车辆行驶路径偏离车道时，将报警提醒', '车道偏离预警', '车道纠偏', '关 闭', '交通标志识别', '自动识别道路交通标志并进行提醒', '超速预警'],
+            rbParking: '全景影像',
+            rbParkingTexts: ['360全景影像', '全景影像退出车速', '当车速达到设置速度值时，自动退出全景影像功能', '15km/h', '20km/h', '30km/h'],
+            rbDrive: '驾驶',
+            rbDriveTexts: ['ESP', 'ESP开关', '极限工况下保持汽车行驶稳定', '方向盘助力', '驾驶模式关联', '自动调节与驾驶模式相匹配的方向盘助力模式', '助力模式', '关闭驾驶模式关联，可选择方向盘助力模式', '轻便', '标准', '运动'],
+            rbInsideTheCar: '车内',
+            rbInsideTheCarTexts: ['呼吸灯', '呼吸灯', '仪表台上呼吸灯根据不同场景显示不同的效果', '呼吸灯亮度'],
+            rbCarBody: '车身',
+            rbCarBodyTexts: ['尾门开启高度', '车窗', '锁车自动升窗'],
+            rbLight: '灯光',
+            rbLightTexts: ['伴我回家', '伴我回家', '设置照我回家灯光延迟时间，您下车后为您提供一段照明时间', '15S', '30S', '60S', '90S', '关 闭', '迎宾功能', '迎宾功能', '携带钥匙进入迎宾区域，灯光点亮', '灯语'],
+            rbAmbientLight: '氛围灯',
+            rbAmbientLightTexts: ['迎宾模式', '关联驾驶模式', '音乐律动']
+        },
+        system: {
+            rbBt: '蓝牙',
+            rbBtTexts: ['蓝牙', '自动连接', '蓝牙名称', '可连接设备'],
+            rbWifi: 'WiFi',
+            rbWifiTexts: ['WiFi', '已连接', 'WiFi热点', '可用网络'],
+            rbCharge: '无线充电',
+            rbChargeTexts: ['无线充电', '无线充电', '手机遗忘提醒'],
+            rbSound: '声音',
+            rbSoundTexts: ['音效', '标准', '流行', '摇滚', '爵士', '古典', '自定义', '高音', '中音', '低音', '音量', '多媒体音量', '电话音量', '导航音量', '语音音量', '音量随速', '此功能开启后，根据车速自动进行线性音量补偿', '低', '中', '高', '关闭', '按键音', '来电语音播报', '来电语音播报开启，来电时播报来电人姓名/手机号', '声场平衡', '复 位'],
+            rbDisplay: '显示',
+            rbDisplayTexts: ['亮度', '中控', '仪表', '中控屏显示模式', '自动模式', '强光模式', '弱光模式', '个性化', '主题', '流光之翼', '凯旋之翼', '未来视窗', '行车视频播放'],
+            rbMore: '自定义',
+            rbMoreTexts: ['日期和时间', '时间制式', '24小时', 'GPS自动校时', '时区', '中国大陆 (UTC+08)', '语言', '系统语言', '中 文', '英 文', '自定义功能', '设定后该功能展示中控DOCK栏位置', '电话', '微信', '系统设置', '多媒体', '用户手册'],
+            rbSystem: '系统',
+            rbSystemTexts: ['系统信息', '系统版本', 'SN码', 'MCU版本号', '储存空间', '储存空间', '清除', '恢复出厂设置']
+        }
+    },
+    'English': {
+        home: {
+            rb_normal: 'COMFORT',
+            rb_eco: 'ECO',
+            rb_spt: 'SPORT',
+            tv_loading: 'loading...',
+            seat_adjustment: ['Seat heating', 'Seat ventilation'],
+            seat_heating: 'Seat heating',
+            seat_ventilation: 'Seat ventilation',
+            tv_edit_car: 'Edit widgets'
+        },
+        appList: ['Bluetooth phone','USB image','Carplay','Android auto','Multimedia','System settings','USB video','Vehicle settings','User manual'],
+        multimedia: {
+            tv_radio: 'Radio',
+            FM: 'FM',
+            AM: 'AM',
+            units: ['MHz', 'KHz'],
+            rbNormal: 'Std',
+            rbPopular: 'Pop',
+            rbRock: 'Rock',
+            rbJazz: 'Jazz',
+            rbClassical: 'Class',
+            rbCustom: 'Custom',
+            soundList: ['Treble', 'Midrange', 'Bass'],
+            mgs: ['Radio station refreshing', 'No other stations found'],
+            tv_cancel: 'Cancel',
+            play_list: 'Radio list',
+            collect_list: 'Favorites',
+            no_radio_state: ['No list', 'No favorite'],
+            removeCollectMgs: 'Delete  favorite',
+            tv_sure: 'OK',
+            tv_bt: 'Bluetooth',
+            notConnectRelative: 'No bluetooth device',
+            btnStartSetting: 'Connect',
+            tv_usb: 'USB',
+            usb_state_text: 'No USB device'
+        },
+        bluetoothPhone: ['No bluetooth device', 'Connect'],
+        usbPhoto: ['All', 'Folder', 'No USB device found'],
+        usbvideo: ['All', 'Folder', 'No USB device found'],
+        vehicleSetting: {
+            rbMeter: 'Instrument',
+            rbMeterTexts: ['Instrument navigation', 'OFF', 'Detail', 'Full Screen', 'Over-speed alarm', 'Over-speed alarm switch', 'Alarm speed setting', 'Rest break Reminder', 'Driving time setting', '2h', '3h', '4h', 'OFF'],
+            rbIntelligentDriving: 'Intelligent driving',
+            rbIntelligentDrivingTexts: [ 'Intelligent driving', 'Driving', 'Interior', 'Body', 'Light', 'Ambient lighting', 'Panorama', 'Instrument', 'LDW reminder', 'Sound alert when the vehicle path deviates from the current lane', 'Lane keeping assist mode', 'Give an alarm when the vehicle is running faster than 60km/h and deviates from the lane', 'LDW', 'OFF' ],
+            rbParking: 'Panorama',
+            rbParkingTexts: ['360 panoramic image', 'Speed to exit the panoramic image', 'Automatically exit the panorama when faster than setting', '15km/h', '20km/h', '30km/h'],
+            rbDrive: 'Driving',
+            rbDriveTexts: ['ESP', 'Keep the vehicle running stably under extreme working conditions', 'Power steering', 'Link to Driving mode', 'Adjust the power steering mode to match the driving mode automatically'],
+            rbInsideTheCar: 'Interior',
+            rbInsideTheCarTexts: ['Breathing light', 'Breathing light', 'Adjust breathing light according to the scene', 'Breathing light brightness'],
+            rbCarBody: 'Body',
+            rbCarBodyTexts: ['Opening height of tailgate', 'Window', 'Automatic window closure when locking vehicle'],
+            rbLight: 'Light',
+            rbLightTexts: ['Headlamp switch-off delay', 'Headlamp switch-off delay', 'Set the delay time for headlamp switch-off to provide you with a period of lighting time after you get off the vehicle', '15S', '30S', '60S', '90S', 'OFF', 'Welcome function', 'Welcome function', 'When the key is in the welcome area, the lights will light up', 'Car light language', 'Car light language'],
+            rbAmbientLight: 'Ambient lighting',
+            rbAmbientLightTexts: ['Welcome mode', 'Associated to driving mode', 'Musical rhythm']
+        },
+        system: {
+            rbBt: 'Bluetooth',
+            rbBtTexts: ['Bluetooth', 'Automatic connection', 'Bluetooth name', 'Available devices'],
+            rbWifi: 'WiFi',
+            rbWifiTexts: ['WiFi', 'Connected', 'WiFiAP', 'Available network'],
+            rbCharge: 'Wireless Charging',
+            rbChargeTexts: ['Wireless charging', 'Wireless charging', 'Phone Forgotten Reminder'],
+            rbSound: 'Sound',
+            rbSoundTexts: ['Voice volume','Std','Pop','Rock','Jazz','Class','Custom','Treble','Midrange','Bass','Reset','listening position','Volume','Multimedia volume','Call volume','Low','Medium','High','OFF','Speed-Sensitive Volume Compensation','When this function is enabled, the linear volume is compensated automatically based on the vehicle speed','Key tone','Exterior simulated sound wave','When the function is enabled, the sound is emitted by the external power amplifier'],
+            rbDisplay: 'Display',
+            rbDisplayTexts: ['Brightness', 'Central control', 'Instrument', 'Display mode of central control screen', 'Automatic ', 'Hard light', 'Soft light', 'Personalization', 'Theme', 'Wings of colorful light', 'Wings of triumph', 'Future windows', 'Driving video playback'],
+            rbMore: 'Custom',
+            rbMoreTexts: ['Date and time', 'Time format', '24-hour', 'GPS automatic time calibration', 'Time zone', 'Mainland China (UTC+08)', 'Language', 'System language', 'Chinese', 'English', 'Phone','User ma…','Picture','Video','Carplay','Custom function','Widgets displayed on the centrol DOCK bar','Custom function'],
+            rbSystem: 'System',
+            rbSystemTexts: ['System Config', 'System Version', 'SN Code', 'MCU version', 'Storage space', 'Occupied', 'Clean up', 'Restore the factory settings'],
+            RestoreSettings:['Restore the factory settings', 'After restore, all system states will be cleared, including: Personalized settings and external apps, etc.', 'Restore and restart', 'Cancel']
+        }
+    },
+
+}
+console.time()
+const lang = languageConfig[langKey]
+await adb.keyevent('3')
+await delay(2000)
+await adb.tap(568, 462)
+await delay(2000)
+var tv_loading = await querySelector("*[resource-id='com.semisky.autolauncher:id/tv_loading']")
+if (getText(tv_loading) !== lang.home.tv_loading) console.log(langKey + ' 主页-卡片-加载中【文本错误】' + getText(tv_loading))
+
+var rb_normal = await querySelector("*[resource-id='com.semisky.autolauncher:id/rb_normal']")
+if (getText(rb_normal) !== lang.home.rb_normal) console.log(langKey + ' 主页-卡片-舒适模式【文本错误】' + getText(rb_normal))
+
+var rb_eco = await querySelector("*[resource-id='com.semisky.autolauncher:id/rb_eco']")
+if (getText(rb_eco) !== lang.home.rb_eco) console.log(langKey + ' 主页-卡片-运动模式【文本错误】' + getText(rb_eco))
+
+var rb_spt = await querySelector("*[resource-id='com.semisky.autolauncher:id/rb_spt']")
+if (getText(rb_spt) !== lang.home.rb_spt) console.log(langKey + ' 主页-卡片-经济模式【文本错误】' + getText(rb_spt))
+await adb.tap(528, 992)
+await delay(500)
+await adb.tap(880, 825)
+var seat_heating = await querySelector("*[resource-id='com.semisky.autolauncher:id/rb_seat_heating']")
+if (getText(seat_heating) !== lang.home.seat_heating) console.log(langKey + ' 主页-座椅设置-座椅加热【文本错误】' + getText(seat_heating))
+var seat_ventilation = await querySelector("*[resource-id='com.semisky.autolauncher:id/rb_seat_ventilation']")
+if (getText(seat_ventilation) !== lang.home.seat_ventilation) console.log(langKey + ' 主页-座椅设置-座椅通风【文本错误】' + getText(seat_ventilation))
+await adb.tap(1150, 825)
+var seat_adjustment = await querySelector("*[resource-id='com.semisky.autolauncher:id/tv_seat_adjustment']")
+if (lang.home.seat_adjustment.indexOf(getText(seat_adjustment)) === -1) console.log(langKey + ' 主页-座椅设置-标题【文本错误】' + getText(seat_adjustment))
+await adb.tap(1175, 835)
+// 关闭座椅设置
+await adb.tap(62, 1016)
+await delay(1000)
+await adb.longpress(1746, 634, 2000)
+var tv_edit_car = await querySelector("*[resource-id='com.semisky.autolauncher:id/tv_edit_car']")
+if (getText(tv_edit_car) !== lang.home.tv_edit_car) console.log(langKey + ' 主页-卡片-编辑卡片【文本错误】' + getText(tv_edit_car))
+await adb.tap(564, 526)
+await delay(2000)
+
+// 单击应用列表
+await adb.tap(62, 1016)
+await delay(2000)
+var appList = await querySelectorAll("*[resource-id='com.semisky.autolauncher:id/item_name']")
+var appListNames = getProps(appList)?.map(v => v.text)
+arrF(lang.appList, appListNames, (item) => {
+    console.log(langKey + ' 应用列表-应用【文本错误】' + item)
+})
+
+// 打开多媒体
+await adb.startApp("com.semisky.multimedia/.media_switcher.MediaAudioMainActivity")
+await delay(2000)
+var tv_radio = await querySelector("*[resource-id='com.semisky.multimedia:id/tv_radio']")
+await adb.tap(getXY(tv_radio))
+if (getText(tv_radio) !== lang.multimedia.tv_radio) console.log(langKey + ' 应用-多媒体-收音机【文本错误】' + getText(tv_radio))
+var tv_bt = await querySelector("*[resource-id='com.semisky.multimedia:id/tv_bt']")
+if (getText(tv_bt) !== lang.multimedia.tv_bt) console.log(langKey + ' 应用-多媒体-蓝牙音乐【文本错误】' + getText(tv_bt))
+var tv_usb = await querySelector("*[resource-id='com.semisky.multimedia:id/tv_usb']")
+if (getText(tv_usb) !== lang.multimedia.tv_usb) console.log(langKey + '  应用-多媒体-USB音乐【文本错误】' + getText(tv_usb))
+await adb.tap(getXY(tv_radio))
+await delay(2000)
+var FM = await querySelector("*[resource-id='com.semisky.multimedia:id/tvChannelType_FM']")
+await adb.tap(getXY(FM))
+await delay(1000)
+var unit = await querySelector("*[resource-id='com.semisky.multimedia:id/tvChannelUnit']")
+if (lang.multimedia.units.indexOf(getText(unit)) === -1) console.log(langKey + '  应用-多媒体-收音机-单位【文本错误】' + getText(unit))
+var AM = await querySelector("*[resource-id='com.semisky.multimedia:id/tvChannelType_AM']")
+await adb.tap(getXY(AM))
+await delay(1000)
+var unit = await querySelector("*[resource-id='com.semisky.multimedia:id/tvChannelUnit']")
+if (lang.multimedia.units.indexOf(getText(unit)) === -1) console.log(langKey + '  应用-多媒体-收音机-单位【文本错误】' + getText(unit))
+await adb.tap(504, 942)
+await delay(1000)
+var tv_info = await querySelector("*[resource-id='com.semisky.multimedia:id/tv_info']")
+if (lang.multimedia.mgs.indexOf(getText(tv_info)) === -1) console.log(langKey + '  应用-多媒体-收音机-刷新（消息提示）【文本错误】' + getText(tv_info))
+var tv_cancel = await querySelector("*[resource-id='com.semisky.multimedia:id/tv_cancel']")
+if (getText(tv_cancel) !== lang.multimedia.tv_cancel) console.log(langKey + ' 应用-多媒体-收音机-刷新（取消）【文本错误】' + getText(tv_cancel))
+await adb.tap(getXY(tv_cancel))
+var tv_info = await querySelector("*[resource-id='com.semisky.multimedia:id/tv_info']")
+if (lang.multimedia.mgs.indexOf(getText(tv_info)) === -1) console.log(langKey + '  应用-多媒体-收音机-刷新（消息提示）【文本错误】' + getText(tv_info))
+await adb.tap(1372, 944)
+await delay(1000)
+// 打开音效
+await adb.tap(1372, 944)
+await delay(2000)
+var sound = (await querySelector("*[resource-id='com.semisky.multimedia:id/ll_lc_layout']"))?.querySelectorAll("*[class='android.widget.TextView']")
+var soundList = getProps(sound)?.map(v => v.text)
+arrF(lang.multimedia.soundList, soundList, (item) => {
+    console.log(langKey + '应用-多媒体-收音机-音效【文本错误】' + item)
+})
+await adb.tap(1540, 946)
+await delay(1000)
+// 打开列表
+await adb.tap(1540, 946)
+await delay(2000)
+var play_list = await querySelector("*[resource-id='com.semisky.multimedia:id/tv_play_list']")
+if (getText(play_list) !== lang.multimedia.play_list) console.log(langKey + ' 应用-多媒体-收音机-列表-电台列表【文本错误】' + getText(play_list))
+await adb.tap(getXY(play_list))
+await delay(1000)
+var no_radio_state = (await querySelector("*[resource-id='com.semisky.multimedia:id/rl_no_radio_state']"))?.children?.[1]
+if (lang.multimedia.no_radio_state.indexOf(getText(no_radio_state)) === -1) console.log(langKey + ' 应用-多媒体-收音机-列表-电台列表-为空提示【文本错误】' + getText(no_radio_state))
+var collect_list = await querySelector("*[resource-id='com.semisky.multimedia:id/tv_collect_list']")
+if (getText(collect_list) !== lang.multimedia.collect_list) console.log(langKey + ' 应用-多媒体-收音机-列表-收藏列表【文本错误】' + getText(collect_list))
+await adb.tap(getXY(collect_list))
+await delay(1000)
+var tv_cancel = await querySelector("*[resource-id='com.semisky.multimedia:id/tv_cancel']")
+var no_radio_state = (await querySelector("*[resource-id='com.semisky.multimedia:id/rl_no_favoritlist_state']"))?.children?.[1]
+if (lang.multimedia.no_radio_state.indexOf(getText(no_radio_state)) === -1 && !tv_cancel) console.log(langKey + ' 应用-多媒体-收音机-列表-收藏列表-为空提示【文本错误】' + getText(no_radio_state))
+if (tv_cancel) {
+    await adb.tap(1850, 158)
+    await delay(1000)
+    var tv_sure = await querySelector("*[resource-id='com.semisky.multimedia:id/tv_sure']")
+    if (getText(tv_sure) !== lang.multimedia.tv_sure) console.log(langKey + ' 应用-多媒体-收音机-列表-收藏列表-确定（删除收藏列表）【文本错误】' + getText(tv_sure))
+    var tv_cancel = await querySelector("*[resource-id='com.semisky.multimedia:id/tv_cancel']")
+    if (getText(tv_cancel) !== lang.multimedia.tv_cancel) console.log(langKey + ' 应用-多媒体-收音机-列表-收藏列表-取消（删除收藏列表）【文本错误】' + getText(tv_cancel))
+    var removeCollectMgs = await querySelector("*[resource-id='com.semisky.multimedia:id/tv']")
+    if (getText(removeCollectMgs) !== lang.multimedia.removeCollectMgs) console.log(langKey + ' 应用-多媒体-收音机-列表-收藏列表-删除收藏列表消息【文本错误】' + getText(removeCollectMgs))
+    await adb.tap(getXY(tv_cancel))
+    await delay(2000)
+    var no_radio_state = (await querySelector("*[resource-id='com.semisky.multimedia:id/rl_no_favoritlist_state']"))?.children?.[1]
+    if (lang.multimedia.no_radio_state.indexOf(getText(no_radio_state)) === -1) console.log(langKey + ' 应用-多媒体-收音机-列表-收藏列表-为空提示【文本错误】' + getText(no_radio_state))
+    await delay(1000)
+} else {
+    await adb.tap(668, 850)
+    await delay(1000)
+    // 点击收藏
+    await adb.tap(672, 942)
+    await delay(2000)
+    // 单击列表
+    await adb.tap(1544, 946)
+    await delay(2000)
+    // 点击收藏列表
+    await adb.tap(getXY(collect_list))
+    await delay(1000)
+    await adb.tap(1850, 158)
+    await delay(2000)
+    var tv_sure = await querySelector("*[resource-id='com.semisky.multimedia:id/tv_sure']")
+    if (getText(tv_sure) !== lang.multimedia.tv_sure) console.log(langKey + ' 应用-多媒体-收音机-列表-收藏列表-确定（删除收藏列表）【文本错误】' + getText(tv_sure))
+    var tv_cancel = await querySelector("*[resource-id='com.semisky.multimedia:id/tv_cancel']")
+    if (getText(tv_cancel) !== lang.multimedia.tv_cancel) console.log(langKey + ' 应用-多媒体-收音机-列表-收藏列表-取消（删除收藏列表）【文本错误】' + getText(tv_cancel))
+    var removeCollectMgs = await querySelector("*[resource-id='com.semisky.multimedia:id/tv']")
+    if (getText(removeCollectMgs) !== lang.multimedia.removeCollectMgs) console.log(langKey + ' 应用-多媒体-收音机-列表-收藏列表-删除收藏列表消息【文本错误】' + getText(removeCollectMgs))
+    await adb.tap(getXY(tv_sure))
+    await delay(1000)
+}
+
+await adb.tap(getXY(tv_bt))
+await delay(1000)
+var notConnectRelative = (await querySelector("*[resource-id='com.semisky.multimedia:id/notConnectRelativeLayout']"))?.querySelector("*[class='android.widget.TextView']")
+if (getText(notConnectRelative) !== lang.multimedia.notConnectRelative) console.log(langKey + '应用-多媒体-蓝牙音乐-蓝牙音频服务未连接（未连接提示）【文本错误】' + getText(removeCollectMgs))
+var btnStartSetting = await querySelector("*[resource-id='com.semisky.multimedia:id/btnStartSetting']")
+if (getText(btnStartSetting) !== lang.multimedia.btnStartSetting) console.log(langKey + '应用-多媒体-蓝牙音乐-立即连接【文本错误】' + getText(btnStartSetting))
+
+await adb.tap(getXY(tv_usb))
+await delay(1000)
+var usb_state_text = await querySelector("*[resource-id='com.semisky.multimedia:id/tv_usb_state_text']")
+if (getText(usb_state_text) !== lang.multimedia.usb_state_text) console.log(langKey + '应用-多媒体-USB音乐-请插入USB设备（无USB连接提示）（未连接提示）【文本错误】' + getText(usb_state_text))
+
+// 打开蓝牙电话应用
+await adb.startApp('com.semisky.bluetooth/.activity.MainActivity')
+await delay(1000)
+// 蓝牙电话打开状态
+var btn_start_set = await querySelector("*[resource-id='com.semisky.bluetooth:id/btn_start_set']")
+// 蓝牙未打开
+if (btn_start_set) {
+    var texts = await querySelectorAll("*[class='android.widget.TextView'][package='com.semisky.bluetooth']")
+    const bluetoothPhoneTexts = getProps(texts)?.map(v => v.text)
+    arrF(lang.bluetoothPhone, bluetoothPhoneTexts, (item) => { console.log(langKey + '应用-蓝牙电话-（未连接状态）' + item) })
+}
+
+// 打开USB图片
+await adb.startApp('com.semisky.multimedia/.media_photo.view.PhotoListActivity')
+await delay(1000)
+var tv_usb_state = await querySelector("*[resource-id='com.semisky.multimedia:id/tv_usb_state_text']")
+// USB未打开
+if (tv_usb_state) {
+    var texts = await querySelectorAll("*[class='android.widget.TextView'][package='com.semisky.multimedia']")
+    const bluetoothPhoneTexts = getProps(texts)?.map(v => v.text)
+    arrF(lang.usbPhoto, bluetoothPhoneTexts, (item) => { console.log(langKey + '应用-USB图片-（未连接状态）' + item) })
+}
+
+// 打开usb视频
+await adb.startApp('com.semisky.multimedia/.media_video.view.VideoListActivity')
+await delay(1000)
+var tv_usb_state = await querySelector("*[resource-id='com.semisky.multimedia:id/tv_usb_state_text']")
+// USB未打开
+if (tv_usb_state) {
+    var texts = await querySelectorAll("*[class='android.widget.TextView'][package='com.semisky.multimedia']")
+    var bluetoothPhoneTexts = getProps(texts)?.map(v => v.text)
+    arrF(lang.usbvideo, bluetoothPhoneTexts, (item) => { console.log(langKey + '应用-USB视频-（未连接状态）' + item) })
+}
+
+// 打开车辆设置
+await adb.startApp('com.igentai.vehiclesettings/.MainActivity')
+await delay(1000)
+var rbMeter = await querySelector("*[resource-id='com.igentai.vehiclesettings:id/rbMeter']")
+if (getText(rbMeter) !== lang.vehicleSetting.rbMeter) console.log(langKey + '车辆设置-仪表【文本错误】' + getText(rbMeter))
+var rbIntelligentDriving = await querySelector("*[resource-id='com.igentai.vehiclesettings:id/rbIntelligentDriving']")
+if (getText(rbIntelligentDriving) !== lang.vehicleSetting.rbIntelligentDriving) console.log(langKey + '车辆设置-智能驾驶' + getText(rbIntelligentDriving))
+var rbParking = await querySelector("*[resource-id='com.igentai.vehiclesettings:id/rbParking']")
+if (getText(rbParking) !== lang.vehicleSetting.rbParking) console.log(langKey + '车辆设置-全景影像' + getText(rbParking))
+var rbDrive = await querySelector("*[resource-id='com.igentai.vehiclesettings:id/rbDrive']")
+if (getText(rbDrive) !== lang.vehicleSetting.rbDrive) console.log(langKey + '车辆设置-驾驶' + getText(rbDrive))
+var rbInsideTheCar = await querySelector("*[resource-id='com.igentai.vehiclesettings:id/rbInsideTheCar']")
+if (getText(rbInsideTheCar) !== lang.vehicleSetting.rbInsideTheCar) console.log(langKey + '车辆设置-车内' + getText(rbInsideTheCar))
+var rbCarBody = await querySelector("*[resource-id='com.igentai.vehiclesettings:id/rbCarBody']")
+if (getText(rbCarBody) !== lang.vehicleSetting.rbCarBody) console.log(langKey + '车辆设置-车身' + getText(rbCarBody))
+var rbLight = await querySelector("*[resource-id='com.igentai.vehiclesettings:id/rbLight']")
+if (getText(rbLight) !== lang.vehicleSetting.rbLight) console.log(langKey + '车辆设置-灯光' + getText(rbLight))
+var rbAmbientLight = await querySelector("*[resource-id='com.igentai.vehiclesettings:id/rbAmbientLight']")
+if (getText(rbAmbientLight) !== lang.vehicleSetting.rbAmbientLight) console.log(langKey + '车辆设置-氛围灯' + getText(rbAmbientLight))
+
+// 打开仪表
+await adb.tap(getXY(rbMeter))
+await delay(2000)
+
+var tvSpeed = await querySelector("*[resource-id='com.igentai.vehiclesettings:id/tvSpeed']")
+// 超速报警速度文本不显示 或者 超速报警开关未打开
+if (!tvSpeed) {
+    // 打开超速报警开关
+    await adb.tap(1074, 476)
+    await delay(1000)
+}
+var texts = (await querySelector("*[resource-id='com.igentai.vehiclesettings:id/flRoot']")).querySelectorAll("*[class='android.widget.TextView']")
+const rbMeterTexts = getProps(texts)?.filter(v => v.text)?.map(v => v.text)
+arrF(lang.vehicleSetting.rbMeterTexts, rbMeterTexts, (item) => { console.log(langKey + '车辆设置-仪表-内部文本' + item) })
+
+// 智能驾驶
+await adb.tap(getXY(rbIntelligentDriving))
+await delay(2000)
+await adb.swipe(800, 374, 800, 728, 100)
+await delay(2000)
+var texts = (await querySelector("*[resource-id='com.igentai.vehiclesettings:id/scrollView']"))?.querySelectorAll("*[class='android.widget.TextView']")
+var rbIntelligentDrivingTexts = getProps(texts)?.filter(v => v.text)?.map(v => v.text)
+arrF(lang.vehicleSetting.rbIntelligentDrivingTexts, rbIntelligentDrivingTexts, (item) => { console.log(langKey + '车辆设置-智能驾驶-内部文本' + item) })
+await adb.swipe(800, 728, 800, 374, 100)
+await delay(2000)
+var texts = (await querySelector("*[resource-id='com.igentai.vehiclesettings:id/scrollView']")).querySelectorAll("*[class='android.widget.TextView']")
+var rbIntelligentDrivingTexts = getProps(texts)?.filter(v => v.text)?.map(v => v.text)
+arrF(lang.vehicleSetting.rbIntelligentDrivingTexts, rbIntelligentDrivingTexts, (item) => { console.log(langKey + '车辆设置-智能驾驶-内部文本' + item) })
+
+// 全景影像
+await adb.tap(getXY(rbParking))
+await delay(2000)
+var texts = (await querySelector("*[resource-id='com.igentai.vehiclesettings:id/flRoot']")).querySelectorAll("*[class='android.widget.TextView']")
+var rbParkingTexts = getProps(texts)?.filter(v => v.text)?.map(v => v.text)
+arrF(lang.vehicleSetting.rbParkingTexts, rbParkingTexts, (item) => { console.log(langKey + '车辆设置-全景影像-内部文本' + item) })
+
+// 驾驶
+await adb.tap(getXY(rbDrive))
+await delay(2000)
+var texts = (await querySelector("*[resource-id='com.igentai.vehiclesettings:id/flRoot']")).querySelectorAll("*[class='android.widget.TextView']")
+var rbDriveTexts = getProps(texts)?.filter(v => v.text)?.map(v => v.text)
+arrF(lang.vehicleSetting.rbDriveTexts, rbDriveTexts, (item) => { console.log(langKey + '车辆设置-全景影像-驾驶' + item) })
+
+// 车内
+await adb.tap(getXY(rbInsideTheCar))
+await delay(2000)
+var texts = (await querySelector("*[resource-id='com.igentai.vehiclesettings:id/flRoot']")).querySelectorAll("*[class='android.widget.TextView']")
+var rbInsideTheCarTexts = getProps(texts)?.filter(v => v.text)?.map(v => v.text)
+arrF(lang.vehicleSetting.rbInsideTheCarTexts, rbInsideTheCarTexts, (item) => { console.log(langKey + '车辆设置-全景影像-车内' + item) })
+
+// 车身
+await adb.tap(getXY(rbCarBody))
+await delay(2000)
+var texts = (await querySelector("*[resource-id='com.igentai.vehiclesettings:id/flRoot']")).querySelectorAll("*[class='android.widget.TextView']")
+var rbCarBodyTexts = getProps(texts)?.filter(v => v.text)?.map(v => v.text)
+arrF(lang.vehicleSetting.rbCarBodyTexts, rbCarBodyTexts, (item) => { console.log(langKey + '车辆设置-全景影像-车身' + item) })
+
+// 灯光
+await adb.tap(getXY(rbLight))
+await delay(2000)
+var texts = (await querySelector("*[resource-id='com.igentai.vehiclesettings:id/flRoot']")).querySelectorAll("*[class='android.widget.TextView']")
+var rbLightTexts = getProps(texts)?.filter(v => v.text)?.map(v => v.text)
+arrF(lang.vehicleSetting.rbLightTexts, rbLightTexts, (item) => { console.log(langKey + '车辆设置-全景影像-驾驶' + item) })
+
+// 氛围灯
+await adb.tap(getXY(rbAmbientLight))
+await delay(2000)
+var texts = (await querySelector("*[resource-id='com.igentai.vehiclesettings:id/flRoot']")).querySelectorAll("*[class='android.widget.TextView']")
+var rbAmbientLightTexts = getProps(texts)?.filter(v => v.text)?.map(v => v.text)
+arrF(lang.vehicleSetting.rbAmbientLightTexts, rbAmbientLightTexts, (item) => { console.log(langKey + '车辆设置-全景影像-驾驶' + item) })
+
+// 打开系统设置
+await adb.startApp('com.semisky.autosetting/.MainActivity')
+await delay(1000)
+// var texts = (await querySelector("*[resource-id='com.semisky.autosetting:id/flRoot']")).querySelectorAll("*[class='android.widget.TextView'],[class='android.widget.RadioButton']")
+// var rbAmbientLightTexts = getProps(texts)?.filter(v => v.text)?.map(v => v.text)
+// console.log(rbAmbientLightTexts)
+var rbBt = await querySelector("*[resource-id='com.semisky.autosetting:id/rbBt']")
+if (getText(rbBt) !== lang.system.rbBt) console.log(langKey + '系统设置-蓝牙【文本错误】' + getText(rbBt))
+var rbWifi = await querySelector("*[resource-id='com.semisky.autosetting:id/rbWifi']")
+if (getText(rbWifi) !== lang.system.rbWifi) console.log(langKey + '系统设置-WiFi【文本错误】' + getText(rbWifi))
+var rbCharge = await querySelector("*[resource-id='com.semisky.autosetting:id/rbCharge']")
+if (getText(rbCharge) !== lang.system.rbCharge) console.log(langKey + '系统设置-无线充电【文本错误】' + getText(rbCharge))
+var rbSound = await querySelector("*[resource-id='com.semisky.autosetting:id/rbSound']")
+if (getText(rbSound) !== lang.system.rbSound) console.log(langKey + '系统设置-声音' + getText(rbSound))
+var rbDisplay = await querySelector("*[resource-id='com.semisky.autosetting:id/rbDisplay']")
+if (getText(rbDisplay) !== lang.system.rbDisplay) console.log(langKey + '系统设置-显示' + getText(rbDisplay))
+var rbMore = await querySelector("*[resource-id='com.semisky.autosetting:id/rbMore']")
+if (getText(rbMore) !== lang.system.rbMore) console.log(langKey + '系统设置-自定义【文本错误】' + getText(rbMore))
+var rbSystem = await querySelector("*[resource-id='com.semisky.autosetting:id/rbSystem']")
+if (getText(rbSystem) !== lang.system.rbSystem) console.log(langKey + '系统设置-系统【文本错误】' + getText(rbSystem))
+
+
+await adb.tap(getXY(rbBt))
+await delay(2000)
+var texts = (await querySelector("*[resource-id='com.semisky.autosetting:id/btScrollView']"))?.querySelectorAll("[resource-id]:not([resource-id='com.semisky.autosetting:id/device_item_name']):not([resource-id='com.semisky.autosetting:id/tvSubtitle'])[class='android.widget.TextView']")
+var rbBtTexts = getProps(texts)?.filter(v => v.text)?.map(v => v.text)
+arrF(lang.system.rbBtTexts, rbBtTexts, (item) => { console.log(langKey + '系统设置-蓝牙-' + item) })
+
+await adb.tap(getXY(rbWifi))
+await delay(2000)
+var texts = (await querySelector("*[resource-id='com.semisky.autosetting:id/wifiScrollView']"))?.querySelectorAll("[resource-id]:not([resource-id='com.semisky.autosetting:id/tv_wifi_name'])[class='android.widget.TextView']")
+var rbWifiTexts = getProps(texts)?.filter(v => v.text)?.map(v => v.text)
+arrF(lang.system.rbWifiTexts, rbWifiTexts, (item) => { console.log(langKey + '系统设置-WIFI-' + item) })
+
+await adb.tap(getXY(rbCharge))
+await delay(2000)
+var texts = (await querySelector("*[resource-id='com.semisky.autosetting:id/flRoot']"))?.querySelectorAll("*[class='android.widget.TextView']")
+var rbChargeTexts = getProps(texts)?.filter(v => v.text)?.map(v => v.text)
+arrF(lang.system.rbChargeTexts, rbChargeTexts, (item) => { console.log(langKey + '系统设置-无线充电-' + item) })
+
+await adb.tap(getXY(rbSound))
+await delay(2000)
+await adb.swipe(800, 374, 800, 728, 100)
+await delay(2000)
+var texts = (await querySelector("*[resource-id='com.semisky.autosetting:id/flRoot']"))?.querySelectorAll("*[class='android.widget.TextView']")
+var rbSoundTexts = getProps(texts)?.filter(v => v.text)?.map(v => v.text)
+arrF(lang.system.rbSoundTexts, rbSoundTexts, (item) => { console.log(langKey + '系统设置-声音-' + item) })
+await adb.swipe(800, 728, 800, 374, 100)
+await delay(2000)
+var texts = (await querySelector("*[resource-id='com.semisky.autosetting:id/flRoot']"))?.querySelectorAll("*[class='android.widget.TextView']")
+var rbSoundTexts = getProps(texts)?.filter(v => v.text)?.map(v => v.text)
+arrF(lang.system.rbSoundTexts, rbSoundTexts, (item) => { console.log(langKey + '系统设置-声音-' + item) })
+
+await adb.tap(getXY(rbDisplay))
+await delay(2000)
+await adb.swipe(800, 374, 800, 728, 100)
+await delay(2000)
+var texts = (await querySelector("*[resource-id='com.semisky.autosetting:id/flRoot']"))?.querySelectorAll("*[class='android.widget.TextView']")
+var rbDisplayTexts = getProps(texts)?.filter(v => v.text)?.map(v => v.text)
+arrF(lang.system.rbDisplayTexts, rbDisplayTexts, (item) => { console.log(langKey + '系统设置-显示-' + item) })
+await adb.swipe(800, 728, 800, 374, 100)
+await delay(2000)
+var texts = (await querySelector("*[resource-id='com.semisky.autosetting:id/flRoot']"))?.querySelectorAll("*[class='android.widget.TextView']")
+var rbDisplayTexts = getProps(texts)?.filter(v => v.text)?.map(v => v.text)
+arrF(lang.system.rbDisplayTexts, rbDisplayTexts, (item) => { console.log(langKey + '系统设置-显示-' + item) })
+
+await adb.tap(getXY(rbMore))
+await delay(2000)
+await adb.swipe(800, 374, 800, 728, 100)
+await delay(2000)
+var texts = (await querySelector("*[resource-id='com.semisky.autosetting:id/flRoot']"))?.querySelectorAll("[resource-id]:not([resource-id='com.semisky.autosetting:id/tvSubtitle']):not([resource-id='com.semisky.autosetting:id/tvStorage'])[class='android.widget.TextView']")
+var rbMoreTexts = getProps(texts)?.filter(v => v.text)?.map(v => v.text)
+arrF(lang.system.rbMoreTexts, rbMoreTexts, (item) => { console.log(langKey + '系统设置-自定义-' + item) })
+await adb.swipe(800, 728, 800, 374, 100)
+await delay(2000)
+var texts = (await querySelector("*[resource-id='com.semisky.autosetting:id/flRoot']"))?.querySelectorAll("[resource-id]:not([resource-id='com.semisky.autosetting:id/tvSubtitle']):not([resource-id='com.semisky.autosetting:id/tvStorage'])[class='android.widget.TextView']")
+var rbMoreTexts = getProps(texts)?.filter(v => v.text)?.map(v => v.text)
+arrF(lang.system.rbMoreTexts, rbMoreTexts, (item) => { console.log(langKey + '系统设置-自定义-' + item) })
+
+await adb.tap(getXY(rbSystem))
+await delay(2000)
+var texts = (await querySelector("*[resource-id='com.semisky.autosetting:id/flRoot']"))?.querySelectorAll("[resource-id]:not([resource-id='com.semisky.autosetting:id/tvSubtitle']):not([resource-id='com.semisky.autosetting:id/tvStorage'])[class='android.widget.TextView']")
+var rbSystemTexts = getProps(texts)?.filter(v => v.text)?.map(v => v.text)
+arrF(lang.system.rbSystemTexts, rbSystemTexts, (item) => { console.log(langKey + '系统设置-设置-' + item) })
+await adb.tap(784,864)
+await delay(2000)
+var texts = (await querySelector("*[resource-id='android:id/content']"))?.querySelectorAll("*[class='android.widget.TextView']")
+var RestoreSettings = getProps(texts)?.filter(v => v.text)?.map(v => v.text)
+arrF(lang.system.RestoreSettings, RestoreSettings, (item) => { console.log(langKey + '系统设置-设置-恢复出厂设置' + item) })
+
+await clickId('com.semisky.autosetting:id/tv_cancel')
+
+console.timeEnd()

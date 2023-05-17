@@ -1,0 +1,54 @@
+// 检测进入驾驶
+while (true) {
+    // Home键
+    await adb.keyevent('3')
+    // 等待
+    await delay(1000)
+    // 点击汽车控制
+    await adb.tap(60, 214)
+    await delay(1000)
+    const jg = await byText('驾驶', async (xy, node) => {
+        await adb.tap(xy)
+    })
+    if (jg) break
+}
+
+// 打开30km/h开关
+while (true) {
+    var jg = await querySelector("*[text='轻便']")
+    var prop = getProp(jg)
+    if (prop.selected==='true') break
+    await adb.tap(getXY(jg))
+    await delay(500)
+}
+console.log('轻便开关已经打开')
+
+// 打开标准开关
+while (true) {
+    var jg = await querySelector("*[text='标准']")
+ 	var prop = getProp(jg)
+    if (prop.selected==='true') break
+    await adb.tap(getXY(jg))
+    await delay(500)
+}
+console.log('标准开关已经打开')
+
+// 打开运动开关
+while (true) {
+    var jg = await querySelector("*[text='运动']")
+    var prop = getProp(jg)
+    if (prop.selected==='true') break
+    await adb.tap(getXY(jg))
+    await delay(500)
+}
+console.log('运动开关已经打开')
+
+// 打开标准开关
+while (true) {
+    var jg = await querySelector("*[text='标准']")
+    var prop = getProp(jg)
+    if (prop.selected==='true') break
+    await adb.tap(getXY(jg))
+    await delay(500)
+}
+console.log('标准开关已经打开')

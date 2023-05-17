@@ -1,0 +1,374 @@
+for(let i = 0; i < 100; i++){
+// 检测进入驾驶
+while (true) {
+    // Home键
+    await adb.keyevent('3')
+    // 等待
+    await delay(1000)
+    // 点击汽车控制
+    await adb.tap(60, 214)
+    await delay(1000)
+    const jg = await byText('灯光', async (xy, node) => {
+        await adb.tap(xy)
+    })
+    if (jg) break
+}
+
+while (true) {
+    var jg = await querySelector("*[text='30S']")
+    var prop = getProp(jg)
+    if (prop.selected==='true') break
+    await adb.tap(getXY(jg))
+    await delay(500)
+}
+console.log('伴我回家30开关')
+
+while (true) {
+    var jg = await querySelector("*[text='关 闭']")
+    var prop = getProp(jg)
+    if (prop.selected==='true') break
+    await adb.tap(getXY(jg))
+    await delay(500)
+}
+console.log('伴我回家关闭开关')
+
+
+while (true) {
+    var jg = await querySelector("*[text='15S']")
+    var prop = getProp(jg)
+    if (prop.selected==='true') break
+    await adb.tap(getXY(jg))
+    await delay(500)
+}
+console.log('伴我回家15开关')
+
+while (true) {
+    var jg = await querySelector("*[text='60S']")
+    var prop = getProp(jg)
+    if (prop.selected==='true') break
+    await adb.tap(getXY(jg))
+    await delay(500)
+}
+console.log('伴我回家60开关')
+
+while (true) {
+    var jg = await querySelector("*[text='90S']")
+    var prop = getProp(jg)
+    if (prop.selected==='true') break
+    await adb.tap(getXY(jg))
+    await delay(500)
+}
+console.log('伴我回家90开关')
+
+while (true) {
+    var jg = await querySelector("*[text='30S']")
+    var prop = getProp(jg)
+    if (prop.selected==='true') break
+    await adb.tap(getXY(jg))
+    await delay(500)
+}
+console.log('伴我回家30开关')
+
+// 点击
+adb.tap(1098,584)
+// 等待
+await delay(1000)
+// 点击
+adb.tap(1098,584)
+console.log('迎宾功能开关')
+// 等待
+await delay(1000)
+
+// 点击
+adb.tap(1100,804)
+
+// 等待
+await delay(1000)
+// 点击
+adb.tap(1100,804)
+console.log('灯语开关')
+
+ await delay(1000)
+  // 检测进入驾驶
+while (true) {
+    // Home键
+    await adb.keyevent('3')
+    // 等待
+    await delay(1000)
+    // 点击汽车控制
+    await adb.tap(60, 214)
+    await delay(1000)
+    const jg = await byText('车身', async (xy, node) => {
+        await adb.tap(xy)
+    })
+    if (jg) break
+}
+
+// 拖动
+await adb.swipe(550,230,1080,230,1500)
+await adb.swipe(1080,230,550,234,1500)
+console.log('尾门开启高度调整完毕')
+
+
+await adb.tap(1092,442)
+await delay(1500)
+await adb.tap(1092,442)
+console.log('锁车自动升窗')
+  
+ await delay(1000)
+  
+// 检测进入驾驶
+while (true) {
+    // Home键
+    await adb.keyevent('3')
+    // 等待
+    await delay(1000)
+    // 点击汽车控制
+    await adb.tap(60, 214)
+    await delay(1000)
+    const jg = await byText('氛围灯', async (xy, node) => {
+        await adb.tap(xy)
+    })
+    if (jg) break
+}
+
+while (true){
+	var jg = await querySelector("*[resource-id='com.igentai.vehiclesettings:id/imgAmbientColor']")
+    if(jg) break
+  // 点击
+  adb.tap(516,166)
+  // 等待
+  await delay(500)
+}
+console.log('氛围灯功能打开')
+// 拖动
+await adb.swipe(760,922,598,934,1000)
+await adb.swipe(598,934,912,922,1500)
+await adb.swipe(912,922,760,922,1000)
+
+console.log('亮度测试')
+
+
+// 拖动
+await adb.swipe(1316,924,1088,918,1000)
+await adb.swipe(1088,918,1774,924,1500)
+await adb.swipe(1774,924,1316,924,1000)
+
+console.log('色彩测试')
+
+
+while (true) {
+	var jg = await querySelector("*[resource-id='com.igentai.vehiclesettings:id/imgAmbientColor']")
+	if(!jg) await adb.tap(520,162)
+	var jg1 = await querySelector("*[text='迎宾模式']")
+	if (getProp(jg1).selected === 'true') await adb.tap(getXY(jg1))
+	var jg2 = await querySelector("*[text='关联驾驶模式']")
+	if (getProp(jg2).selected === 'true') await adb.tap(getXY(jg2))
+	var jg3 = await querySelector("*[text='音乐律动']")
+	if (getProp(jg3).selected === 'true') await adb.tap(getXY(jg3))
+	var jg = await querySelector("*[resource-id='com.igentai.vehiclesettings:id/imgAmbientColor']")
+	var titles = getProps((await querySelector("*[text='迎宾模式']")).parentNode.querySelectorAll('node'))
+	if(titles.filter(v=>{v.selected === 'true'}).length===0 && jg) break
+}
+
+await adb.tap(844,162)
+await adb.tap(1130,164)
+await adb.tap(1406,166)
+await adb.tap(1406,166)
+await adb.tap(1130,164)
+await adb.tap(844,162)
+var titles = getProps((await querySelector("*[text='迎宾模式']")).parentNode.querySelectorAll('node'))
+if(titles) console.log(titles.filter(v=>{v.selected === 'true'}).map(a=>a.text).join(','),'点击错误')
+
+while (true){
+	var jg = await querySelector("*[resource-id='com.igentai.vehiclesettings:id/imgAmbientColor']")
+    if(!jg) break
+  // 点击
+  adb.tap(516,166)
+  // 等待
+  await delay(500)
+}
+
+await delay(1000)
+const defWiFiName = '测试WIFI名称'
+const defWiFiPwd = '12345678'
+const linkWiFiName = 'iGentai-5G-WiFi5'
+const linkWiFiPwd = '18811883535'
+
+// 打开WIFI模块
+while (true) {
+    // Home键
+    await adb.keyevent('3')
+    // 等待
+    await delay(1500)
+    // 点击应用
+    await adb.tap(62, 1012)
+    await delay(2500)
+    await byText('系统设置', async (xy, node) => {
+        await adb.tap(xy)
+    }, { y: -25 })
+    await delay(1000)
+    var jg = await byText('WiFi', async (xy, node) => {
+        await adb.tap(xy)
+    })
+    if (jg) break
+}
+
+// 滑动到最上方
+await adb.swipe(766, 125, 766, 150, 10)
+await delay(1000)
+
+// 打开WIFI模块
+while (true) {
+    var wifi = (await querySelector("*[resource-id='com.semisky.autosetting:id/fsvWifi']")).querySelector("*[resource-id='com.semisky.autosetting:id/swOpen']")
+    var prop = getProp(wifi)
+    if (prop.checked === 'true') break
+    await adb.tap(getXY(wifi))
+    await delay(1000)
+}
+console.log('wifi开关已经打开')
+
+// 关闭WIFI模块
+while (true) {
+    var wifi = (await querySelector("*[resource-id='com.semisky.autosetting:id/fsvWifi']")).querySelector("*[resource-id='com.semisky.autosetting:id/swOpen']")
+    var prop = getProp(wifi)
+    if (prop.checked === 'false') break
+    await adb.tap(getXY(wifi))
+    await delay(1000)
+}
+console.log('wifi开关已经关闭')
+
+
+// 打开WIFI热点模块
+while (true) {
+    var wifi = (await querySelector("*[resource-id='com.semisky.autosetting:id/fsvWifiAp']")).querySelector("*[resource-id='com.semisky.autosetting:id/swOpen']")
+    var prop = getProp(wifi)
+    if (prop.checked === 'true') break
+    await adb.tap(getXY(wifi))
+    await delay(1000)
+}
+console.log('wifi热点已经打开')
+
+
+// 关闭WIFI热点模块
+while (true) {
+    var wifi = (await querySelector("*[resource-id='com.semisky.autosetting:id/fsvWifiAp']")).querySelector("*[resource-id='com.semisky.autosetting:id/swOpen']")
+    var prop = getProp(wifi)
+    if (prop.checked === 'false') break
+    await adb.tap(getXY(wifi))
+    await delay(1000)
+}
+console.log('wifi热点已经关闭')
+
+// 打开WIFI热点模块
+while (true) {
+    var wifi = (await querySelector("*[resource-id='com.semisky.autosetting:id/fsvWifiAp']")).querySelector("*[resource-id='com.semisky.autosetting:id/swOpen']")
+    var prop = getProp(wifi)
+    if (prop.checked === 'true') break
+    await adb.tap(getXY(wifi))
+    await delay(1000)
+}
+console.log('wifi热点已经打开')
+
+
+// 等待
+while (true) {
+    var wifiName = (await querySelector("*[text='热点名称']"))
+    if (wifiName) break
+}
+
+// 修改WIFI热点名称
+while (true) {
+    // var wifi = (await querySelector("*[]"))
+    var wifiAP = (await querySelector("*[resource-id='com.semisky.autosetting:id/ftvWifiHotspotName']"))?.querySelector("*[resource-id='com.semisky.autosetting:id/tvSubtitle']")
+    if (wifiAP) await adb.tap(getXY(wifiAP))
+    var wifiEditView = await querySelector("*[resource-id='com.semisky.autosetting:id/tv_title']")
+    if (wifiEditView) {
+        for (let i = 0; i < 32; i++) {
+            if ((await querySelector("*[resource-id='com.semisky.autosetting:id/et_input']"))?.getAttribute('text') === '') break
+            await adb.tap(1776, 936)
+        }
+        await delay(1000)
+        await adb.text(`${defWiFiName}`)
+    }
+    const inputProp = await getProp(await querySelector("*[resource-id='com.semisky.autosetting:id/et_input']"))
+    if (inputProp?.text === defWiFiName) {
+        await adb.tap(822, 530)
+        break
+    }
+}
+
+
+// 修改WIFI热点密码
+while (true) {
+    // var wifi = (await querySelector("*[]"))
+    var wifiPwd = (await querySelector("*[resource-id='com.semisky.autosetting:id/ftvWifiHotspotPwd']"))?.querySelector("*[resource-id='com.semisky.autosetting:id/tvSubtitle']")
+    if (wifiPwd) await adb.tap(getXY(wifiPwd))
+    var wifiEditView = await querySelector("*[resource-id='com.semisky.autosetting:id/tv_title']")
+    if (wifiEditView) {
+        for (let i = 0; i < 32; i++) {
+            if ((await querySelector("*[resource-id='com.semisky.autosetting:id/et_input']"))?.getAttribute('text') === '') break
+            await adb.tap(1776, 936)
+        }
+        await delay(1000)
+        await adb.text(`${defWiFiPwd}`)
+    }
+    const inputProp = await getProp(await querySelector("*[resource-id='com.semisky.autosetting:id/et_input']"))
+    if (inputProp?.text) {
+        await adb.tap(822, 530)
+      	await delay(1000)
+        break
+    }
+}
+
+
+// 打开WIFI模块
+while (true) {
+    var wifi = (await querySelector("*[resource-id='com.semisky.autosetting:id/fsvWifi']")).querySelector("*[resource-id='com.semisky.autosetting:id/swOpen']")
+    var prop = getProp(wifi)
+    if (prop.checked === 'true') break
+    await adb.tap(getXY(wifi))
+   // await delay(1000)
+}
+
+await delay(1000)
+adb.swipe(814, 570, 840, 235, 1000)
+await delay(2000)
+
+
+while (true) {
+  	var linkWiFI =  await querySelector("*[text='已连接']")
+    if(linkWiFI) break
+    var myWiFi = (await querySelector(`*[resource-id='com.semisky.autosetting:id/tv_wifi_name'][text=${linkWiFiName}]`))
+    await adb.tap(getXY(myWiFi))
+    var confirmProp = await getProp(await querySelector("*[resource-id='com.semisky.autosetting:id/tv_title']"))
+    if (confirmProp?.text === linkWiFiName) {
+        await adb.text(`${linkWiFiPwd}`)
+        await delay(1000)
+    } else {
+        await adb.tap(1198, 528)
+        await delay(1000)
+    }
+	
+    var inputProp = await getProp(await querySelector("*[resource-id='com.semisky.autosetting:id/et_input']"))
+    if (inputProp.text && inputProp.text !== '密码') {
+        await adb.tap(844, 528)
+        await delay(1000)
+        break
+    }
+}
+
+
+await delay(3000)
+await adb.swipe(766, 125, 766, 150, 10)
+await delay(1000)
+console.log('复位...')
+var linkWiFI =  await querySelector("*[text='已连接']")
+await adb.tap(getXY(linkWiFI))
+await delay(2000)
+var closeWifi = await querySelector("*[resource-id='com.semisky.autosetting:id/tvIgnore']")
+await adb.tap(getXY(closeWifi))
+await adb.tap(732,704)
+
+}
+

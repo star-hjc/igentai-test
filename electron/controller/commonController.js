@@ -6,6 +6,7 @@ const { assetsPath } = require('../main/config')
 const request = require('../utils/request')
 
 const {
+    isDirectorySync,
     readdirAllSync,
     renameFileSync,
     createFileSync,
@@ -17,6 +18,7 @@ const {
 } = require('../utils/file')
 
 module.exports = {
+    isDirectory,
     renameFile,
     readFile,
     setTitle,
@@ -58,6 +60,13 @@ function readdirCase () {
     ipcMain.handle('on-readdirCase-event', (event) => {
         const basePath = path.join(assetsPath, 'case')
         return readdirAllSync(basePath)
+    })
+}
+
+/** 判断为文件夹 */
+function isDirectory () {
+    ipcMain.handle('on-isDirectory-event', (event, filePath) => {
+        return isDirectorySync(filePath)
     })
 }
 

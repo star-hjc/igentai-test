@@ -8,6 +8,7 @@ module.exports = {
     createGetScreenWindow,
     createWorkBenchesWindow,
     createUiNodeWindow,
+    createCPUWindow,
     getAppInfo,
     onNodeClick,
     onRefreshScreenshot
@@ -32,6 +33,25 @@ function createWorkBenchesWindow () {
         workWin.maximize()
         workWin.loadURL(`${loadURL}#/work?${querystring.stringify(data)}`)
         workWin.setTitle('工作台')
+        workWin.webContents.openDevTools()
+    })
+}
+
+function createCPUWindow () {
+    ipcMain.handle('on-createCPUWindow-event', (event, data = {}, option = {}) => {
+        const workWin = new BrowserWindow({
+            autoHideMenuBar: true,
+            resizable: true,
+            webPreferences: {
+                preload: path.join(__dirname, '../preload/workBenchesPreload.js'),
+                nodeIntegration: true
+            },
+            ...option
+        })
+        /** 最大化 */
+        workWin.maximize()
+        workWin.loadURL(`${loadURL}#/cpu?${querystring.stringify(data)}`)
+        workWin.setTitle('监控')
         workWin.webContents.openDevTools()
     })
 }
