@@ -81,7 +81,12 @@
                                     </div>
                                     <div v-if="state.ipInfo.actionAddress?.length" class="content-item">
                                         <span>所在地：</span>
-                                        <span> {{ state.ipInfo.actionAddress?.join(' , ') }}</span>
+                                        <span>
+                                            {{
+                                                state.ipInfo.actionAddress?.join(' , ')
+                                                || `${state.ipInfo.province}-${state.ipInfo.city}`
+                                            }}
+                                        </span>
                                     </div>
                                 </div>
                             </div>
@@ -100,7 +105,8 @@
                                 </el-radio-group>
                                 <div class="content">
                                     <div class="content-item" style="color: #E6A23C;"
-                                        v-show="state.connectionMethod === 'serialport'">(不建议使用)</div>
+                                        v-show="state.connectionMethod === 'serialport'">(不建议使用【图片获取用时1min , UI节点获取用时2s】)
+                                    </div>
                                     <div class="content-item">
                                         <div v-show="state.connectionMethod === 'serialport'">
                                             <span>串口：</span>
@@ -181,6 +187,8 @@
                                     </div>
 
                                     <div class="content-item">
+                                        <el-button type="warning"
+                                            @click="onStopUiautomatorServe">停止uiautomator服务</el-button>
                                         <el-button type="warning" @click="onKillADB">停止当前ADB服务</el-button>
                                         <el-button type="warning" @click="onKillADB(true)">停止所有ADB服务</el-button>
                                     </div>
@@ -188,9 +196,16 @@
                             </div>
                             <!-- 判断是否运行 -->
                             <div class="log work-area-item">
-                                <div class="title"><span class="top">日志：</span></div>
+                                <div class="title">
+                                    <span class="top">日志：</span>
+                                    <el-button @click="getLog">刷新</el-button>
+                                </div>
                                 <div class="content">
-                                    开发中...
+                                    <div v-for="item in state.logFile" :key="item.title" class="log-item"
+                                        @click="openFileExplorer(item.path)">
+                                        {{ item.title }}&nbsp;&nbsp;&nbsp;创建时间：{{ item.createTime }}
+                                    </div>
+                                    <div v-if="!state.logFile?.length" class="log-item" style="text-align: center;">空</div>
                                 </div>
                             </div>
                         </el-scrollbar>
@@ -223,6 +238,7 @@ const state = reactive({
         position: []
     },
     initNotExistFile: {},
+    logFile: [],
     file: null,
     caseBasePath: '',
     rightFile: null
@@ -231,14 +247,20 @@ const state = reactive({
 onMounted(async () => {
     state.caseBasePath = await appApi.getAssetsPath('case')
     getCase()
+    getLog()
     getDeviceList()
     getLocalIPv4()
 })
 
 async function getIpInfo () {
     await appApi.getIpInfo().then(data => {
-        console.log(data)
         state.ipInfo = data
+    })
+}
+
+async function getLog () {
+    await appApi.readdirLog().then(data => {
+        state.logFile = data
     })
 }
 
@@ -391,6 +413,14 @@ function createFolder () {
         .catch(() => { })
 }
 
+async function onStopUiautomatorServe () {
+    adb.setUiautomatorServe({ ...state.device }, 2).then(() => {
+        ElMessage.success('关闭Uiautomator服务成功...')
+    }).catch(() => {
+        ElMessage.error('关闭uiautomator服务失败...')
+    })
+}
+
 async function onKillADB (all = false) {
     ElMessage.success('重启ADB服务中...')
     if (all) {
@@ -488,6 +518,7 @@ function onSelectDevice (val, method) {
             if (data.files?.length && data.packages?.length) {
                 state.initNotExistFile = data
                 isLink.value = true
+                adb.startATXService(device)
                 return
             }
             adb.installInitExistFile(device, data).then((notExistFile) => {
@@ -506,8 +537,10 @@ function onSelectDevice (val, method) {
         state.device.method = 'usb'
         return
     }
+    state.initNotExistFile = {}
     state.device.methodName = '串口'
     state.device.method = method
+    isLink.value = true
 }
 </script>
 
@@ -563,6 +596,7 @@ function onSelectDevice (val, method) {
 
                 .el-menu {
                     min-height: var(--menu-container-height);
+                    color: var(--el-menu-active-color);
                 }
             }
         }
@@ -594,6 +628,18 @@ function onSelectDevice (val, method) {
                             display: flex;
                             align-items: center;
                             white-space: nowrap;
+                        }
+                    }
+
+                    .log .content {
+                        .log-item {
+                            height: 25px;
+                            color: #666666;
+                            background: #FFFFFF;
+                        }
+
+                        .log-item:hover {
+                            background: var(--el-menu-hover-bg-color);
                         }
                     }
 

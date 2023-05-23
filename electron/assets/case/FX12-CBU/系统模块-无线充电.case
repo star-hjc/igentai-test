@@ -1,55 +1,15 @@
-// 打开无线充电模块
-while (true) {
-    // Home键
-    await adb.keyevent('3')
-    // 等待
-    await delay(1500)
-    // 点击应用
-    await adb.tap(62, 1012)
-    await delay(2500)
-    await byText('系统设置', async (xy, node) => {
-        await adb.tap(xy)
-    }, { y: -25 })
+var rbCharge = await querySelector("[resource-id='com.semisky.autosetting:id/rbCharge']")
+if(!rbCharge){
+    await adb.startApp('com.semisky.autosetting/.MainActivity')
     await delay(1000)
-    var jg = await byText('无线充电', async (xy, node) => {
-        await adb.tap(xy)
-    })
-    if (jg) break
+    await clickId("rbCharge")
 }
+await adb.tap(getXY(rbCharge))
 
+clickText("swOpen")
+clickText("swOpen")
 
-while (true) {
-    var jg = (await querySelector("*[resource-id='com.semisky.autosetting:id/fsvWirelessCharge2']")).querySelector("*[resource-id='com.semisky.autosetting:id/swOpen']");
-    var prop = getProp(jg)
-    if (prop.checked === 'false') await adb.tap(getXY(jg))
-    var jg1 = (await querySelector("*[resource-id='com.semisky.autosetting:id/fsvPhoneForgotRemind2']")).querySelector("*[resource-id='com.semisky.autosetting:id/swOpen']");
-    var prop1 = getProp(jg1)
-    if (prop1.checked === 'false') await adb.tap(getXY(jg1))
-    if (prop1.checked === 'true' && prop.checked === 'true') break
-}
+clickText("swOpen",1)
+clickText("swOpen",1)
 
-
-var jg = (await querySelector("*[resource-id='com.semisky.autosetting:id/fsvWirelessCharge2']")).querySelector("*[resource-id='com.semisky.autosetting:id/swOpen']");
-var prop = getProp(jg)
-if(prop.checked === 'true') await adb.tap(getXY(jg))
-await delay(1000)
-var jg1 = (await querySelector("*[resource-id='com.semisky.autosetting:id/fsvPhoneForgotRemind2']")).querySelector("*[resource-id='com.semisky.autosetting:id/swOpen']");
-var prop1 = getProp(jg1)
-console.log(`无线充电关闭已关闭，手机遗忘提醒开关状态：${prop1.checked}`)
-// 点击无线充电开关
-await adb.tap(1096, 228)
-await delay(1500)
-var jg1 = (await querySelector("*[resource-id='com.semisky.autosetting:id/fsvPhoneForgotRemind2']")).querySelector("*[resource-id='com.semisky.autosetting:id/swOpen']");
-var prop1 = getProp(jg1)
-console.log(`无线充电关闭已打开，手机遗忘提醒开关状态：${prop1.checked}`)
-// 点击手机遗忘提醒开关
-await adb.tap(1090, 328)
-var jg1 = (await querySelector("*[resource-id='com.semisky.autosetting:id/fsvPhoneForgotRemind2']")).querySelector("*[resource-id='com.semisky.autosetting:id/swOpen']");
-var prop1 = getProp(jg1)
-console.log(`手机遗忘提醒开关关闭，手机遗忘提醒开关状态：${prop1.checked}`)
-await delay(1500)
-await adb.tap(1090, 328)
-await delay(1500)
-var jg1 = (await querySelector("*[resource-id='com.semisky.autosetting:id/fsvPhoneForgotRemind2']")).querySelector("*[resource-id='com.semisky.autosetting:id/swOpen']");
-var prop1 = getProp(jg1)
-console.log(`手机遗忘提醒开关打开，手机遗忘提醒开关状态：${prop1.checked}`)
+await adb.keyevent("KEYCODE_HOME")

@@ -1,5 +1,21 @@
 const { SerialPort } = require('serialport')
+const path = require('path')
+const fs = require('fs')
+const { assetsPath } = require('../main/config')
+const logPath = path.join(assetsPath, `log/串口.log`)
 
+function writeFileSync (filePath, data, cover = false) {
+    try {
+        if (fs.existsSync(filePath) && cover) {
+            fs.appendFileSync(filePath, data)
+            return true
+        }
+        fs.writeFileSync(filePath, data)
+        return true
+    } catch (err) {
+        return false
+    }
+}
 /**
  * ！！！ 存在并发问题
  * 2023-05-04 Star 书写
@@ -24,6 +40,7 @@ module.exports = class Serial {
         this.serialport.write(`${command}\n`)
         return new Promise((resolve, reject) => {
             this.serialport.on('error', err => {
+                writeFileSync(logPath, `${new Date().toLocaleString()}\ncommand:${command}\ndata:${err}\n\n`, true)
                 reject({
                     command: `${command}`,
                     data: err,
@@ -31,13 +48,18 @@ module.exports = class Serial {
                     message: err
                 })
             })
-            this.serialport.on('data', data => {
-                if (String(data) === 'console:/ $ ') {
-                    resolve(
-                        dataStr.replace(/\^C\r*\n*/g, '')
-                            .replace(/\d*\|*console:\/\s+\$/g, '')
-                            .replace(command, '').trim()
-                    )
+            this.serialport.on('data', async (data) => {
+                if (/^console:\/\s+(#|\$)\s+$/.test(String(data))) {
+                    const result = dataStr?.replace(/\^C\r*\n*/g, '')
+                        ?.replace(/\d*\|*console:\/\s+(#|\$)\s+/g, '')
+                        ?.replace(command, '')?.trim()
+                    writeFileSync(logPath, `${new Date().toLocaleString()}\ncommand:${command}\ndata:${result}\n\n`, true)
+                    resolve({
+                        command: `${command}`,
+                        data: result,
+                        success: true,
+                        message: 'ok'
+                    })
                     this.close()
                 }
                 dataStr += String(data)
@@ -46,14 +68,12 @@ module.exports = class Serial {
     }
 
     async getProce (proceNum) {
-        const output = await this.shell(`COLUMNS=512 top -n 1 -m ${proceNum} -d 1\n`)
+        const { data: output, success } = await this.shell(`COLUMNS=512 top -n 1 -m ${proceNum} -d 1`)
+        if (!success) return { top: {}, info: [] }
         if (!output) return { top: {}, info: [] }
-
         const lines = `${output}`.trim()
             .replace(/(.*?)(?=Tasks)/, '')
             .replaceAll(/\x1B\[([0-9]{0,2})m/g, '')
-            .replaceAll('console:/ $', '')
-            .replaceAll('^C', '')
             .replace(/(.*?)(?=COLUMNS=512 top).*/, '')
             .replace('Tasks:', '')
             .replace('Mem:', '')
@@ -95,4 +115,3 @@ module.exports = class Serial {
         return { top, info }
     }
 }
-

@@ -1,94 +1,16 @@
-// 检测进入仪表
-while (true) {
-    // Home键
-    await adb.keyevent('3')
-    // 等待
-    await delay(1000)
-    // 点击汽车控制
-    await adb.tap(60, 214)
-    await delay(1000)
-    const jg = await byText('仪表', async (xy, node) => {
-        await adb.tap(xy)
-    })
-    if (jg) break
-}
+await adb.startApp("com.igentai.vehiclesettings/.MainActivity")
+await delay(1000)
+await clickId("rbMeter")
+var sbrSpeed = await querySelector("[resource-id='com.igentai.vehiclesettings:id/sbrSpeed']")
+if(!sbrSpeed) clickId('switch_thumb')
+await delay(1000)
+var sbrSpeed = await querySelector("[resource-id='com.igentai.vehiclesettings:id/sbrSpeed']")
+await adb.swipe(...getRange(sbrSpeed),1000)
+var arr = await querySelectorAll("[resource-id*='frbLevel'] [class*='TextView']")
 
-// 初始化 功能全部关闭
-while (true) {
-    var jg1 = await byText('关闭', async (xy, node) => {
-        await adb.tap(xy)
-    })
-    var jg2 = await querySelector("*[text='超速报警速度']")
-    if (jg2) {
-        await adb.tap(1076, 450)
-    }
-    var jg3 = await byText('关 闭', async (xy, node) => {
-        await adb.tap(xy)
-    })
-    if (jg1 && !jg2 && jg3) break
-}
-console.log('初始化完成')
+await adb.tap(getXY(arr[0]))
+await adb.tap(getXY(arr[1]))
+await adb.tap(getXY(arr[2]))
+await adb.tap(getXY(arr[3]))
 
-// 打开局部开关
-while (true) {
-    var jg = await querySelector("*[text='局部']")
-    var prop = getProp(jg)
-    if (prop.selected==='true') break
-    await adb.tap(getXY(jg))
-    await delay(500)
-}
-console.log('局部开关已经打开')
-
-// 打开全屏开关
-while (true) {
-    var jg = await querySelector("*[text='全屏']")
-    var prop = await getProp(jg)
-    if (prop.selected==='true') break
-    await adb.tap(getXY(jg))
-    await delay(500)
-}
-console.log('全屏开关已经打开')
-
-
-// 打开报警超速开关
-while (true) {
-    var jg = await querySelector("*[text='超速报警速度']")
-	console.log(jg)
- 	if (jg) break
-    await adb.tap(1060,494)
- 	await delay(500)
-}
-console.log('报警超速开关已经打开')
-
-// 疲劳驾驶设定4h
-while (true) {
-    var jg = await querySelector("*[text='4h']")
-    var prop = getProp(jg)
-    if (prop.selected==='true') break
-    await adb.tap(getXY(jg))
-    await delay(500)
-}
-console.log('疲劳驾驶设定4h')
-
-
-// 疲劳驾驶设定3h
-while (true) {
-    var jg = await querySelector("*[text='3h']")
-    var prop = getProp(jg)
-    if (prop.selected==='true') break
-    await adb.tap(getXY(jg))
-    await delay(500)
-}
-console.log('疲劳驾驶设定3h')
-
-
-// 疲劳驾驶设定2h
-while (true) {
-    var jg = await querySelector("*[text='2h']")
-    var prop = getProp(jg)
-    if (prop.selected==='true') break
-    await adb.tap(getXY(jg))
-    await delay(500)
-}
-console.log('疲劳驾驶设定2h')
-
+await adb.keyevent("KEYCODE_HOME")

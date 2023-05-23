@@ -6,7 +6,9 @@ module.exports = {
     readFile,
     isDirectory,
     openBrowser,
+    devTool,
     readdirCase,
+    readdirLog,
     switchDevtools,
     createFile,
     getIpInfo,
@@ -24,6 +26,10 @@ async function setTitle (title) {
     await ipcRenderer.invoke('on-setTitle-event', title)
 }
 
+async function devTool (isOpen) {
+    await ipcRenderer.invoke('on-devTool-event', isOpen)
+}
+
 function openBrowser (url) {
     ipcRenderer.invoke('on-openBrowser-event', url)
 }
@@ -32,6 +38,9 @@ function readdirCase () {
     return ipcRenderer.invoke('on-readdirCase-event')
 }
 
+function readdirLog () {
+    return ipcRenderer.invoke('on-readdirLog-event')
+}
 function switchDevtools () {
     ipcRenderer.invoke('on-switchDevtools-event')
 }
@@ -80,8 +89,8 @@ function readFile (filePath) {
     return ipcRenderer.invoke('on-readFile-event', filePath)
 }
 
-function writeFile (filePath, data) {
-    return ipcRenderer.invoke('on-writeFile-event', filePath, data)
+function writeFile (filePath, data, cover) {
+    return ipcRenderer.invoke('on-writeFile-event', filePath, data, cover)
 }
 
 function isDirectory (filePath) {

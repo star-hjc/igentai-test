@@ -1,0 +1,21 @@
+// 查询仪表
+var rbMeter = await querySelector("[resource-id='com.igentai.vehiclesettings:id/rbMeter']")
+if(!rbMeter){
+    // 打开车辆设置页面
+    await adb.startApp("com.igentai.vehiclesettings/.MainActivity")
+    await delay(1000)
+}
+await adb.tap(getXY(rbMeter))
+console.time()
+var sbrSpeed = await querySelector("[resource-id='com.igentai.vehiclesettings:id/sbrSpeed']")
+console.timeEnd()
+if(!sbrSpeed) clickId('switch_thumb')
+await delay(1000)
+var sbrSpeed = await querySelector("[resource-id='com.igentai.vehiclesettings:id/sbrSpeed']")
+await adb.swipe(...getRange(sbrSpeed),1000)
+var arr = await querySelectorAll("[resource-id*='frbLevel'] [class*='TextView']")
+
+await adb.tap(getXY(arr[0]))
+await adb.tap(getXY(arr[1]))
+await adb.tap(getXY(arr[2]))
+await adb.tap(getXY(arr[3]))

@@ -1,132 +1,83 @@
-// 打开WIFI模块
-while (true) {
-   await adb.startApp('com.semisky.autosetting/.MainActivity')
+var rbSound = await querySelector("[resource-id='com.semisky.autosetting:id/rbSound']")
+if(!rbSound){
+    await adb.startApp('com.semisky.autosetting/.MainActivity')
     await delay(1000)
-    var jg = await byText('声音', async (xy, node) => {
-        await adb.tap(xy)
-    })
-    if (jg) break
+    await clickId("rbSound")
 }
-
+await adb.tap(getXY(rbSound))
 // 滑动到最上方
 await adb.swipe(766, 125, 766, 150, 10)
 await delay(1000)
 
+var arr = await querySelectorAll("[resource-id*='rgTabSoundEffect_LC'] [class*='RadioButton']")
 // 点击
-await adb.tap(1060,240)
+await adb.tap(getXY(arr[0]))
 // 点击
-await adb.tap(972,244)
+await adb.tap(getXY(arr[1]))
 // 点击
-await adb.tap(850,246)
+await adb.tap(getXY(arr[2]))
 // 点击
-await adb.tap(756,242)
+await adb.tap(getXY(arr[3]))
 // 点击
-await adb.tap(652,236)
+await adb.tap(getXY(arr[4]))
 // 点击
-await adb.tap(534,240)
+await adb.tap(getXY(arr[5]))
 
+var high_voice_seekbar = await querySelector("[resource-id*='high_voice_seekbar']")
+await adb.swipe(...getRange(high_voice_seekbar),1000)
 
-// 点击自定义
-await adb.tap(1060,240)
-// 拖动
-await adb.swipe(800,378,506,378,1500)
-// 拖动
-await adb.swipe(506,378,1104,378,2000)
-// 拖动
-await adb.swipe(1104,378,800,378,1500)
-console.log('高音测试完毕...')
-// 等待
-await delay(1000)
-// 拖动
-await adb.swipe(800,512,506,512,1500)
-// 拖动
-await adb.swipe(506,512,1104,512,2000)
-// 拖动
-await adb.swipe(1104,512,800,512,1500)
-console.log('中音测试完毕...')
-// 等待
-await delay(1000)
-// 拖动
-await adb.swipe(800,644,506,644,1500)
-// 拖动
-await adb.swipe(506,644,1104,644,2000)
-// 拖动
-await adb.swipe(1104,644,800,644,1500)
-console.log('低音测试完毕...')
+var middle_voice_seekbar = await querySelector("[resource-id*='middle_voice_seekbar']")
+await adb.swipe(...getRange(middle_voice_seekbar),1000)
 
-// 拖动
-await adb.swipe(928,938,506,938,1500)
-// 拖动
-await adb.swipe(506,938,1104,938,2000)
-// 拖动
-await adb.swipe(1104,938,928,938,1500)
-console.log('多媒体声音测试完毕...')
+var low_voice_seekbar = await querySelector("[resource-id*='low_voice_seekbar']")
+var range = getRange(low_voice_seekbar)
+await adb.swipe(...range,1000)
+await adb.swipe(range[2] - 50,(range[1]+range[3])/2,(range[2]+range[0])/2,(range[1]+range[3])/2,1000)
+
+var seekBarMultiMedia = await querySelector("[resource-id*='seekBarMultiMedia']")
+await adb.swipe(...getRange(seekBarMultiMedia),1000)
+
+var seekBarPhone = await querySelector("[resource-id*='seekBarPhone']")
+await adb.swipe(...getRange(seekBarPhone),1000)
 
 // 滑动到最下方
-await adb.swipe(766, 150, 766, 125,  10)
+await adb.swipe(766, 150, 766, 125, 10)
+await delay(1000)
 
-// 等待
-await delay(3000)
-
-// 拖动
-await adb.swipe(1104,194,506,194,2000)
-// 拖动
-await adb.swipe(506,194,1104,194,2000)
-console.log('电话声音测试完毕...')
-
-// 拖动
-await adb.swipe(816,326,506,326,2000)
-// 拖动
-await adb.swipe(506,326,1104,326,2000)
-// 拖动
-await adb.swipe(1104,326,816,326,2000)
-console.log('导航声音测试完毕...')
-
-// 拖动
-await adb.swipe(888,462,506,462,2000)
-// 拖动
-await adb.swipe(506,462,1104,462,2000)
-// 拖动
-await adb.swipe(1104,462,888,462,2000)
-console.log('导航声音测试完毕...')
-
+var arr = await querySelectorAll("[resource-id*='rgVolumeWithSpeed'] [class*='RadioButton']")
 // 点击
-await adb.tap(570,696)
+await adb.tap(getXY(arr[0]))
 // 点击
-await adb.tap(732,692)
+await adb.tap(getXY(arr[1]))
 // 点击
-await adb.tap(886,698)
+await adb.tap(getXY(arr[2]))
 // 点击
-await adb.tap(1042,698)
+await adb.tap(getXY(arr[3]))
 // 点击
-await adb.tap(728,694)
+await adb.tap(getXY(arr[4]))
 
-console.log('身量随速测试完毕...')
+await adb.tap(getXY(arr[1]))
 
-await adb.tap(1090,820)
-// 等待
-await delay(1500)
-await adb.tap(1090,820)
-console.log('按键音测试完毕...')
+await clickId("swOpen")
 
-await adb.tap(1094,950)
-// 等待
-await delay(1500)
-await adb.tap(1094,950)
-console.log('来电语音播报测试完毕...')
+await clickId("swOpen",1)
 
-await adb.tap(1522,876)
-// 拖动
-await adb.swipe(1524,556,1460,458,1500)
-// 拖动
-await adb.swipe(1460,458,1576,474,1500)
-// 拖动
-await adb.swipe(1576,474,1574,640,1500)
-// 拖动
-await adb.swipe(1574,640,1466,642,1500)
-// 拖动
-await adb.swipe(1460,458,1524,556,1500)
+await clickId("swOpen")
 
-console.log('声车平衡测试完毕...')
-// 等待
-await delay(1500)
+await clickId("swOpen",1)
+
+// 声车平衡测试
+await clickId("resetStage")
+// 拖动
+await adb.swipe(1524,556,1460,458,1000)
+// 拖动
+await adb.swipe(1460,458,1576,474,1000)
+// 拖动
+await adb.swipe(1576,474,1574,640,1000)
+// 拖动
+await adb.swipe(1574,640,1466,642,1000)
+// 拖动
+await adb.swipe(1460,458,1524,556,1000)
+
+await clickId("resetStage")
+

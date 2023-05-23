@@ -35,7 +35,7 @@ function arrayMatched (arrOne, arrTwo, callback) {
             let lackIsOne, lackIsTwo
             if (i < two && !arrOne.includes(arrTwo[i])) lackIsOne = arrTwo[i]
             if (i < one && !arrTwo.includes(arrOne[i])) lackIsTwo = arrOne[i]
-            callback(lackIsOne, lackIsTwo)
+            callback(lackIsTwo, lackIsOne)
         }
         return
     }
@@ -61,8 +61,9 @@ function rand (max = 100, min = 0) {
  */
 async function loopByTime (callback, timeout) {
     const start = new Date()
-    while (new Date() - start < timeout) {
-        await callback()
+    while (new Date() - start <= timeout) {
+        const result = await callback()
+        if (result) break
         sleep(100)
     }
 }
@@ -79,6 +80,5 @@ function bw (num, lsb, size, binary = 16, length = 8) {
         x -= 1
         if (x < 0) { y -= 1; x = 7 }
     }
-    console.log(byteArr)
     return byteArr.map(v => parseInt(v.slice(0, 4).join(''), 2).toString(16) + parseInt(v.slice(4, 8).join(''), 2).toString(16)).join('')
 }

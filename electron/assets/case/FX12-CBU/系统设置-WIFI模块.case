@@ -12,13 +12,9 @@ while (true) {
     // 点击应用
     await adb.tap(62, 1012)
     await delay(2500)
-    await byText('系统设置', async (xy, node) => {
-        await adb.tap(xy)
-    }, { y: -25 })
+    await clickText('系统设置')
     await delay(1000)
-    var jg = await byText('WiFi', async (xy, node) => {
-        await adb.tap(xy)
-    })
+    var jg = await clickText('WiFi')
     if (jg) break
 }
 
@@ -31,7 +27,7 @@ while (true) {
     var wifi = (await querySelector("*[resource-id='com.semisky.autosetting:id/fsvWifi']")).querySelector("*[resource-id='com.semisky.autosetting:id/swOpen']")
     var prop = getProp(wifi)
     if (prop.checked === 'true') break
-    await adb.tap(getXY(wifi))
+    await adb.tap(...getXY(wifi))
     await delay(1000)
 }
 console.log('wifi开关已经打开')
@@ -41,7 +37,7 @@ while (true) {
     var wifi = (await querySelector("*[resource-id='com.semisky.autosetting:id/fsvWifi']")).querySelector("*[resource-id='com.semisky.autosetting:id/swOpen']")
     var prop = getProp(wifi)
     if (prop.checked === 'false') break
-    await adb.tap(getXY(wifi))
+    await adb.tap(...getXY(wifi))
     await delay(1000)
 }
 console.log('wifi开关已经关闭')
@@ -52,7 +48,7 @@ while (true) {
     var wifi = (await querySelector("*[resource-id='com.semisky.autosetting:id/fsvWifiAp']")).querySelector("*[resource-id='com.semisky.autosetting:id/swOpen']")
     var prop = getProp(wifi)
     if (prop.checked === 'true') break
-    await adb.tap(getXY(wifi))
+    await adb.tap(...getXY(wifi))
     await delay(1000)
 }
 console.log('wifi热点已经打开')
@@ -63,7 +59,7 @@ while (true) {
     var wifi = (await querySelector("*[resource-id='com.semisky.autosetting:id/fsvWifiAp']")).querySelector("*[resource-id='com.semisky.autosetting:id/swOpen']")
     var prop = getProp(wifi)
     if (prop.checked === 'false') break
-    await adb.tap(getXY(wifi))
+    await adb.tap(...getXY(wifi))
     await delay(1000)
 }
 console.log('wifi热点已经关闭')
@@ -73,7 +69,7 @@ while (true) {
     var wifi = (await querySelector("*[resource-id='com.semisky.autosetting:id/fsvWifiAp']")).querySelector("*[resource-id='com.semisky.autosetting:id/swOpen']")
     var prop = getProp(wifi)
     if (prop.checked === 'true') break
-    await adb.tap(getXY(wifi))
+    await adb.tap(...getXY(wifi))
     await delay(1000)
 }
 console.log('wifi热点已经打开')
@@ -89,7 +85,7 @@ while (true) {
 while (true) {
     // var wifi = (await querySelector("*[]"))
     var wifiAP = (await querySelector("*[resource-id='com.semisky.autosetting:id/ftvWifiHotspotName']"))?.querySelector("*[resource-id='com.semisky.autosetting:id/tvSubtitle']")
-    if (wifiAP) await adb.tap(getXY(wifiAP))
+    if (wifiAP) await adb.tap(...getXY(wifiAP))
     var wifiEditView = await querySelector("*[resource-id='com.semisky.autosetting:id/tv_title']")
     if (wifiEditView) {
         for (let i = 0; i < 32; i++) {
@@ -111,7 +107,7 @@ while (true) {
 while (true) {
     // var wifi = (await querySelector("*[]"))
     var wifiPwd = (await querySelector("*[resource-id='com.semisky.autosetting:id/ftvWifiHotspotPwd']"))?.querySelector("*[resource-id='com.semisky.autosetting:id/tvSubtitle']")
-    if (wifiPwd) await adb.tap(getXY(wifiPwd))
+    if (wifiPwd) await adb.tap(...getXY(wifiPwd))
     var wifiEditView = await querySelector("*[resource-id='com.semisky.autosetting:id/tv_title']")
     if (wifiEditView) {
         for (let i = 0; i < 32; i++) {
@@ -135,7 +131,7 @@ while (true) {
     var wifi = (await querySelector("*[resource-id='com.semisky.autosetting:id/fsvWifi']")).querySelector("*[resource-id='com.semisky.autosetting:id/swOpen']")
     var prop = getProp(wifi)
     if (prop.checked === 'true') break
-    await adb.tap(getXY(wifi))
+    await adb.tap(...getXY(wifi))
    // await delay(1000)
 }
 
@@ -148,7 +144,7 @@ while (true) {
   	var linkWiFI =  await querySelector("*[text='已连接']")
     if(linkWiFI) break
     var myWiFi = (await querySelector(`*[resource-id='com.semisky.autosetting:id/tv_wifi_name'][text=${linkWiFiName}]`))
-    await adb.tap(getXY(myWiFi))
+    await adb.tap(...getXY(myWiFi))
     var confirmProp = await getProp(await querySelector("*[resource-id='com.semisky.autosetting:id/tv_title']"))
     if (confirmProp?.text === linkWiFiName) {
         await adb.text(`${linkWiFiPwd}`)
@@ -172,10 +168,10 @@ await adb.swipe(766, 125, 766, 150, 10)
 await delay(1000)
 console.log('复位...')
 var linkWiFI =  await querySelector("*[text='已连接']")
-await adb.tap(getXY(linkWiFI))
+await adb.tap(...getXY(linkWiFI))
 await delay(2000)
 var closeWifi = await querySelector("*[resource-id='com.semisky.autosetting:id/tvIgnore']")
-await adb.tap(getXY(closeWifi))
+await adb.tap(...getXY(closeWifi))
 await adb.tap(732,704)
 
 

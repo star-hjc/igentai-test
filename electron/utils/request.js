@@ -14,9 +14,7 @@ axiosInstance.interceptors.request.use(
     config => {
         return config
     },
-    error => {
-        return Promise.reject(error)
-    }
+    error => { return Promise.reject(error) }
 )
 
 /**
@@ -26,8 +24,6 @@ axiosInstance.interceptors.response.use(
     response => {
         return response.data
     },
-    error => {
-        return error
-    }
+    () => { return }
 )
 module.exports = axiosInstance

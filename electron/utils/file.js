@@ -1,6 +1,6 @@
 const fs = require('fs')
+const cp = require('child_process')
 const path = require('path')
-const { exec } = require('./command')
 
 module.exports = { isDirectorySync, renameFileSync, readdirAllSync, createFileSync, createFolderSync, removeFileSync, openFileExplorerSync, readFileSync, writeFileSync }
 
@@ -40,13 +40,13 @@ function readdirAllSync (folderBasePath) {
         if (isDirectorySync(childrenPath)) {
             return { type: 'folder', title: item, children: readdirAllSync(childrenPath), path: childrenPath }
         }
-        if (/\.case$/.test(item)) {
-            const { ctime, mtime, birthtime } = fs.statSync(childrenPath)
-            return {
-                type: 'document', title: item.match(/^(.*)\.case$/)[1], path: childrenPath,
-                createTime: (birthtime || ctime).toLocaleString(),
-                updateTime: new Date(Math.max(ctime, mtime)).toLocaleString()
-            }
+        const { ctime, mtime, birthtime } = fs.statSync(childrenPath)
+        return {
+            type: 'document',
+            title: item,
+            path: childrenPath,
+            createTime: (birthtime || ctime).toLocaleString(),
+            updateTime: new Date(Math.max(ctime, mtime)).toLocaleString()
         }
     }).filter(v => v)
 }
@@ -101,7 +101,7 @@ function removeFileSync (filePath, recursive = false) {
  */
 async function openFileExplorerSync (filePath) {
     const baseFilePath = getBasePath(filePath)
-    await exec(`start ${baseFilePath}`)
+    cp.exec(`start ${baseFilePath}`)
 }
 
 /**
@@ -112,7 +112,6 @@ async function openFileExplorerSync (filePath) {
  * @returns
  */
 function renameFileSync (filePath, fileNameOrNewPath, move = false) {
-    console.log(fileNameOrNewPath)
     if (!filePath || !fileNameOrNewPath) return
     if (move) {
         fs.renameSync(filePath, fileNameOrNewPath)
@@ -141,7 +140,7 @@ function writeFileSync (filePath, data, cover = false) {
             fs.appendFileSync(filePath, data)
             return true
         }
-        fs.writeFileSync(filePath, data, { flag: 'a' })
+        fs.writeFileSync(filePath, data)
         return true
     } catch (err) {
         return false

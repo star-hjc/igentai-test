@@ -101,6 +101,8 @@ function getScreenshot (device) {
     contentBorderRef.value.style.top = '-99999px'
     contentBorderRef.value.style.left = '-99999px'
     loading.value = true
+    console.log(device)
+
     adb.getScreenshot(device).then(data => {
         imgBase64.value = data
         if (state.imgBase64s?.length >= num.value) state.imgBase64s.shift()

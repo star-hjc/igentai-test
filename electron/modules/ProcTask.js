@@ -1,7 +1,6 @@
 
 const { exec } = require('child_process')
 const Serial = require('./Serial.js')
-const { delay } = require('../utils/common.js')
 
 module.exports = class ProcTask {
     constructor (device, proceNum = 10, inter = 5) {
@@ -20,12 +19,9 @@ module.exports = class ProcTask {
     async runA72 (param = {}, callblack) {
         this.serial = new Serial(param.path, param.baudRate)
         callblack(await this.serial.getProce(this.num))
-        await delay(1000)
-        console.log(this.inter)
         this.timeA72 = setInterval(async () => {
-            let data = await this.serial.getProce(this.num)
-            callblack(data)
-            data = null
+            this.serial = new Serial(param.path, param.baudRate)
+            callblack(await this.serial.getProce(this.num))
         }, this.inter * 1000)
     }
 
@@ -35,7 +31,6 @@ module.exports = class ProcTask {
 
     stopA72 () {
         clearInterval(this.timeA72)
-        this.serial?.close()
     }
 
     async getProce () {

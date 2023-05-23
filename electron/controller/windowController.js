@@ -52,7 +52,6 @@ function createCPUWindow () {
         workWin.maximize()
         workWin.loadURL(`${loadURL}#/cpu?${querystring.stringify(data)}`)
         workWin.setTitle('监控')
-        workWin.webContents.openDevTools()
     })
 }
 
@@ -71,7 +70,6 @@ function createRunCaseWindow () {
             ...option
         })
         runWin.loadURL(`${loadURL}#/run?${querystring.stringify(data)}`)
-        runWin.webContents.openDevTools()
     })
 }
 
@@ -94,6 +92,7 @@ function createGetScreenWindow () {
             ...option
         })
         screenWin.loadURL(`${loadURL}#/screen?${querystring.stringify(data)}`)
+        screenWin.webContents.openDevTools()
         // screenWin.webContents.openDevTools()
         screenWin.on('closed', () => {
             screenWin = null

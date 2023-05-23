@@ -4,6 +4,7 @@ const adb = require('../utils/adb')
 const request = require('../utils/request')
 
 module.exports = {
+    command,
     getDevices,
     getWiFiIP,
     getScreenInfo,
@@ -23,8 +24,11 @@ module.exports = {
     swipe,
     multitouch,
     input,
+    clearText,
+    setText,
     startApp,
     keyevent,
+    setUiautomatorServe,
     getRunAppisActivity
 }
 
@@ -117,6 +121,14 @@ async function getAtxVersion () {
     })
 }
 
+async function setUiautomatorServe () {
+    ipcMain.handle('on-setUiautomatorServe-event', async (event, device, type = 0) => {
+        const types = ['get', 'post', 'delete']
+        if (!device?.port) return
+        return await request[types[Math.max(0, Math.min(types.length - 1, type)) || 0]](`${adb.atxHost(device.port, device.ip)}/uiautomator`)
+    })
+}
+
 /** 获取设备截图 */
 async function getScreenshot () {
     ipcMain.handle('on-getScreenshot-event', async (event, device) => {
@@ -184,5 +196,23 @@ async function getRunAppisActivity () {
 async function input () {
     ipcMain.handle('on-input-event', async (event, device, content) => {
         return await adb.input(device, content)
+    })
+}
+
+async function clearText () {
+    ipcMain.handle('on-clearText-event', async (event, device) => {
+        return await adb.clearText(device)
+    })
+}
+
+async function setText () {
+    ipcMain.handle('on-setText-event', async (event, device, content) => {
+        return await adb.setText(device, content)
+    })
+}
+
+async function command () {
+    ipcMain.handle('on-command-event', async (event, device, args) => {
+        return await adb.command(device, args)
     })
 }

@@ -2,8 +2,6 @@
     <div class="work" ref="workRef">
         <el-container class="work-container">
             <el-header>
-                <el-tag :type="runStateEnum[runState][1]" style="margin-right: 15px;">{{ runStateEnum[runState][0]
-                }}</el-tag>
                 <el-popover placement="top-start" title="设备信息" :width="215" trigger="hover">
                     <template #reference>
                         <el-button>设备信息</el-button>
@@ -14,12 +12,35 @@
                     </div>
                     <div>设备ID：{{ state.query.id || state.query.path }}</div>
                     <div v-if="state.query.path">波特率：{{ state.query.baudRate }}</div>
+                    <div>uiautomator服务：{{ uiautomatorState }}</div>
+                    <div style="height: 40px;margin-top:15px ; display: flex;justify-content: center;align-items: center;">
+                        <el-button @click="onLinkDevice">重新连接</el-button>
+                        <el-button @click="onDevTool">控制台</el-button>
+                    </div>
                 </el-popover>
+                <el-tag :type="runStateEnum[runState][1]" style="margin:0 15px;">{{ runStateEnum[runState][0]
+                }}</el-tag>
+
+                <el-button @click="runCode" :disabled="runState === 3">运行</el-button>
+                <el-button @click="onrRelode">停止</el-button>
                 <el-button @click="getScreen">获取屏幕</el-button>
                 <el-button @click="getUiNode">获取UI节点</el-button>
-                <el-button @click="getSelectRow">获取选中行</el-button>
-                <el-button @click="runCode" :disabled="runState === 3">运行</el-button>
-                <el-button @click="insertText(new Date().toLocaleTimeString(), 'before')">插入“123”文本</el-button>
+                <el-select style="margin-left: 15px;" v-model="activity" placeholder="选择启动页..." loadingText="加载中..."
+                    :loading="activityLoading" @visibleChange="onOpenActivity">
+                    <el-option v-for="item in state.activityList" :key="item" :value="item">
+                        <div style="display: flex;align-items: center;justify-content: space-between;gap:15px;">
+                            <span>{{ item }}</span>
+                            <div>
+                                <el-button
+                                    @click="insertText(`await adb.startApp(${JSON.stringify(item)})`, 'after')">插入</el-button>
+                                <el-button type="primary" @click="onStartAppPage(item)">启动</el-button>
+                            </div>
+                        </div>
+                    </el-option>
+                </el-select>
+                <!-- <el-button @click="getSelectRow">获取选中行</el-button> -->
+
+                <!-- <el-button @click="insertText(new Date().toLocaleTimeString(), 'before')">插入“123”文本</el-button> -->
             </el-header>
             <el-container>
                 <el-aside>
@@ -105,6 +126,9 @@ const runState = ref(2)
 const runStateEnum = ref([['失败', 'danger'], ['成功', 'success'], ['待运行', 'info'], ['运行中', '']])
 const activeName = ref('codemirror')
 const code = ref('')
+const activity = ref('')
+const uiautomatorState = ref(false)
+const activityLoading = ref(true)
 provide('work', { insertText })
 
 const state = reactive({
@@ -124,7 +148,8 @@ const state = reactive({
     moveLine: {
         y: undefined,
         max: 'calc(var(--header-height) + 45px)'
-    }
+    },
+    activityList: []
 })
 
 onMounted(() => {
@@ -132,13 +157,66 @@ onMounted(() => {
     state.query = { ...query, baudRate: parseInt(query.baudRate || 0) }
     codemirrorRef.value.$el.addEventListener('keydown', ctrlAndS)
     getCode()
+    getRunAppisActivity()
+    setUiautomatorServe()
 })
+
+async function setUiautomatorServe () {
+    await adb.setUiautomatorServe({ ...state.query }, 1).then(async () => {
+        await adb.setUiautomatorServe({ ...state.query }, 0).then(data => {
+            uiautomatorState.value = data?.running || false
+        })
+    })
+}
+
+async function onrRelode () {
+    await appApi.writeFile(state.query.filePath, code.value)
+    location.reload()
+}
+
+async function onLinkDevice () {
+    ElMessage.success('连接中...')
+    const device = { ...state.query }
+    await adb.startATXService(device)
+    await setUiautomatorServe()
+    adb.getAtxVersion(device).then(() => {
+        ElMessage.success('连接成功...')
+    }).catch(() => {
+        ElMessage.error('连接失败...')
+    })
+}
+
+function getRunAppisActivity () {
+    if (!state.query.id && !state.query.path) return
+    activityLoading.value = true
+    adb.getRunAppisActivity({ ...state.query }).then((data) => {
+        activityLoading.value = false
+        state.activityList = [...new Set([...state.activityList, ...data || []])]
+    })
+}
+
+function onOpenActivity (isShow) {
+    if (isShow) getRunAppisActivity()
+}
+
+// eslint-disable-next-line no-unused-vars
+function onCopy (activity) {
+    navigator.clipboard.writeText(activity)
+}
+
+function onStartAppPage (activity) {
+    adb.startApp({ ...state.query }, activity)
+}
 
 function getCode () {
     if (!state.query?.filePath) return
     appApi.readFile(state.query?.filePath).then((data) => {
         code.value = data
     })
+}
+
+function onDevTool () {
+    appApi.devTool(true)
 }
 
 async function saveCode () {
@@ -164,7 +242,10 @@ function getScreen () {
 function getUiNode () {
     viewApi.createUiNodeWindow({ ...state.query })
 }
-
+/**
+ * 获取编辑器属性
+ */
+// eslint-disable-next-line no-unused-vars
 function getSelectRow () {
     const state = codemirrorView.value.state
     const ranges = state.selection.ranges
@@ -173,13 +254,16 @@ function getSelectRow () {
     const cursor = ranges[0].anchor
     const length = state.doc.length
     const lines = state.doc.lines
+    // eslint-disable-next-line no-console
     console.log(state.doc.line(line))
+    // eslint-disable-next-line no-console
     console.log({ selected, cursor, length, lines, line })
 }
 
 async function runCode () {
     // 运行中
     runState.value = 3
+    // await run(code.value, { ...state.query }).then(() => { runState.value = 1 })
     try {
         await run(code.value, { ...state.query }).then(() => { runState.value = 1 })
     } catch (error) {
@@ -249,7 +333,7 @@ function onHelpClose () {
 }
 
 function onCodemirrorload (payload) {
-    console.log(payload)
+    // console.log(payload)
     codemirrorView.value = payload.view
 }
 
@@ -322,6 +406,7 @@ function getOptions (context) {
         }
 
         .el-main {
+            height: var(--main-height);
             --el-main-padding: 0;
             --help-height: 200px;
             --tool-width: 40px;

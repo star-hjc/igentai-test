@@ -20,11 +20,13 @@ const {
 module.exports = {
     isDirectory,
     renameFile,
+    devTool,
     readFile,
     setTitle,
     writeFile,
     createFile,
     readdirCase,
+    readdirLog,
     openBrowser,
     removeFile,
     getIpInfo,
@@ -48,6 +50,17 @@ function setTitle () {
     })
 }
 
+/**
+ * 开发者模式
+ */
+function devTool () {
+    ipcMain.handle('on-devTool-event', (event, isOpen) => {
+        const webContents = BrowserWindow.fromWebContents(event.sender).webContents
+        if (isOpen) return webContents.openDevTools()
+        webContents.closeDevTools()
+    })
+}
+
 /** 使用系统默认浏览器打开 URL */
 function openBrowser () {
     ipcMain.handle('on-openBrowser-event', (event, url) => {
@@ -59,6 +72,26 @@ function openBrowser () {
 function readdirCase () {
     ipcMain.handle('on-readdirCase-event', (event) => {
         const basePath = path.join(assetsPath, 'case')
+        return caseMap(readdirAllSync(basePath))
+    })
+}
+
+function caseMap (arr) {
+    return arr.map((v) => {
+        if (v.children?.length) {
+            return { ...v, children: caseMap(v.children) }
+        }
+        return {
+            ...v,
+            title: v.title.match(/^(.*)\.case$/)?.[1] || v.title
+        }
+    })
+}
+
+/** 读取日志文件 */
+function readdirLog () {
+    ipcMain.handle('on-readdirLog-event', (event) => {
+        const basePath = path.join(assetsPath, 'log')
         return readdirAllSync(basePath)
     })
 }
@@ -155,8 +188,8 @@ function readFile () {
 
 /** 写入文件 */
 function writeFile () {
-    ipcMain.handle('on-writeFile-event', (event, filePath, data) => {
-        return writeFileSync(filePath, data)
+    ipcMain.handle('on-writeFile-event', (event, filePath, data, cover) => {
+        return writeFileSync(filePath, data, cover)
     })
 }
 

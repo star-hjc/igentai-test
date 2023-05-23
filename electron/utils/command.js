@@ -10,10 +10,10 @@ async function exec (command, options) {
     return new Promise((resolve, reject) => {
         cp.exec(command, { ...options }, (err, stdout) => {
             if (err) {
-                file.writeFileSync(logPath, `${new Date().toLocaleString()}\ncmd:${command}\nerr:${err}\n`)
+                file.writeFileSync(logPath, `${new Date().toLocaleString()}\ncmd:${command}\nerr:${err}\n`, true)
                 return reject(err)
             }
-            file.writeFileSync(logPath, `${new Date().toLocaleString()}\ncmd:${command}\ndata:${stdout}\n`)
+            file.writeFileSync(logPath, `${new Date().toLocaleString()}\ncmd:${command}\ndata:${stdout}\n`, true)
             resolve(stdout)
         })
     }).catch(() => null)
@@ -72,7 +72,7 @@ async function shell (command, args, options) {
         })
 
         childProcess.on('error', (err) => {
-            file.writeFileSync(logPath, `${new Date().toLocaleString()}\ncmd:${command} ${args.join(' ')}\nerr:${err?.message}\n`)
+            file.writeFileSync(logPath, `${new Date().toLocaleString()}\ncmd:${command} ${args.join(' ')}\nerr:${err?.message}\n`, true)
             reject({
                 command: `${command} ${args.join(' ')}`,
                 data: null,
@@ -83,7 +83,7 @@ async function shell (command, args, options) {
 
         childProcess.on('close', code => {
             if (code !== 0) {
-                file.writeFileSync(logPath, `${new Date().toLocaleString()}\ncmd:${command} ${args.join(' ')}\nerr:${stderr}\n`)
+                file.writeFileSync(logPath, `${new Date().toLocaleString()}\ncmd:${command} ${args.join(' ')}\nerr:${stderr}\n`, true)
                 return reject({
                     command: `${command} ${args.join(' ')}`,
                     data: stderr,
@@ -91,7 +91,7 @@ async function shell (command, args, options) {
                     message: stderr
                 })
             }
-            file.writeFileSync(logPath, `${new Date().toLocaleString()}\ncmd:${command} ${args.join(' ')}\ndata:${stdout}\n`)
+            file.writeFileSync(logPath, `${new Date().toLocaleString()}\ncmd:${command} ${args.join(' ')}\ndata:${stdout}\n`, true)
             resolve({
                 command: `${command} ${args.join(' ')}`,
                 data: stdout,

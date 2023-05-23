@@ -1,21 +1,13 @@
-// 检测进入智能驾驶
-while (true) {
-    // Home键
-    await adb.keyevent('3')
-    // 等待
-    await delay(1000)
-    // 点击汽车控制
-    await adb.tap(60, 214)
-    await delay(1000)
-    const jg = await byText('智能驾驶', async (xy, node) => {
-        await adb.tap(xy)
-    })
-    if (jg) break
-}
-
-// 滑动到顶上
-await adb.swipe(820,300,820,600,10)
+await adb.startApp("com.igentai.vehiclesettings/.MainActivity")
 await delay(1000)
+await clickId("rbIntelligentDriving")
+await adb.swipe(800,820,800,210,100)
 
-// 点击
-adb.tap(1052,714)
+await clickId("switch_thumb")
+
+var arr = await querySelectorAll("[resource-id*='flvLamLevel'] [class*='TextView']")
+
+await adb.tap(getXY(arr[0]))
+await adb.tap(getXY(arr[1]))
+
+await clickId("switch_thumb",1)

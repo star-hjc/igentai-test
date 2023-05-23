@@ -1,6 +1,7 @@
 const { ipcRenderer } = require('electron')
 
 module.exports = {
+    command,
     getDevices,
     getWiFiIP,
     pushFile,
@@ -20,8 +21,11 @@ module.exports = {
     swipe,
     multitouch,
     input,
+    setText,
+    clearText,
     keyevent,
     startApp,
+    setUiautomatorServe,
     getRunAppisActivity
 }
 /** ADB ||------------ */
@@ -45,6 +49,10 @@ async function killServer () {
 
 async function startATXService (device) {
     return await ipcRenderer.invoke('on-startATXService-event', device)
+}
+
+async function setUiautomatorServe (device, type) {
+    return await ipcRenderer.invoke('on-setUiautomatorServe-event', device, type)
 }
 
 /** ADB ||------------ */
@@ -124,4 +132,18 @@ async function keyevent (device, keycode) {
 /** 文本输入事件  */
 async function input (device, content) {
     return await ipcRenderer.invoke('on-input-event', device, content)
+}
+
+/** 文本输入事件  */
+async function clearText (device) {
+    return await ipcRenderer.invoke('on-clearText-event', device)
+}
+
+/** 文本输入事件  */
+async function setText (device, content) {
+    return await ipcRenderer.invoke('on-setText-event', device, content)
+}
+
+async function command (device, args) {
+    return await ipcRenderer.invoke('on-command-event', device, args)
 }

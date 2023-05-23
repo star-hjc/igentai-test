@@ -24,7 +24,6 @@ onUnmounted(() => {
 })
 
 appApi.ipcRenderer.on('call-cpu-linux-event', (event, data) => {
-    console.log(data)
     for (const infoItem of data.info) {
         const index = state.series.findIndex(v => v.name === infoItem.cmd)
         if (index !== -1) {
@@ -97,13 +96,13 @@ function initChart (options = {}) {
         },
         series: options.series || [
             {
-                name: '初始化1',
+                name: '测试数据1',
                 data: [33, 88],
                 type: 'line',
                 emphasis: { focus: 'series' }
             },
             {
-                name: '初始化2',
+                name: '测试数据2',
                 data: [55, 66],
                 type: 'line',
                 emphasis: { focus: 'series' }

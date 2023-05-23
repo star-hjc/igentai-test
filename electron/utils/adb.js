@@ -13,6 +13,7 @@ module.exports = {
     getDevices,
     killServer,
     getWiFiIP,
+    starSerialPortService,
     startATXService,
     getScreenInfo,
     getPackagesList,
@@ -27,9 +28,12 @@ module.exports = {
     swipe,
     multitouch,
     input,
+    clearText,
+    setText,
     keyevent,
     startApp,
-    getRunAppisActivity
+    getRunAppisActivity,
+    command
 }
 
 function adb (args, deviceId) {
@@ -79,15 +83,27 @@ async function switchWiFiADB (device, host) {
     return tcpip && connect
 }
 
+async function starSerialPortService (device) {
+    await command(device, ['su'])
+    await command(device, ['am', 'force-stop', 'com.android.uiautomator2.server'])
+    await command(device, ['chmod', '755', '/data/local/tmp/atx-agent'])
+    await command(device, ['chmod', '755', '/data/local/tmp/minicap'])
+    await command(device, ['chmod', '755', '/data/local/tmp/minicap.so'])
+    await command(device, ['chmod', '755', '/data/local/tmp/ui.xml'])
+    await command(device, ['/data/local/tmp/atx-agent', 'server -d'])
+}
+
 /** 启动atx服务 */
 async function startATXService (device) {
     if (!device?.port || !device.id) return
     await adb(['shell', 'chmod', '755', '/data/local/tmp/atx-agent'], device.id)
     await adb(['shell', 'chmod', '755', '/data/local/tmp/minicap'], device.id)
     await adb(['shell', 'chmod', '755', '/data/local/tmp/minicap.so'], device.id)
+    await adb(['shell', 'chmod', '755', '/data/local/tmp/ui.xml'], device.id)
     await adb(['shell', '/data/local/tmp/atx-agent', 'server -d'], device.id)
     await adb(['forward', `tcp:${device.port}`, 'tcp:7912'], device.id)
     const { success } = await adb(['forward', `tcp:${device.port}`, 'tcp:7912'], device.id)
+    await delay()
     return success
 }
 
@@ -162,18 +178,38 @@ function atxHost (port = '6666', ip) {
 
 /** 获取设备截图 */
 async function getScreenshot (device) {
-    if (!device?.port) return
-    const arraybufferData = await request(`${atxHost(device.port, device.ip)}/screenshot`, { responseType: 'arraybuffer' })
-    return `data:image/png;base64,${arraybufferData ? Buffer.from(arraybufferData, 'binary').toString('base64') : '11'}`
+    if (device.id && device?.port) {
+        const arraybufferData = await request(`${atxHost(device.port, device.ip)}/screenshot`, { responseType: 'arraybuffer' })
+        if (arraybufferData) {
+            return `data:image/png;base64,${arraybufferData ? Buffer.from(arraybufferData, 'binary').toString('base64') : ''}`
+        }
+    }
+    if (device.id || device.path) {
+        const { data, success } = await command(device, ['screencap', '-p', '|', 'base64'])
+        if (!success) return `data:image/png;base64,`
+        return `data:image/png;base64,${data}`
+    }
 }
 
 /** 获取XML-UI */
 async function getUI (device, all = false) {
-    if (!device?.port) return
-    const data = await request(`${atxHost(device.port, device.ip)}/dump/hierarchy`)
-    const result = data?.result || ''
-    if (!all) return result
-    return [await xml2js.parseStringPromise(result), result]
+    if (device.id && device?.port) {
+        const data = await request(`${atxHost(device.port, device.ip)}/dump/hierarchy`)
+        if (data) {
+            const result = data?.result || ''
+            if (!all) return result
+            return [await xml2js.parseStringPromise(result), result]
+        }
+    }
+    if (device.id || device.path) {
+        const { data, success } = await command(device, ['uiautomator', 'dump', '/sdcard/ui.xml', '&&', 'cat', '/sdcard/ui.xml'])
+        if (!success) return
+        let result = data.split('\n')
+        result.shift()
+        result = result.join('\n')
+        if (!all) return result
+        return [await xml2js.parseStringPromise(result), result]
+    }
 }
 
 /** 点击触屏事件  */
@@ -199,8 +235,10 @@ function startApp (device, name) {
 /** 获取运行在窗口的软件的Activity */
 async function getRunAppisActivity (device) {
     const { data, success } = await command(device, ['dumpsys', 'activity', 'top', '|', 'grep', '"ACTIVITY"'])
-    if (success) return data.trim()?.split(' ')?.[1]
-    return null
+    if (success) {
+        return data.trim()?.split('\r\n')?.map(v => v?.trim()?.split(/\s+/))?.map(a => a?.[1])?.reverse()
+    }
+    return data
 }
 
 /** 手机按键 */
@@ -215,6 +253,27 @@ async function input (device, content) {
     await command(device, ['settings', 'put', 'secure', 'default_input_method', 'com.android.adbkeyboard/.AdbIME'])
     await delay(800)
     const data = await command(device, ['am', 'broadcast', '-a', 'ADB_INPUT_TEXT', '--es', 'msg', content])
+    await command(device, ['settings', 'put', 'secure', 'default_input_method', keyName.trim()])
+    return data
+}
+
+/** 文本输入事件  */
+async function clearText (device) {
+    const { data: keyName, success } = await command(device, ['settings', 'get', 'secure', 'default_input_method'])
+    if (!success) return
+    await command(device, ['settings', 'put', 'secure', 'default_input_method', 'com.android.adbkeyboard/.AdbIME'])
+    await delay(800)
+    const data = await command(device, ['am', 'broadcast', '-a', 'ADB_CLEAR_TEXT'])
+    await command(device, ['settings', 'put', 'secure', 'default_input_method', keyName.trim()])
+    return data
+}
+
+async function setText (device, content) {
+    const { data: keyName, success } = await command(device, ['settings', 'get', 'secure', 'default_input_method'])
+    if (!success) return
+    await command(device, ['settings', 'put', 'secure', 'default_input_method', 'com.android.adbkeyboard/.AdbIME'])
+    await delay(800)
+    const data = await command(device, ['am', 'broadcast', '-a', 'ADB_SET_TEXT', '--es', 'msg', content])
     await command(device, ['settings', 'put', 'secure', 'default_input_method', keyName.trim()])
     return data
 }

@@ -45,7 +45,11 @@ export const variableData = () => {
         { label: 'querySelectorAll', detail: '根据属性获取屏幕节点', other: `()` },
         { label: 'getXY', detail: '获取节点的坐标', other: `()` },
         { label: 'getProp', detail: '获取节点的所有属性', other: `()` },
-        { label: 'getProps', detail: '获取多个节点的所有属性', other: `()` }
+        { label: 'getProps', detail: '获取多个节点的所有属性', other: `()` },
+        { label: 'clickId', detail: '根据资源ID单击', other: `()` },
+        { label: 'clickText', detail: '根据文本内容单击', other: `()` },
+        { label: 'select', detail: '根据属性获取屏幕节点', other: `()` },
+        { label: 'selectAll', detail: '根据属性获取屏幕节点', other: `()` }
     ]
     return data.map(v => {
         return { label: `${v.label}`, type: 'text', apply: `${v.label}${v.other || ''}`, detail: v.detail }

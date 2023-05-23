@@ -17,8 +17,8 @@
                 <el-option v-for="item in state.serialPortList" :key="item.path" :label="item.path" :value="item.path" />
             </el-select>
             波特率:<el-input style="width: 68px;margin: 0 10px;" v-model="baudRate" placeholder="波特率" />
-            <el-button type="primary" @click="begin('a72')" :disabled="getStateA72">A72开始获取</el-button>
-            <el-button type="primary" @click="stop('a72')" :disabled="!getStateA72">A72停止</el-button>
+            <el-button type="primary" @click="begin('a72')" :disabled="getStateA72">linux开始获取</el-button>
+            <el-button type="primary" @click="stop('a72')" :disabled="!getStateA72">linux停止</el-button>
             <el-dropdown style="margin-left:100px;">
                     <el-button style="margin-left:15px;" type="primary">功能</el-button>
                     <template #dropdown>
@@ -63,7 +63,7 @@ const getState = ref(false)
 const getStateA72 = ref(false)
 const loadingText = ref('')
 const selectDevice = ref('')
-const selectUSB = ref('COM14')
+const selectUSB = ref('')
 const baudRate = ref(115200)
 const num = ref(10)
 const inter = ref(5)
@@ -91,6 +91,10 @@ function chartResize () {
     cpuzmDOM.value.chartResize()
     cpua72DOM.value.chartResize()
     cpuzma72DOM.value.chartResize()
+}
+
+function exportExcle () {
+    ElMessage('功能开发中...')
 }
 
 const state = reactive({
@@ -187,7 +191,7 @@ async function onShowUsbOptions (isShow) {
         }
 
         .a72::before {
-            content: 'A72';
+            content: 'linux';
             position: absolute;
             left: 10px;
         }

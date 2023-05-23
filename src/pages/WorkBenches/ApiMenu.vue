@@ -184,7 +184,7 @@ const state = reactive({
     input: { value: '', code: (value) => `await adb.input(${value})` },
     delay: { value: 1000, code: (value) => `await delay(${value})` },
     loop: { code: () => `while(true){\n\n}` },
-    loopByNum: { value: 1, code: (value) => `for(const i = 0; i < ${value}; i++;){\n\n}` },
+    loopByNum: { value: 1, code: (value) => `for(let i = 0; i < ${value}; i++){\n\n}` },
     loopByTime: { value: 8000, code: (value) => `await loopByTime(async()=>{\n\n},${value})` },
     clickId: { value: '', code: (value) => `await clickId(${value})` },
     clickText: { value: '', code: (value) => `await clickText(${value})` }
