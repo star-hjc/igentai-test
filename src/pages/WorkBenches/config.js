@@ -21,7 +21,8 @@ export const prefixData = () => {
         { label: 'adb.tap', detail: '屏幕点击(x, y)' },
         { label: 'adb.swipe', detail: '屏幕拖动(x, y, toX, toY, time)' },
         { label: 'adb.keyevent', detail: '手机按键(key)' },
-        { label: 'adb.input', detail: '手机输入' }
+        { label: 'adb.input', detail: '手机输入' },
+        { label: 'adb.command', detail: `命令行，例：await adb.command(['input','tap',943,506])` }
     ]
     return data.map(v => {
         return { label: `${v.label}`, type: 'text', apply: `${v.label}${v.other || '()'}`, detail: v.detail }
@@ -35,6 +36,7 @@ export const variableData = () => {
         { label: 'await', detail: '等待' },
         { label: 'async', detail: '异步标记' },
         { label: 'for', detail: 'loop', other: ` (let i = 0; i < bound; i++) {\n\n}\n` },
+        { label: 'for', detail: 'in loop', other: ` (let name in collection) {\n\n}\n` },
         { label: 'for', detail: 'of loop', other: ` (let name of collection) {\n\n}\n` },
         { label: 'while', detail: 'loop', other: ` () {\n\n}\n` },
         { label: 'JSON', detail: 'JSON对象' },
@@ -44,7 +46,8 @@ export const variableData = () => {
         { label: 'querySelector', detail: '根据属性获取屏幕节点', other: `()` },
         { label: 'querySelectorAll', detail: '根据属性获取屏幕节点', other: `()` },
         { label: 'getXY', detail: '获取节点的坐标', other: `()` },
-        { label: 'getProp', detail: '获取节点的所有属性', other: `()` },
+        { label: 'getRange', detail: '获取节点的范围:[左上角X，左上角Y，右下角X，右下角Y]', other: `()` },
+        { label: 'getProp', detail: '获取节点的所有属性，', other: `()` },
         { label: 'getProps', detail: '获取多个节点的所有属性', other: `()` },
         { label: 'clickId', detail: '根据资源ID单击', other: `()` },
         { label: 'clickText', detail: '根据文本内容单击', other: `()` },

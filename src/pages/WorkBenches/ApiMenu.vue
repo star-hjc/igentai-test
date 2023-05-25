@@ -205,7 +205,6 @@ function insert (type = '') {
     if (props.activeName === 'visualization') {
         state[type]
     }
-    // console.log(, props.activeName)
 }
 </script>
 

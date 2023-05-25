@@ -336,7 +336,6 @@ function onRightClickMenu (e, item) {
     state.rightClickMenu.isShow = true
     nextTick(() => {
         // eslint-disable-next-line no-console
-        console.log(RightClickMenuRef.value.$el.clientWidth)
         state.rightClickMenu.position = [`${e.clientX + 20}px`, `${e.clientY + 20}px`]
     })
 }

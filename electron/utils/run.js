@@ -22,6 +22,12 @@ module.exports = async (code, device) => {
     adb.tap = function (x, y) {
         return adbApi.tap.call(this, device, ...([x, y].filter(v => v !== undefined).flat()))
     }
+    if (device.id) {
+        const data = await adb.setUiautomatorServe(1)
+        if (!['Successfully started', 'Already started'].includes(data)) {
+            throw new Error('u2服务开启失败')
+        }
+    }
     async function DOM () {
         return new DOMParser().parseFromString(await adb.getUI(), 'text/xml')
     }
@@ -129,11 +135,11 @@ module.exports = async (code, device) => {
             writeFile(logPath, data.toString(), true)
         })
     }
-    // eslint-disable-next-line no-eval
-    const runResult = await eval(`(async()=>{${code}})()`)
-    await delay(1000)
     setTimeout(() => {
         childProcess?.kill()
     }, 1000)
+    // eslint-disable-next-line no-eval
+    const runResult = await eval(`(async()=>{${code}})()`)
+    await delay(1000)
     return runResult
 }

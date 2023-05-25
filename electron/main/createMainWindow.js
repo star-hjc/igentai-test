@@ -17,7 +17,7 @@ module.exports = function createWindow () {
     win.maximize()
     win.setTitle('IGENTAI-TEST')
     /** 开发者工具 */
-    win.webContents.openDevTools()
+    // win.webContents.openDevTools()
     win.loadURL(loadURL)
     win.setAppDetails({
         appId: 'com.star.igentai-test.main'

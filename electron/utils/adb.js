@@ -201,7 +201,7 @@ async function getUI (device, all = false) {
             return [await xml2js.parseStringPromise(result), result]
         }
     }
-    if (device.id || device.path) {
+    if (device.path) {
         const { data, success } = await command(device, ['uiautomator', 'dump', '/sdcard/ui.xml', '&&', 'cat', '/sdcard/ui.xml'])
         if (!success) return
         let result = data.split('\n')

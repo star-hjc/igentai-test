@@ -92,7 +92,6 @@ function createGetScreenWindow () {
             ...option
         })
         screenWin.loadURL(`${loadURL}#/screen?${querystring.stringify(data)}`)
-        screenWin.webContents.openDevTools()
         // screenWin.webContents.openDevTools()
         screenWin.on('closed', () => {
             screenWin = null
