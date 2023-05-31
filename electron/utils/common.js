@@ -1,5 +1,4 @@
-
-module.exports = { bw, delay, sleep, rand, arrayMatched, loopByTime }
+module.exports = { bw, delay, sleep, rand, arrayMatched, loopByTime, loopByNum }
 
 /**
  * 等待
@@ -58,14 +57,33 @@ function rand (max = 100, min = 0) {
  * 限时循环
  * @param {Function} callback 循环体
  * @param {Number} timeout 循环时间
+ * @param {String} errMgs 错误消息
  */
-async function loopByTime (callback, timeout) {
+async function loopByTime (callback, timeout, errMgs = '') {
     const start = new Date()
+    let result
     while (new Date() - start <= timeout) {
-        const result = await callback()
+        result = await callback()
         if (result) break
-        sleep(100)
+        await delay(100)
     }
+    if (!result && errMgs) throw new Error(errMgs)
+}
+
+/**
+ * 限次循环
+ * @param {Function} callback 循环体
+ * @param {Number} num 循环次数
+ * @param {String} errMgs 错误消息
+ */
+async function loopByNum (callback, num, errMgs = '') {
+    let result
+    for (let i = 0; i < num; i++) {
+        result = await callback()
+        if (result) break
+        await delay(100)
+    }
+    if (!result && errMgs) throw new Error(errMgs)
 }
 
 /** 算报文 */

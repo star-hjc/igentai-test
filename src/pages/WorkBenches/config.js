@@ -6,7 +6,6 @@ export const suffixData = (prefix) => {
         { label: 'querySelector', detail: '根据属性获取屏幕节点' },
         { label: 'querySelectorAll', detail: '根据属性获取屏幕节点' },
         { label: 'getAttribute', detail: '获取节点指定属性:text...' }
-
     ]
     return data.map(v => {
         return { label: `${prefix}..${v.label}`, type: 'text', apply: `${prefix}.${v.label}${v.other || '()'}`, detail: v.detail }
@@ -22,6 +21,9 @@ export const prefixData = () => {
         { label: 'adb.swipe', detail: '屏幕拖动(x, y, toX, toY, time)' },
         { label: 'adb.keyevent', detail: '手机按键(key)' },
         { label: 'adb.input', detail: '手机输入' },
+        { label: 'adb.clearText', detail: '清空输入框' },
+        { label: 'adb.getRunAppisActivity', detail: '获取运行在后台的Activity' },
+        { label: 'adb.startApp', detail: '根据Activity启动App' },
         { label: 'adb.command', detail: `命令行，例：await adb.command(['input','tap',943,506])` }
     ]
     return data.map(v => {
@@ -48,6 +50,8 @@ export const variableData = () => {
         { label: 'getXY', detail: '获取节点的坐标', other: `()` },
         { label: 'getRange', detail: '获取节点的范围:[左上角X，左上角Y，右下角X，右下角Y]', other: `()` },
         { label: 'getProp', detail: '获取节点的所有属性，', other: `()` },
+        { label: 'loopByNum', detail: '根据次数循环，loopByNum(函数,循环次数,(默认可以不填[不填继续执行案例]，填写后，超出次数后抛出错误,进行下一次案例...))', other: `()` },
+        { label: 'loopByTime', detail: '根据时间循环，loopByNum(函数,循环时间,(默认可以不填[不填继续执行案例]，填写后，超出次数后抛出错误,进行下一次案例...))', other: `()` },
         { label: 'getProps', detail: '获取多个节点的所有属性', other: `()` },
         { label: 'clickId', detail: '根据资源ID单击', other: `()` },
         { label: 'clickText', detail: '根据文本内容单击', other: `()` },
@@ -61,16 +65,16 @@ export const variableData = () => {
 
 export const keyevent = [
     {
-        key: 'KEYCODE_CALL',
-        label: `拨号键`
-    },
-    {
-        key: 'KEYCODE_ENDCALL',
-        label: `挂机键`
+        key: 'KEYCODE_APP_SWITCH',
+        label: `后台APP`
     },
     {
         key: 'KEYCODE_HOME',
         label: `Home`
+    },
+    {
+        key: 'KEYCODE_POWER',
+        label: `电源键`
     },
     {
         key: 'KEYCODE_MENU',
@@ -89,12 +93,16 @@ export const keyevent = [
         label: `拍照键`
     },
     {
+        key: 'KEYCODE_CALL',
+        label: `拨号键`
+    },
+    {
         key: 'KEYCODE_FOCUS',
         label: `拍照对焦键`
     },
     {
-        key: 'KEYCODE_POWER',
-        label: `电源键`
+        key: 'KEYCODE_ENDCALL',
+        label: `挂机键`
     },
     {
         key: 'KEYCODE_NOTIFICATION',

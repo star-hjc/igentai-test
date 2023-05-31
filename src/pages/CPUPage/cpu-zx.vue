@@ -36,14 +36,16 @@ const objectSplit = (data, keys) => {
     }
     const splitIsObj = {}
     for (const key of keys) {
-        splitIsObj[key] = newDate[key]
-        delete newDate[key]
+        if (newDate[key]) {
+            splitIsObj[key] = newDate[key]
+            delete newDate[key]
+        }
     }
     return [newDate, splitIsObj]
 }
 
 appApi.ipcRenderer.on('call-cpu-event', (event, data) => {
-    const [, obj] = objectSplit(data.top, ['cpu', 'user', 'nice', 'sys', 'idle', 'iow', 'irq', 'sirq', 'host'])
+    const [, obj] = objectSplit(data.top, ['cpu', 'user', 'nice', 'sys', 'idle', 'iow', 'irq', 'sirq', 'host', 'User', 'System', 'IOW', 'IRQ'])
     const arr = Object.entries(obj).map(v => { return [v[0], parseFloat(v[1])] })
     for (const [key, value] of arr) {
         const index = state.series.findIndex(v => v.name === key)

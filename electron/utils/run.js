@@ -9,6 +9,7 @@ const {
     sleep,
     rand,
     arrayMatched,
+    loopByNum,
     loopByTime
 } = require('./common')
 const { select } = require('xpath')
@@ -64,7 +65,7 @@ module.exports = async (code, device) => {
         if (node.length) node = node[0]
         return Object.values(node.attributes)?.reduce((a, b) => {
             a[b.name] = b.value
-            if (b.name === 'bounds') a.bounds = getXY(node)
+            if (b.name === 'bounds') a.xy = getXY(node)
             return a
         }, {})
     }
@@ -83,6 +84,14 @@ module.exports = async (code, device) => {
         const nodes = await querySelectorAll(`[resource-id*='${id}']`)
         await cb(getXY(nodes[newObj.i]), nodes[newObj.i])
         return nodes?.length ? nodes[newObj.i] : undefined
+    }
+    /** 弃用 */
+    // eslint-disable-next-line no-unused-vars
+    function arrF (arrAll, arr, callback) {
+        if (!arr?.length) return callback(arrAll.join(','))
+        for (const item of arr) {
+            if (!arrAll.includes(item)) callback(item)
+        }
     }
     // eslint-disable-next-line no-unused-vars
     async function selectAll (str) {
