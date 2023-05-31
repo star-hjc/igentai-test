@@ -1,6 +1,0 @@
-await adb.startApp("com.igentai.vehiclesettings/.MainActivity")
-await delay(1000)
-await clickId("rbAmbientLight")
-await clickId("cbLightEnable")
-await clickId("cbWelcomeMode")
-await adb.keyevent("KEYCODE_HOME")

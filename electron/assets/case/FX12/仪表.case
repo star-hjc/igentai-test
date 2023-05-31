@@ -1,7 +1,0 @@
-await adb.startApp("com.igentai.vehiclesettings/.MainActivity")
-await delay(1000)
-await clickId("rbMeter")
-querySelector()
-await clickId("switch_thumb")
-console.log(select('com.igentai.vehiclesettings:id/switch_thumb'))
-getRange(await clickId("rbMeter"))
