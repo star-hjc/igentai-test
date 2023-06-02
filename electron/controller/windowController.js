@@ -9,6 +9,7 @@ module.exports = {
     createWorkBenchesWindow,
     createUiNodeWindow,
     createCPUWindow,
+    createLogWindow,
     getAppInfo,
     onNodeClick,
     onRefreshScreenshot
@@ -16,6 +17,7 @@ module.exports = {
 
 let screenWin = null
 let uiNodeWin = null
+let logWin = null
 
 /** 打开代码编辑工作台 */
 function createWorkBenchesWindow () {
@@ -122,6 +124,33 @@ function createUiNodeWindow () {
         // uiNodeWin.webContents.openDevTools()
         uiNodeWin.on('closed', () => {
             uiNodeWin = null
+        })
+        return true
+    })
+}
+
+/** 打开设备屏幕窗口 */
+function createLogWindow () {
+    ipcMain.handle('on-createLogWindow-event', (event, data = {}, option = {}) => {
+        if (logWin !== null) {
+            logWin.focus()
+            return
+        }
+        logWin = new BrowserWindow({
+            autoHideMenuBar: true,
+            resizable: true,
+            width: 960,
+            height: 740,
+            webPreferences: {
+                preload: path.join(__dirname, '../preload/screenPreload.js'),
+                nodeIntegration: true
+            },
+            ...option
+        })
+        logWin.loadURL(`${loadURL}#/log?${querystring.stringify(data)}`)
+        // uiNodeWin.webContents.openDevTools()
+        logWin.on('closed', () => {
+            logWin = null
         })
         return true
     })

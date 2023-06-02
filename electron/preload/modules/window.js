@@ -6,6 +6,7 @@ module.exports = {
     createWorkBenchesWindow,
     createUiNodeWindow,
     createCPUWindow,
+    createLogWindow,
     getAppInfo
 }
 
@@ -27,6 +28,9 @@ function createUiNodeWindow (data, option) {
 
 function createCPUWindow (data, option) {
     return ipcRenderer.invoke('on-createCPUWindow-event', data, option)
+}
+function createLogWindow (data, option) {
+    return ipcRenderer.invoke('on-createLogWindow-event', data, option)
 }
 
 function getAppInfo (data, option) {

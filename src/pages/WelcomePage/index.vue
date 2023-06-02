@@ -14,6 +14,12 @@
                     </el-icon>
                     <span>CPU监控</span>
                 </div>
+                <div class="tool" @click="openGetLog">
+                    <el-icon size="45">
+                        <Tickets />
+                    </el-icon>
+                    <span>日志抓取</span>
+                </div>
                 <div class="tool" @click="switchDevtools">
                     <el-icon size="45">
                         <SetUp />
@@ -374,6 +380,10 @@ function openWorkBenches () {
 
 function openCpuView () {
     viewApi.createCPUWindow({ ...state.device })
+}
+
+function openGetLog () {
+    viewApi.createLogWindow({ ...state.device })
 }
 
 function switchDevtools () {
