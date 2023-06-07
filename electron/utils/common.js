@@ -100,3 +100,4 @@ function bw (num, lsb, size, binary = 16, length = 8) {
     }
     return byteArr.map(v => parseInt(v.slice(0, 4).join(''), 2).toString(16) + parseInt(v.slice(4, 8).join(''), 2).toString(16)).join('')
 }
+

@@ -3,6 +3,7 @@ const { ipcRenderer } = require('electron')
 module.exports = {
     setTitle,
     writeFile,
+    cropImg,
     readFile,
     isDirectory,
     openBrowser,
@@ -95,4 +96,8 @@ function writeFile (filePath, data, cover) {
 
 function isDirectory (filePath) {
     return ipcRenderer.invoke('on-isDirectory-event', filePath)
+}
+
+function cropImg (imgBase64, args) {
+    return ipcRenderer.invoke('on-cropImg-event', imgBase64, args)
 }

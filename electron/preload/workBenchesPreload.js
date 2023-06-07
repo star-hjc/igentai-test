@@ -4,6 +4,7 @@ const viewApi = require('./modules/window')
 const adbApi = require('./modules/adb')
 const run = require('../utils/run')
 const cpuApi = require('./modules/cpu')
+const opencvApi = require('./modules/opencv')
 
 contextBridge.exposeInMainWorld('appApi', {
     ...common,
@@ -12,6 +13,10 @@ contextBridge.exposeInMainWorld('appApi', {
 
 contextBridge.exposeInMainWorld('viewApi', {
     ...viewApi
+})
+
+contextBridge.exposeInMainWorld('opencvApi', {
+    ...opencvApi
 })
 
 contextBridge.exposeInMainWorld('adb', {

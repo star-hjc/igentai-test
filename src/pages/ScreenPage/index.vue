@@ -7,6 +7,7 @@
                     :value="index" />
             </el-select>
             <div>
+                <el-checkbox v-model="isCrop" @click="omSwCrop">截图</el-checkbox>
                 <el-checkbox v-model="isGetPosition">获取坐标</el-checkbox>
             </div>
             <div>
@@ -14,21 +15,38 @@
                 <el-input-number style="width: 75px;" v-model="num" :min="1" :max="10" controls-position="right"
                     @change="onSelectNum" />
             </div>
+            <el-color-picker v-model="color" show-alpha />
+            <el-button  @click="onCrop">裁剪</el-button>
             <el-button @click="onRefresh">清空</el-button>
         </div>
         <el-scrollbar class="img-container" view-class="img-center">
-            <img ref="imgRef" :src="imgBase64" @click="onImgClick" />
-            <div ref="contentBorderRef" class="content-border"></div>
+            <img ref="imgRef" :src="imgBase64" :draggable="!isCrop" @click="onImgClick" @mousedown="onSelectDown"
+                @mouseup="onSelectUp" @mouseout="onSelectOut" />
+            <div ref="contentBorderRef" :style="`border: 1px solid ${color};`" class="content-border"></div>
         </el-scrollbar>
+        <el-dialog v-model="isSaveCrop" title="保存截图">
+            <el-scrollbar ref="scrollbarRef" height="40vh"
+                view-style="display: flex;justify-content: center;align-items: center;">
+                <img ref="cropImgRef" :src="cropImgBase64" draggable="false" :style="`width:${cropImgSize}%;`" />
+            </el-scrollbar>
+
+            <el-slider v-model="cropImgSize" />
+        </el-dialog>
     </div>
 </template>
 
 <script setup>
+import { ElMessage } from 'element-plus'
 import { useRoute } from 'vue-router'
 const imgBase64 = ref('')
+const cropImgBase64 = ref('')
+const cropImgSize = ref(21)
 const imgIndex = ref(0)
+const isCrop = ref(true)
 const imgRef = ref(null)
 const contentBorderRef = ref(null)
+const isSaveCrop = ref(false)
+const color = ref('rgba(255,0,0,1)')
 const num = ref(5)
 const isGetPosition = ref(false)
 const loading = ref(false)
@@ -41,6 +59,7 @@ const state = reactive({
         id: '',
         path: ''
     },
+    contentBorder: [],
     imgBase64s: []
 })
 
@@ -49,14 +68,63 @@ appApi.ipcRenderer.on('call-onNodeClick-event', (event, [bX, By, toX, toY]) => {
     const { x, y, clientWidth, clientHeight, naturalHeight, naturalWidth } = imgRef.value
     const widthRatio = clientWidth / naturalWidth
     const heightRatio = clientHeight / naturalHeight
-    contentBorderRef.value.style.top = `${y + ((By || 0) * heightRatio)}px`
-    contentBorderRef.value.style.left = `${x + ((bX || 0) * widthRatio)}px`
-    contentBorderRef.value.style.width = `${widthRatio * ((toX - bX) || 0)}px`
-    contentBorderRef.value.style.height = `${widthRatio * ((toY - By) || 0)}px`
+    showContentBorder(x + ((bX || 0) * widthRatio), y + ((By || 0) * heightRatio), widthRatio * ((toX - bX) || 0), widthRatio * ((toY - By) || 0))
 })
+
+function omSwCrop () {
+    if (isCrop.value) {
+        contentBorderRef.value.style.top = '-99999px'
+        contentBorderRef.value.style.left = '-99999px'
+    }
+}
+
+function showContentBorder (x, y, width, height) {
+    contentBorderRef.value.style.top = `${y}px`
+    contentBorderRef.value.style.left = `${x}px`
+    contentBorderRef.value.style.width = `${width}px`
+    contentBorderRef.value.style.height = `${height}px`
+}
 
 function onRefresh () {
     location.reload()
+}
+
+async function onCrop () {
+    const contentBorder = state.contentBorder
+    if (contentBorder?.length < 8) return ElMessage.error('截图条件不满足')
+    const { naturalHeight, naturalWidth, x: oldX, y: oldY, width, height } = imgRef.value
+    const ratioX = width / naturalWidth
+    const ratioY = height / naturalHeight
+    const x = (contentBorder[4] - oldX) / ratioX
+    const y = (contentBorder[5] - oldY) / ratioY
+    cropImgBase64.value = await appApi.cropImg(imgBase64.value, [x, y, contentBorder[6] / ratioX, contentBorder[7] / ratioX])
+    if (cropImgBase64.value) isSaveCrop.value = true
+}
+
+function onSelecMove ({ pageX, pageY }) {
+    state.contentBorder[2] = pageX - 1
+    state.contentBorder[3] = pageY - 1
+    const contentBorder = state.contentBorder
+    state.contentBorder[4] = Math.min(contentBorder[0], contentBorder[2])
+    state.contentBorder[5] = Math.min(contentBorder[1], contentBorder[3])
+    state.contentBorder[6] = Math.abs(contentBorder[0] - contentBorder[2])
+    state.contentBorder[7] = Math.abs(contentBorder[1] - contentBorder[3])
+    showContentBorder(state.contentBorder[4], state.contentBorder[5], state.contentBorder[6], state.contentBorder[7])
+}
+
+function onSelectDown ({ pageX, pageY }) {
+    if (!isCrop.value) return
+    state.contentBorder[0] = pageX + 1
+    state.contentBorder[1] = pageY + 1
+    imgRef.value.addEventListener('mousemove', onSelecMove)
+}
+
+function onSelectUp ({ pageX, pageY }) {
+    imgRef.value.removeEventListener('mousemove', onSelecMove)
+}
+
+function onSelectOut () {
+    imgRef.value.removeEventListener('mousemove', onSelecMove)
 }
 
 onresize = function () {
@@ -136,24 +204,26 @@ function getScreenshot (device) {
     .img-container {
         box-sizing: border-box;
         height: calc(100vh - 50px);
+
         :deep(.img-center) {
             height: calc(100vh - 50px);
             display: flex;
+            justify-content: center;
+            align-items: center;
             padding: 10px;
             box-sizing: border-box;
-            align-items: center;
-            justify-content: center;
+            user-select: none;
         }
 
         img {
+            user-select: none;
             cursor: url('@/assets/img/cursor/link-select.cur'), pointer;
         }
 
         .content-border {
+            pointer-events: none;
             position: fixed;
             z-index: 999;
-            filter: invert(0.7);
-            border: 1px solid red;
             top: -99999px;
             left: -99999px;
         }

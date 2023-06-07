@@ -2,7 +2,7 @@ const fs = require('fs')
 const cp = require('child_process')
 const path = require('path')
 
-module.exports = { isDirectorySync, renameFileSync, readdirAllSync, createFileSync, createFolderSync, removeFileSync, openFileExplorerSync, readFileSync, writeFileSync }
+module.exports = { isDirectorySync, renameFileSync, readdirAllSync, createFileSync, lstatSync, createFolderSync, removeFileSync, getImgBase64Sync, openFileExplorerSync, readFileSync, writeFileSync }
 
 /**
  * 是否是文件夹
@@ -12,10 +12,24 @@ module.exports = { isDirectorySync, renameFileSync, readdirAllSync, createFileSy
  */
 function isDirectorySync (filePath) {
     try {
-        const stat = fs.lstatSync(filePath)
+        const stat = lstatSync(filePath)
         return stat.isDirectory()
     } catch (err) {
         return false
+    }
+}
+
+/**
+ * 是否是路径
+ * true:是路径 false:路径不存在
+ * @param {String} filePath 文件路径
+ * @returns {Boolean}
+ */
+function lstatSync (filePath) {
+    try {
+        return fs.lstatSync(filePath)
+    } catch (err) {
+        return
     }
 }
 
@@ -144,5 +158,17 @@ function writeFileSync (filePath, data, cover = false) {
         return true
     } catch (err) {
         return false
+    }
+}
+
+/**
+ * 根据路径获取图标Base64
+ * @returns base64
+ */
+function getImgBase64Sync (filePath) {
+    try {
+        return Buffer.from(fs.readFileSync(filePath)).toString('base64')
+    } catch (error) {
+        return
     }
 }

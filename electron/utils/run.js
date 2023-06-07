@@ -1,4 +1,5 @@
 const cp = require('child_process')
+const appApi = require('../preload/modules/common')
 const adbApi = require('../preload/modules/adb')
 const { getAssetsPath, writeFile } = require('../preload/modules/common')
 
@@ -26,11 +27,17 @@ module.exports = async (code, device) => {
     if (device.id) {
         const data = await adb.setUiautomatorServe(1)
         if (!['Successfully started', 'Already started'].includes(data)) {
-            throw new Error('u2服务开启失败')
+            console.warn('u2服务开启失败...')
         }
     }
     async function DOM () {
         return new DOMParser().parseFromString(await adb.getUI(), 'text/xml')
+    }
+    // eslint-disable-next-line no-unused-vars
+    async function findImage () {
+        console.log(await appApi.cropImg(await adb.getScreenshot(), [1, 1, 100, 100]))
+        // const baseImg = await adb.getScreenshot()
+        // // opencvApi.findImage(,)
     }
     // eslint-disable-next-line no-unused-vars
     async function querySelector (str) {

@@ -1,4 +1,5 @@
 const path = require('path')
+const Jimp = require('jimp')
 const { SerialPort } = require('serialport')
 const { ipcMain, BrowserWindow, shell } = require('electron')
 const { exec } = require('../utils/command')
@@ -21,6 +22,7 @@ module.exports = {
     isDirectory,
     renameFile,
     devTool,
+    cropImg,
     readFile,
     setTitle,
     writeFile,
@@ -200,3 +202,14 @@ function getSerialPortList () {
     })
 }
 
+function cropImg () {
+    ipcMain.handle('on-cropImg-event', (event, imgBase64, args = []) => {
+        return new Promise(async (resolve, reject) => {
+            Jimp.read(Buffer.from(imgBase64.split(';base64,').pop(), 'base64')).then(image => {
+                resolve(image.crop(...args).getBase64Async(Jimp.MIME_PNG))
+            }).catch(() => {
+                reject()
+            })
+        }).catch(() => {})
+    })
+}
