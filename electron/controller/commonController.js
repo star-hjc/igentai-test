@@ -10,6 +10,7 @@ const {
     isDirectorySync,
     readdirAllSync,
     renameFileSync,
+    getBasePath: getBasePathSync,
     createFileSync,
     createFolderSync,
     removeFileSync,
@@ -19,7 +20,9 @@ const {
 } = require('../utils/file')
 
 module.exports = {
+    downloadBase64,
     isDirectory,
+    getBasePath,
     renameFile,
     devTool,
     cropImg,
@@ -72,9 +75,9 @@ function openBrowser () {
 
 /** 读取脚本文件 */
 function readdirCase () {
-    ipcMain.handle('on-readdirCase-event', (event) => {
+    ipcMain.handle('on-readdirCase-event', (event, notTypes) => {
         const basePath = path.join(assetsPath, 'case')
-        return caseMap(readdirAllSync(basePath))
+        return caseMap(readdirAllSync(basePath, notTypes))
     })
 }
 
@@ -135,8 +138,8 @@ function switchDevtools () {
 
 /** 获取静态地址 */
 function getAssetsPath () {
-    ipcMain.handle('on-getAssetsPath-event', (event, suffixPath = '') => {
-        return path.join(assetsPath, suffixPath)
+    ipcMain.handle('on-getAssetsPath-event', (event, suffixPath = '', basePath = '') => {
+        return path.join(basePath || assetsPath, suffixPath)
     })
 }
 
@@ -195,6 +198,20 @@ function writeFile () {
     })
 }
 
+function downloadBase64 () {
+    ipcMain.handle('on-downloadBase64-event', (event, filePath, base64) => {
+        const suffix = base64.split(',')[0].split(';')[0].split('/')[1]
+        return writeFileSync(`${filePath}.${suffix}`, Buffer.from(base64.split(',')[1], 'base64'))
+    })
+}
+
+/** 获取文件夹路径 */
+function getBasePath () {
+    ipcMain.handle('on-getBasePath-event', (event, filePath) => {
+        return getBasePathSync(filePath)
+    })
+}
+
 /** 获取串口 */
 function getSerialPortList () {
     ipcMain.handle('on-getSerialPortList-event', async (event) => {
@@ -210,6 +227,6 @@ function cropImg () {
             }).catch(() => {
                 reject()
             })
-        }).catch(() => {})
+        }).catch(() => { })
     })
 }

@@ -14,13 +14,15 @@ module.exports = {
     createFile,
     getIpInfo,
     getLocalIPv4,
+    getBasePath,
     createFolder,
     removeFile,
     getAssetsPath,
     openFileExplorer,
     renameFile,
     killServerByPname,
-    getSerialPortList
+    getSerialPortList,
+    downloadBase64
 }
 
 async function setTitle (title) {
@@ -35,8 +37,8 @@ function openBrowser (url) {
     ipcRenderer.invoke('on-openBrowser-event', url)
 }
 
-function readdirCase () {
-    return ipcRenderer.invoke('on-readdirCase-event')
+function readdirCase (notTypes) {
+    return ipcRenderer.invoke('on-readdirCase-event', notTypes)
 }
 
 function readdirLog () {
@@ -100,4 +102,12 @@ function isDirectory (filePath) {
 
 function cropImg (imgBase64, args) {
     return ipcRenderer.invoke('on-cropImg-event', imgBase64, args)
+}
+
+function getBasePath (filePath, basePath) {
+    return ipcRenderer.invoke('on-getBasePath-event', filePath, basePath)
+}
+
+function downloadBase64 (filePath, base64) {
+    return ipcRenderer.invoke('on-downloadBase64-event', filePath, base64)
 }

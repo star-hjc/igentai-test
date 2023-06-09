@@ -1,6 +1,7 @@
 const cp = require('child_process')
-const appApi = require('../preload/modules/common')
+// const appApi = require('../preload/modules/common')
 const adbApi = require('../preload/modules/adb')
+const opencvApi = require('../preload/modules/opencv')
 const { getAssetsPath, writeFile } = require('../preload/modules/common')
 
 /* eslint-disable */
@@ -34,10 +35,11 @@ module.exports = async (code, device) => {
         return new DOMParser().parseFromString(await adb.getUI(), 'text/xml')
     }
     // eslint-disable-next-line no-unused-vars
-    async function findImage () {
-        console.log(await appApi.cropImg(await adb.getScreenshot(), [1, 1, 100, 100]))
-        // const baseImg = await adb.getScreenshot()
-        // // opencvApi.findImage(,)
+    async function findImage (imgName = '', option) {
+        const base64 = (await adb.getScreenshot()).split(',')?.[1]
+        if (!base64) return
+        const url = new URL(`${imgName || '../'}`, device.filePath).href.replace('file:///', '')
+        return await opencvApi.findImage(base64, url, option)
     }
     // eslint-disable-next-line no-unused-vars
     async function querySelector (str) {

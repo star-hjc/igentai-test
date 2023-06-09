@@ -232,6 +232,7 @@ const state = reactive({
     menuData: [],
     /** adb,serialport */
     connectionMethod: 'adb',
+    usedProt: [],
     device: { id: '', path: '', ip: '', port: 6666, method: '', methodName: '', baudRate: 115200 },
     wifiPort: 8848,
     ipv4: [],
@@ -273,6 +274,7 @@ async function getLog () {
 async function onCloseDevice () {
     state.device.path = ''
     state.device.id = ''
+    state.usedProt = []
     ElMessage.success('清空成功')
 }
 
@@ -299,7 +301,7 @@ async function getLocalIPv4 () {
 }
 
 async function getCase () {
-    await appApi.readdirCase().then(data => {
+    await appApi.readdirCase(['png']).then(data => {
         state.menuData = data
     })
 }
@@ -523,17 +525,16 @@ async function installInitExistFile () {
 function onSelectDevice (val, method) {
     const device = { ...state.device }
     if (method === 'adb') {
-        adb.getInitNotExistFile(device).then(data => {
-            if (data.files?.length && data.packages?.length) {
+        adb.getInitNotExistFile(device).then(async (data) => {
+            if (data.files?.length || data.packages?.length) {
                 state.initNotExistFile = data
-                isLink.value = true
-                adb.startATXService(device)
-                return
+                await adb.installInitExistFile(device, data).then((notExistFile) => {
+                    state.initNotExistFile = notExistFile
+                    isLink.value = true
+                })
             }
-            adb.installInitExistFile(device, data).then((notExistFile) => {
-                state.initNotExistFile = notExistFile
-                isLink.value = true
-            })
+            state.initNotExistFile = data
+            adb.startATXService(device)
         })
         if (/^\s*\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b:\d{1,5}\s*$/.test(val)) {
             state.device.methodName = 'WIFI'

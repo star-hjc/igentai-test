@@ -45,6 +45,7 @@ export const variableData = () => {
         { label: 'Array', detail: 'Array对象' },
         { label: 'arrayMatched', detail: '数组对比，callback（与第一个数组对比第一个数组多余的值{Array},与第一个数组对比第一个数组不存在的值{Array}）' },
         { label: 'console', detail: '控制台' },
+        { label: 'findImage', detail: 'findImage(图片地址)' },
         { label: 'function', detail: 'definition', other: ` name(){\n\n}\n` },
         { label: 'querySelector', detail: '根据属性获取屏幕节点', other: `()` },
         { label: 'querySelectorAll', detail: '根据属性获取屏幕节点', other: `()` },

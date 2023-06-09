@@ -85,10 +85,10 @@ async function switchWiFiADB (device, host) {
 
 async function starSerialPortService (device) {
     await command(device, ['su'])
-    await command(device, ['am', 'force-stop', 'com.android.uiautomator2.server'])
     await command(device, ['chmod', '755', '/data/local/tmp/atx-agent'])
     await command(device, ['chmod', '755', '/data/local/tmp/minicap'])
     await command(device, ['chmod', '755', '/data/local/tmp/minicap.so'])
+    await command(device, ['chmod', '755', '/data/local/tmp/minicap-nopie'])
     await command(device, ['chmod', '755', '/data/local/tmp/ui.xml'])
     await command(device, ['/data/local/tmp/atx-agent', 'server -d'])
 }
@@ -99,6 +99,7 @@ async function startATXService (device) {
     await adb(['shell', 'chmod', '755', '/data/local/tmp/atx-agent'], device.id)
     await adb(['shell', 'chmod', '755', '/data/local/tmp/minicap'], device.id)
     await adb(['shell', 'chmod', '755', '/data/local/tmp/minicap.so'], device.id)
+    await adb(['shell', 'chmod', '755', '/data/local/tmp/minicap-nopie'], device.id)
     await adb(['shell', 'chmod', '755', '/data/local/tmp/ui.xml'], device.id)
     await adb(['shell', '/data/local/tmp/atx-agent', 'server -d'], device.id)
     await adb(['forward', `tcp:${device.port}`, 'tcp:7912'], device.id)
@@ -201,7 +202,7 @@ async function getUI (device, all = false) {
             return [await xml2js.parseStringPromise(result), result]
         }
     }
-    if (device.path) {
+    if (device.id || device.path) {
         const { data, success } = await command(device, ['uiautomator', 'dump', '/sdcard/ui.xml', '&&', 'cat', '/sdcard/ui.xml'])
         if (!success) return
         let result = data.split('\n')

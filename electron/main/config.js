@@ -14,7 +14,8 @@ module.exports = {
         files: [
             { name: 'atx-agent', path: path.join(assetsPath, 'package', 'atx-agent') },
             { name: 'minicap', path: path.join(assetsPath, 'package', 'minicap') },
-            { name: 'minicap.so', path: path.join(assetsPath, 'package', 'minicap.so') }
+            { name: 'minicap.so', path: path.join(assetsPath, 'package', 'minicap.so') },
+            { name: 'minicap-nopie', path: path.join(assetsPath, 'package', 'minicap-nopie') }
         ],
         packages: [
             { path: path.join(assetsPath, 'package', 'app-uiautomator.apk'), package: 'com.github.uiautomator', name: 'app-uiautomator.apk' },

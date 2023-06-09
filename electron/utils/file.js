@@ -2,7 +2,7 @@ const fs = require('fs')
 const cp = require('child_process')
 const path = require('path')
 
-module.exports = { isDirectorySync, renameFileSync, readdirAllSync, createFileSync, lstatSync, createFolderSync, removeFileSync, getImgBase64Sync, openFileExplorerSync, readFileSync, writeFileSync }
+module.exports = { isDirectorySync, renameFileSync, readdirAllSync, createFileSync, getBasePath, lstatSync, existsSync, createFolderSync, removeFileSync, getImgBase64Sync, openFileExplorerSync, readFileSync, writeFileSync }
 
 /**
  * 是否是文件夹
@@ -20,14 +20,26 @@ function isDirectorySync (filePath) {
 }
 
 /**
- * 是否是路径
- * true:是路径 false:路径不存在
  * @param {String} filePath 文件路径
  * @returns {Boolean}
  */
 function lstatSync (filePath) {
     try {
         return fs.lstatSync(filePath)
+    } catch (err) {
+        return
+    }
+}
+
+/**
+ * 是否是路径
+ * true:是路径 false:路径不存在
+ * @param {String} filePath 文件路径
+ * @returns {Boolean}
+ */
+function existsSync (filePath) {
+    try {
+        return fs.existsSync(filePath)
     } catch (err) {
         return
     }
@@ -47,12 +59,12 @@ function getBasePath (filePath) {
  * @param {String} folderBasePath 文件夹路径
  * @returns {Arrer}
  */
-function readdirAllSync (folderBasePath) {
+function readdirAllSync (folderBasePath, notTypes = []) {
     if (!isDirectorySync(folderBasePath)) return []
     return fs.readdirSync(folderBasePath).map(item => {
         const childrenPath = path.join(folderBasePath, item)
         if (isDirectorySync(childrenPath)) {
-            return { type: 'folder', title: item, children: readdirAllSync(childrenPath), path: childrenPath }
+            return { type: 'folder', title: item, children: readdirAllSync(childrenPath, notTypes), path: childrenPath }
         }
         const { ctime, mtime, birthtime } = fs.statSync(childrenPath)
         return {
@@ -62,7 +74,7 @@ function readdirAllSync (folderBasePath) {
             createTime: (birthtime || ctime).toLocaleString(),
             updateTime: new Date(Math.max(ctime, mtime)).toLocaleString()
         }
-    }).filter(v => v)
+    }).filter(v => v && !notTypes.includes(v.path?.split('\\')?.at(-1)?.split('.')?.at(-1)))
 }
 
 /**

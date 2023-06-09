@@ -16,7 +16,7 @@
                     @change="onSelectNum" />
             </div>
             <el-color-picker v-model="color" show-alpha />
-            <el-button  @click="onCrop">裁剪</el-button>
+            <el-button @click="onCrop">裁剪</el-button>
             <el-button @click="onRefresh">清空</el-button>
         </div>
         <el-scrollbar class="img-container" view-class="img-center">
@@ -26,11 +26,15 @@
         </el-scrollbar>
         <el-dialog v-model="isSaveCrop" title="保存截图">
             <el-scrollbar ref="scrollbarRef" height="40vh"
-                view-style="display: flex;justify-content: center;align-items: center;">
+                view-style="display: flex;justify-content: center;align-items: center;height:40vh;">
                 <img ref="cropImgRef" :src="cropImgBase64" draggable="false" :style="`width:${cropImgSize}%;`" />
             </el-scrollbar>
 
             <el-slider v-model="cropImgSize" />
+            <div style="display: flex;justify-content: center;align-items: center;padding: 10px;">
+                <el-input v-model="cropImgName" />
+                <el-button type="primary" style="margin: auto;" @click="onSaveCropImg">保存</el-button>
+            </div>
         </el-dialog>
     </div>
 </template>
@@ -42,6 +46,7 @@ const imgBase64 = ref('')
 const cropImgBase64 = ref('')
 const cropImgSize = ref(21)
 const imgIndex = ref(0)
+const cropImgName = ref('')
 const isCrop = ref(true)
 const imgRef = ref(null)
 const contentBorderRef = ref(null)
@@ -63,12 +68,21 @@ const state = reactive({
     imgBase64s: []
 })
 
-appApi.ipcRenderer.on('call-onNodeClick-event', (event, [bX, By, toX, toY]) => {
+appApi.ipcRenderer.on('call-onNodeClick-event', (event, [bX, bY, toX, toY]) => {
     if (!imgRef.value) return
     const { x, y, clientWidth, clientHeight, naturalHeight, naturalWidth } = imgRef.value
     const widthRatio = clientWidth / naturalWidth
     const heightRatio = clientHeight / naturalHeight
-    showContentBorder(x + ((bX || 0) * widthRatio), y + ((By || 0) * heightRatio), widthRatio * ((toX - bX) || 0), widthRatio * ((toY - By) || 0))
+    state.contentBorder[0] = bX
+    state.contentBorder[1] = bY
+    state.contentBorder[2] = Math.abs(bX - toY)
+    state.contentBorder[3] = Math.abs(bY - toY)
+    state.contentBorder[4] = x + ((bX || 0) * widthRatio)
+    state.contentBorder[5] = y + ((bY || 0) * heightRatio)
+    state.contentBorder[6] = widthRatio * ((toX - bX) || 0)
+    state.contentBorder[7] = widthRatio * ((toY - bY) || 0)
+    const contentBorder = state.contentBorder
+    showContentBorder(contentBorder[4], contentBorder[5], contentBorder[6], contentBorder[7])
 })
 
 function omSwCrop () {
@@ -90,6 +104,7 @@ function onRefresh () {
 }
 
 async function onCrop () {
+    cropImgName.value = new Date().getTime()
     const contentBorder = state.contentBorder
     if (contentBorder?.length < 8) return ElMessage.error('截图条件不满足')
     const { naturalHeight, naturalWidth, x: oldX, y: oldY, width, height } = imgRef.value
@@ -99,6 +114,20 @@ async function onCrop () {
     const y = (contentBorder[5] - oldY) / ratioY
     cropImgBase64.value = await appApi.cropImg(imgBase64.value, [x, y, contentBorder[6] / ratioX, contentBorder[7] / ratioX])
     if (cropImgBase64.value) isSaveCrop.value = true
+}
+
+async function onSaveCropImg () {
+    const folderPath = await appApi.getBasePath(state.device.filePath)
+    if (/[\u4E00-\u9FA5]|[\uFE30-\uFFA0]/.test(cropImgName.value)) {
+        ElMessage.success('文件名不能为中文!')
+        isSaveCrop.value = false
+        return
+    }
+    appApi.downloadBase64(`${folderPath}\\${cropImgName.value}`, cropImgBase64.value).then(data => {
+        if (data) return ElMessage.success('保存成功!')
+        ElMessage.success('保存出现错误!')
+    })
+    isSaveCrop.value = false
 }
 
 function onSelecMove ({ pageX, pageY }) {
