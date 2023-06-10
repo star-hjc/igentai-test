@@ -2,7 +2,7 @@ const { app, BrowserWindow } = require('electron')
 const createMainWindow = require('./createMainWindow')
 const initController = require('../controller')
 
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
     createMainWindow()
     app.on('activate', () => {
         if (BrowserWindow.getAllWindows().length === 0) createMainWindow()

@@ -1,7 +1,8 @@
 const path = require('path')
+const { createWorker } = require('tesseract.js')
 const querystring = require('querystring')
 const { ipcMain, BrowserWindow } = require('electron')
-const { loadURL } = require('../main/config')
+const { loadURL, assetsPath } = require('../main/config')
 
 module.exports = {
     createRunCaseWindow,
@@ -12,16 +13,45 @@ module.exports = {
     createLogWindow,
     getAppInfo,
     onNodeClick,
-    onRefreshScreenshot
+    onRefreshScreenshot,
+    ocr
 }
 
 let screenWin = null
 let uiNodeWin = null
 let logWin = null
+let worker = null
+
+async function initAddLanguage (lang = ['eng', 'rus']) {
+    worker = await createWorker({
+        langPath: path.join(assetsPath, '/ocr-lang/'),
+        gzip: false
+    })
+    await worker.loadLanguage(lang)
+}
+
+async function ocr () {
+    ipcMain.handle('on-ocr-event', async (event, file, options = {}) => {
+        await worker.initialize(options.lang)
+        if (options.range && options.range?.length === 4) {
+            options.range = { left: options.range[0], top: options.range[1], width: options.range[2], height: options.range[3] }
+        } else {
+            options.range = undefined
+        }
+        console.log(options.range)
+
+        const { data } = await worker.recognize(file, {
+            rectangle: options.range
+        })
+        console.log('Bounding boxes:', data.lines.map(line => line.bbox))
+        return data?.text
+    })
+}
 
 /** 打开代码编辑工作台 */
 function createWorkBenchesWindow () {
-    ipcMain.handle('on-createWorkBenchesWindow-event', (event, data = {}, option = {}) => {
+    ipcMain.handle('on-createWorkBenchesWindow-event', async (event, data = {}, option = {}) => {
+        await initAddLanguage()
         const workWin = new BrowserWindow({
             autoHideMenuBar: true,
             resizable: true,
@@ -30,6 +60,10 @@ function createWorkBenchesWindow () {
                 nodeIntegration: true
             },
             ...option
+        })
+        workWin.on('close', async (event) => {
+            await worker.terminate()
+            console.log(worker)
         })
         /** 最大化 */
         workWin.maximize()
@@ -59,7 +93,8 @@ function createCPUWindow () {
 
 /** 打开运行案例窗口 */
 function createRunCaseWindow () {
-    ipcMain.handle('on-createRunCaseWindow-event', (event, data = {}, option = {}) => {
+    ipcMain.handle('on-createRunCaseWindow-event', async (event, data = {}, option = {}) => {
+        await initAddLanguage()
         const runWin = new BrowserWindow({
             autoHideMenuBar: true,
             resizable: true,
@@ -70,6 +105,9 @@ function createRunCaseWindow () {
                 nodeIntegration: true
             },
             ...option
+        })
+        runWin.on('close', async (event) => {
+            await worker.terminate()
         })
         runWin.loadURL(`${loadURL}#/run?${querystring.stringify(data)}`)
     })

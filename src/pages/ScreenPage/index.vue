@@ -18,6 +18,7 @@
             <el-color-picker v-model="color" show-alpha />
             <el-button @click="onCrop">裁剪</el-button>
             <el-button @click="onRefresh">清空</el-button>
+            <el-button @click="ongetCropRangeStr">获取截图范围</el-button>
         </div>
         <el-scrollbar class="img-container" view-class="img-center">
             <img ref="imgRef" :src="imgBase64" :draggable="!isCrop" @click="onImgClick" @mousedown="onSelectDown"
@@ -105,17 +106,27 @@ function onRefresh () {
 
 async function onCrop () {
     cropImgName.value = new Date().getTime()
+    if (state.contentBorder?.length < 8) return ElMessage.error('截图条件不满足')
+    cropImgBase64.value = await appApi.cropImg(imgBase64.value, getCropRange())
+    if (cropImgBase64.value) isSaveCrop.value = true
+}
+
+function ongetCropRangeStr () {
+    if (state.contentBorder?.length < 8) return ElMessage.error('截图条件不满足')
+    const data = getCropRange().map(v => Math.round(v)).join(',')
+    navigator.clipboard.writeText(data)
+    ElMessage.success(data)
+}
+
+function getCropRange () {
     const contentBorder = state.contentBorder
-    if (contentBorder?.length < 8) return ElMessage.error('截图条件不满足')
     const { naturalHeight, naturalWidth, x: oldX, y: oldY, width, height } = imgRef.value
     const ratioX = width / naturalWidth
     const ratioY = height / naturalHeight
     const x = (contentBorder[4] - oldX) / ratioX
     const y = (contentBorder[5] - oldY) / ratioY
-    cropImgBase64.value = await appApi.cropImg(imgBase64.value, [x, y, contentBorder[6] / ratioX, contentBorder[7] / ratioX])
-    if (cropImgBase64.value) isSaveCrop.value = true
+    return [x, y, contentBorder[6] / ratioX, contentBorder[7] / ratioX]
 }
-
 async function onSaveCropImg () {
     const folderPath = await appApi.getBasePath(state.device.filePath)
     if (/[\u4E00-\u9FA5]|[\uFE30-\uFFA0]/.test(cropImgName.value)) {

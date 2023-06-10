@@ -1,10 +1,10 @@
 const cp = require('child_process')
-// const appApi = require('../preload/modules/common')
+const viewApi = require('../preload/modules/window')
 const adbApi = require('../preload/modules/adb')
 const opencvApi = require('../preload/modules/opencv')
-const { getAssetsPath, writeFile } = require('../preload/modules/common')
-
 /* eslint-disable */
+const { getAssetsPath, writeFile, cropImg } = require('../preload/modules/common')
+
 const {
     bw,
     delay,
@@ -47,6 +47,10 @@ module.exports = async (code, device) => {
     }
     async function querySelectorAll (str) {
         return (await DOM())?.querySelectorAll(str) || null
+    }
+    // eslint-disable-next-line no-unused-vars
+    async function ocr (options, file) {
+        return await viewApi.ocr(file || await adb.getScreenshot(), options)
     }
     // eslint-disable-next-line no-unused-vars
     function getText (node) {

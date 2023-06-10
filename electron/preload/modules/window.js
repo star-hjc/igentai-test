@@ -7,7 +7,11 @@ module.exports = {
     createUiNodeWindow,
     createCPUWindow,
     createLogWindow,
-    getAppInfo
+    getAppInfo,
+    ocr
+}
+function ocr (file, options) {
+    return ipcRenderer.invoke('on-ocr-event', file, options)
 }
 
 function createWorkBenchesWindow (data, option) {
