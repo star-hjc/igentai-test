@@ -38,12 +38,9 @@ async function ocr () {
         } else {
             options.range = undefined
         }
-        console.log(options.range)
-
         const { data } = await worker.recognize(file, {
             rectangle: options.range
         })
-        console.log('Bounding boxes:', data.lines.map(line => line.bbox))
         return data?.text
     })
 }
@@ -63,7 +60,6 @@ function createWorkBenchesWindow () {
         })
         workWin.on('close', async (event) => {
             await worker.terminate()
-            console.log(worker)
         })
         /** 最大化 */
         workWin.maximize()

@@ -530,8 +530,9 @@ function onSelectDevice (val, method) {
                 state.initNotExistFile = data
                 await adb.installInitExistFile(device, data).then((notExistFile) => {
                     state.initNotExistFile = notExistFile
-                    isLink.value = true
                 })
+            } else {
+                isLink.value = true
             }
             state.initNotExistFile = data
             adb.startATXService(device)

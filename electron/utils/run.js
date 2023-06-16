@@ -42,11 +42,11 @@ module.exports = async (code, device) => {
         return await opencvApi.findImage(base64, url, option)
     }
     // eslint-disable-next-line no-unused-vars
-    async function querySelector (str) {
-        return (await DOM())?.querySelector(str) || null
+    async function querySelector (str, dom) {
+        return (dom || await DOM())?.querySelector(str) || null
     }
-    async function querySelectorAll (str) {
-        return (await DOM())?.querySelectorAll(str) || null
+    async function querySelectorAll (str, dom) {
+        return (dom || await DOM())?.querySelectorAll(str) || null
     }
     // eslint-disable-next-line no-unused-vars
     async function ocr (options, file) {
@@ -107,12 +107,12 @@ module.exports = async (code, device) => {
         }
     }
     // eslint-disable-next-line no-unused-vars
-    async function selectAll (str) {
-        return getProps(await querySelectorAll(str))
+    async function selectAll (str, dom) {
+        return getProps(await querySelectorAll(str, dom))
     }
     // eslint-disable-next-line no-unused-vars
-    async function select (str) {
-        return getProp((await querySelector(str)))
+    async function select (str, dom) {
+        return getProp((await querySelector(str, dom)))
     }
     // eslint-disable-next-line no-unused-vars
     function getProps (nodes) {
@@ -121,26 +121,19 @@ module.exports = async (code, device) => {
             return getProp(v)
         })
     }
-    async function click (str, index = 0, callback) {
-        const node = (await querySelectorAll(str))?.[index]
+    async function click (str, index = 0, dom) {
+        const node = (await querySelectorAll(str, dom))?.[index]
         if (!node) return
-        if (await callback(node)) return
         await adb.tap(...getXY(node))
         return node
     }
     // eslint-disable-next-line no-unused-vars
-    async function clickId (resourceId, index, str) {
-        return click(`*[resource-id*='${resourceId}']`, index, (node) => {
-            if (!str) return
-            return node?.querySelector(str)
-        })
+    async function clickId (resourceId, index, dom) {
+        return click(`*[resource-id*='${resourceId}']`, index, dom)
     }
     // eslint-disable-next-line no-unused-vars
-    async function clickText (text, index, str) {
-        return click(`*[text='${text}']`, index, (node) => {
-            if (!str) return
-            return node?.querySelector(str)
-        })
+    async function clickText (text, index, dom) {
+        return click(`*[text='${text}']`, index, dom)
     }
     let childProcess = null
 

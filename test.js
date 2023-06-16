@@ -9,4 +9,3 @@
 // const matchedLocations = matched.threshold(threshold, 1, cv.THRESH_BINARY)
 //     .convertTo(cv.CV_8U)
 //     .findNonZero()
-// console.log(data)

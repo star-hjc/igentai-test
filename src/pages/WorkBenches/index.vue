@@ -333,7 +333,6 @@ function onHelpClose () {
 }
 
 function onCodemirrorload (payload) {
-    // console.log(payload)
     codemirrorView.value = payload.view
 }
 
