@@ -35,24 +35,12 @@ async function onRunCase () {
     errNum.value = 0
     runs.value = 0
     const code = await appApi.readFile(state.device.filePath) || ''
-    for (let i = 0; i < runNum.value; i++) {
+    await run(code, { ...state.device }, (num, result) => {
+        ElMessage.success(`运行第${num}次...`)
         runs.value += 1
-        ElMessage.success(`运行第${runs.value}次...`)
-        await onRunOneCase(code).then(v => { if (!v) errNum.value += 1 })
-    }
+        if (!result) errNum.value += 1
+    }, runNum.value)
     ElMessage.success('运行完成...')
-}
-
-async function onRunOneCase (code) {
-    let result = true
-    try {
-        await run(code, { ...state.device }).then(() => { result = true })
-    } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error(error)
-        result = false
-    }
-    return result
 }
 </script>
 

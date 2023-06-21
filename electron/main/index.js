@@ -1,4 +1,5 @@
 const { app, BrowserWindow } = require('electron')
+
 const createMainWindow = require('./createMainWindow')
 const initController = require('../controller')
 

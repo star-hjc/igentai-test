@@ -127,7 +127,7 @@ function removeFileSync (filePath, recursive = false) {
  */
 async function openFileExplorerSync (filePath) {
     const baseFilePath = getBasePath(filePath)
-    cp.exec(`start ${baseFilePath}`)
+    cp.exec(`start "" "${baseFilePath}" /select, "${filePath}`)
 }
 
 /**
@@ -169,6 +169,7 @@ function writeFileSync (filePath, data, cover = false) {
         fs.writeFileSync(filePath, data)
         return true
     } catch (err) {
+        console.log(err)
         return false
     }
 }

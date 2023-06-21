@@ -687,7 +687,6 @@ function onSelectDevice (val, method) {
                                     -ms-user-select: none;
                                     user-select: none;
                                     vertical-align: middle;
-                                    -webkit-appearance: none;
                                     background-color: var(--el-button-bg-color);
                                     border: var(--el-border);
                                     border-color: var(--el-button-border-color);

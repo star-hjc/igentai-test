@@ -1,0 +1,183 @@
+const fs = require('fs')
+const title = '123'
+const data = {
+    tableData: [
+        {
+            caseName: '用例1',
+            num: 16,
+            pass: 16,
+            fail: 0,
+            time: '00:01:47'
+        }
+    ],
+    logData: [
+        {
+            lev: 'warning',
+            time: '16:47:48',
+            mgs: '设置-负一屏-文字错误-askdklasjdl'
+        },
+        {
+            lev: 'danger',
+            time: '16:47:48',
+            mgs: '设置-负一屏-文字错误-askdklasjdl'
+        },
+        {
+            lev: 'danger',
+            time: '16:47:48',
+            mgs: '设置-负一屏-文字错误-askdklasjdl'
+        },
+        {
+            lev: 'danger',
+            time: '16:47:48',
+            mgs: '设置-负一屏-文字错误-askdklasjdl'
+        },
+        {
+            lev: 'danger',
+            time: '16:47:48',
+            mgs: '设置-负一屏-文字错误-askdklasjdl'
+        },
+        {
+            lev: 'danger',
+            time: '16:47:48',
+            mgs: '设置-负一屏-文字错误-askdklasjdl'
+        },
+        {
+            lev: 'danger',
+            time: '16:47:48',
+            mgs: '设置-负一屏-文字错误-askdklasjdl'
+        },
+        {
+            lev: 'warning',
+            time: '16:47:48',
+            mgs: '设置-负一屏-文字错误-askdklasjdl'
+        },
+        {
+            lev: 'warning',
+            time: '16:47:48',
+            mgs: '设置-负一屏-文字错误-askdklasjdl'
+        },
+        {
+            lev: 'warning',
+            time: '16:47:48',
+            mgs: '设置-负一屏-文字错误-askdklasjdl'
+        },
+        {
+            lev: 'warning',
+            time: '16:47:48',
+            mgs: '设置-负一屏-文字错误-askdklasjdl'
+        },
+        {
+            lev: 'warning',
+            time: '16:47:48',
+            mgs: '设置-负一屏-文字错误-askdklasjdl'
+        },
+        {
+            lev: 'warning',
+            time: '16:47:48',
+            mgs: '设置-负一屏-文字错误-askdklasjdl'
+        },
+        {
+            lev: 'warning',
+            time: '16:47:48',
+            mgs: '设置-负一屏-文字错误-askdklasjdl'
+        },
+        {
+            lev: 'warning',
+            time: '16:47:48',
+            mgs: '设置-负一屏-文字错误-askdklasjdl'
+        },
+        {
+            lev: 'warning',
+            time: '16:47:48',
+            mgs: '设置-负一屏-文字错误-askdklasjdl'
+        },
+        {
+            lev: 'warning',
+            time: '16:47:48',
+            mgs: '设置-负一屏-文字错误-askdklasjdl'
+        }
+    ]
+}
+const deviceName = '设备名称'
+const methods = {
+}
+
+/* <link rel="icon" type="image/svg+xml" href="/vite.svg" /> */
+const baseHtml =
+    `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>${title}</title>
+    <script>
+        function loadScript(src) {
+            var script = document.createElement('script');
+            script.src = src;
+            document.head.appendChild(script);
+        }
+        function loadLike(href) {
+            var link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = href;
+            document.head.appendChild(link);
+        }
+    </script>
+    <link rel="stylesheet" href="https://unpkg.com/element-plus/dist/index.css"/>
+    <link rel="stylesheet" href="./css.css"/>
+    <script src='https://unpkg.com/vue@3'></script>
+    <script src='./vue.js'></script>
+    <script src='https://unpkg.com/element-plus' ></script>
+    <script src='./element.js' ></script>
+</head>
+<body>
+    <div id="app">
+        <div style="display: flex;justify-content: space-between;padding: 20px;">
+            <span style="font-size: 3rem;font-weight: bold;">IGentAI</span>
+            <div>
+                <div>报告生成时间：${new Date().toLocaleString()}</div>
+                <div>执行设备：${deviceName}</div>
+            </div>
+        </div>
+        <div style="display: flex;justify-content: space-between;padding: 20px;">
+            <span style="font-size: 1.5rem;font-weight: bold;">案例</span>
+        </div>
+        <el-table :data="tableData" max-height="300" style="width: 100%">
+            <el-table-column prop="caseName" label="用例" width="180"></el-table-column>
+            <el-table-column prop="num" label="数量" width="180"></el-table-column>
+            <el-table-column prop="pass" label="成功"></el-table-column>
+            <el-table-column prop="fail" label="失败"></el-table-column>
+            <el-table-column prop="time" label="用时"></el-table-column>
+        </el-table>
+        <div style="display: flex;justify-content: space-between;padding: 20px;">
+            <span style="font-size: 1.5rem;font-weight: bold;">日志</span>
+        </div>
+        <el-table :data="logData" style="width: 100%">
+            <el-table-column prop="lev" label="等级" width="180">
+                <template #default="scope">
+                    <el-tag
+                    :type="scope.row.lev||'success'"
+                    disable-transitions
+                    >{{ scope.row.lev }}</el-tag>
+                </template>
+            </el-table-column>
+            <el-table-column prop="time" label="时间"></el-table-column>
+            <el-table-column prop="mgs" label="消息"></el-table-column>
+        </el-table>
+    </div>
+    <script>
+        const App = {
+            data() {
+                return ${JSON.stringify(data)}
+            },
+            methods: ${JSON.stringify(methods)},
+        }
+        var app = Vue.createApp(App)
+        app.use(ElementPlus);
+        app.mount("#app");
+    </script>
+</body>
+</html>
+`
+fs.writeFileSync('./static-html/log.html', baseHtml)

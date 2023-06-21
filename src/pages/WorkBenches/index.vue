@@ -264,13 +264,13 @@ async function runCode () {
     // 运行中
     runState.value = 3
     // await run(code.value, { ...state.query }).then(() => { runState.value = 1 })
-    try {
-        await run(code.value, { ...state.query }).then(() => { runState.value = 1 })
-    } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error(error)
+    await run(code.value, { ...state.query }, (num, result) => {
+        if (result) {
+            runState.value = 1
+            return
+        }
         runState.value = 0
-    }
+    })
 }
 
 function insertText (content = '', type = 'end') {

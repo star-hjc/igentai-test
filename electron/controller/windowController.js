@@ -22,7 +22,7 @@ let uiNodeWin = null
 let logWin = null
 let worker = null
 
-async function initAddLanguage (lang = ['eng', 'rus']) {
+async function initAddLanguage (lang = ['eng', 'rus', 'chi_sim', 'chi_tra', 'spa', 'ara', 'fas', 'deu', 'kor']) {
     worker = await createWorker({
         langPath: path.join(assetsPath, '/ocr-lang/'),
         gzip: false
@@ -32,7 +32,7 @@ async function initAddLanguage (lang = ['eng', 'rus']) {
 
 async function ocr () {
     ipcMain.handle('on-ocr-event', async (event, file, options = {}) => {
-        await worker.initialize(options.lang)
+        await worker.initialize(options.lang || 'eng')
         if (options.range && options.range?.length === 4) {
             options.range = { left: options.range[0], top: options.range[1], width: options.range[2], height: options.range[3] }
         } else {

@@ -22,7 +22,8 @@ module.exports = {
     renameFile,
     killServerByPname,
     getSerialPortList,
-    downloadBase64
+    downloadBase64,
+    createReport
 }
 
 async function setTitle (title) {
@@ -110,4 +111,8 @@ function getBasePath (filePath, basePath) {
 
 function downloadBase64 (filePath, base64) {
     return ipcRenderer.invoke('on-downloadBase64-event', filePath, base64)
+}
+
+function createReport (title, deviceName, data, methods) {
+    return ipcRenderer.invoke('on-createReport-event', title, deviceName, data, methods)
 }

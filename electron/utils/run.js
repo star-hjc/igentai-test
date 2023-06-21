@@ -1,7 +1,8 @@
-const cp = require('child_process')
 const viewApi = require('../preload/modules/window')
 const adbApi = require('../preload/modules/adb')
+const appApi = require('../preload/modules/common')
 const opencvApi = require('../preload/modules/opencv')
+const dayjs = require('dayjs')
 /* eslint-disable */
 const { getAssetsPath, writeFile, cropImg } = require('../preload/modules/common')
 
@@ -17,19 +18,13 @@ const {
 const { select } = require('xpath')
 /* eslint-enable */
 
-module.exports = async (code, device) => {
+module.exports = async (code, device, runCallback, num) => {
     const adb = {}
     // if (/.*require\(.*/.test(code)) return
     // select.prototype
     for (const key in adbApi) { adb[key] = adbApi[key].bind(this, device) }
     adb.tap = function (x, y) {
         return adbApi.tap.call(this, device, ...([x, y].filter(v => v !== undefined).flat()))
-    }
-    if (device.id) {
-        const data = await adb.setUiautomatorServe(1)
-        if (!['Successfully started', 'Already started'].includes(data)) {
-            console.warn('u2服务开启失败...')
-        }
     }
     async function DOM () {
         return new DOMParser().parseFromString(await adb.getUI(), 'text/xml')
@@ -135,26 +130,56 @@ module.exports = async (code, device) => {
     async function clickText (text, index, dom) {
         return click(`*[text='${text}']`, index, dom)
     }
-    let childProcess = null
-
-    if (device.id) {
-        const logPath = await getAssetsPath(`log/${device.id}-${new Date().toLocaleString().replace(/\s/g, '').replace(/\//g, '').replace(/:/g, '')}.log`)
-        const cw = await getAssetsPath('/exe')
-        cp.spawn('adb', ['-s', `${device.id}`, 'logcat', '-b', 'all', '-c'], { cw })
-        await delay(1000)
-        childProcess = cp.spawn('adb', ['-s', `${device.id}`, 'logcat'], { cw })
-        childProcess.stderr.on('data', (data) => {
-            writeFile(logPath, data.toString(), true)
-        })
-        childProcess.stdout.on('data', (data) => {
-            writeFile(logPath, data.toString(), true)
-        })
+    // eslint-disable-next-line no-unused-vars
+    const log = {
+        log: pushLog.bind(this, ''),
+        success: pushLog.bind(this, 'success'),
+        info: pushLog.bind(this, 'info'),
+        warning: pushLog.bind(this, 'warning'),
+        danger: pushLog.bind(this, 'danger')
     }
-    setTimeout(() => {
-        childProcess?.kill()
-    }, 1000)
-    // eslint-disable-next-line no-eval
-    const runResult = await eval(`(async()=>{${code}})()`)
-    await delay(1000)
-    return runResult
+    const logData = []
+    const tableData = []
+    function pushLog (lev = '', mgs = '') {
+        // eslint-disable-next-line no-console
+        console.log(mgs)
+        logData.push({ lev, mgs, time: new Date().toLocaleString() })
+    }
+    let time = new Date()
+    let pass = 0
+    let fail = 0
+    for (let i = 1; i <= (num || 1); i++) {
+        try {
+            if (device.id) {
+                const data = await adb.setUiautomatorServe(1)
+                if (!['Successfully started', 'Already started'].includes(data)) {
+                    // eslint-disable-next-line no-console
+                    console.log(data)
+                    // eslint-disable-next-line no-console
+                    console.warn('u2服务开启失败...')
+                }
+            }
+            // eslint-disable-next-line no-eval
+            await eval(`(async()=>{${code}})()`)
+            await delay(1000)
+            pass++
+            await runCallback(i, true)
+        } catch (error) {
+            // eslint-disable-next-line no-console
+            console.error(error)
+            fail++
+            await runCallback(i, false)
+        }
+    }
+    time = new Date() - time
+    const caseName = device.filePath.split('\\')?.at(-1)?.replace('.case', '') || '未知'
+    device.caseName = caseName
+    tableData.push({
+        num: num || 1,
+        pass,
+        fail,
+        caseName,
+        time: dayjs().startOf('day').add(time || 0, 'millisecond').format('HH:mm:ss')
+    })
+    if (num) appApi.createReport(device, device.id || device.path, { tableData, logData }, {})
 }

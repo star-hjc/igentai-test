@@ -1,10 +1,11 @@
 const path = require('path')
 const Jimp = require('jimp')
 const { SerialPort } = require('serialport')
-const { ipcMain, BrowserWindow, shell } = require('electron')
+const { ipcMain, BrowserWindow, shell, app } = require('electron')
 const { exec } = require('../utils/command')
 const { assetsPath } = require('../main/config')
 const request = require('../utils/request')
+const report = require('../utils/report')
 
 const {
     isDirectorySync,
@@ -41,7 +42,8 @@ module.exports = {
     killServerByPname,
     getSerialPortList,
     switchDevtools,
-    openFileExplorer
+    openFileExplorer,
+    createReport
 }
 
 /**
@@ -228,5 +230,16 @@ function cropImg () {
                 reject()
             })
         }).catch(() => { })
+    })
+}
+
+function createReport () {
+    ipcMain.handle('on-createReport-event', (event, device = {}, deviceName = '', data = {}, methods = {}) => {
+        try {
+            const html = report(device.caseName, deviceName, data, methods)
+            return writeFileSync(path.join(app.getPath('desktop'), `${deviceName}${new Date().getTime()}.html`), html, false)
+        } catch (err) {
+            return true
+        }
     })
 }
