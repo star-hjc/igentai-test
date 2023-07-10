@@ -22,7 +22,7 @@ module.exports = function createWindow (config = {}, onClose) {
     if (isMax) win.maximize()
     /** 开发者工具 */
     if (isOpenDevTools) win.webContents.openDevTools()
-    win.loadURL(`${loadURL}/#/${routerPath}?${querystring.stringify(data)}`)
+    win.loadURL(`${loadURL}#/${routerPath}?${querystring.stringify(data)}`)
     const wins = store.get('win')
     wins.push({ id: win.id, loadURL, type })
     store.set('win', wins)
