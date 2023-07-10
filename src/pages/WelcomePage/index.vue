@@ -79,18 +79,18 @@
                                 <div class="content">
                                     <div class="content-item">
                                         <span>本机IPv4：</span>
-                                        <span> {{ state.ipv4?.join(' , ') }}</span>
+                                        <span> {{ state.ipv4?.join(' , ') || '未知' }}</span>
                                     </div>
                                     <div v-if="state.ipInfo?.ip" class="content-item">
                                         <span>网络根IPv4：</span>
-                                        <span> {{ state.ipInfo.ip }}</span>
+                                        <span> {{ state.ipInfo.ip || '' }}</span>
                                     </div>
-                                    <div v-if="state.ipInfo.actionAddress?.length" class="content-item">
+                                    <div v-if="state.ipInfo?.actionAddress?.length" class="content-item">
                                         <span>所在地：</span>
                                         <span>
                                             {{
-                                                state.ipInfo.actionAddress?.join(' , ')
-                                                || `${state.ipInfo.province}-${state.ipInfo.city}`
+                                                state.ipInfo?.actionAddress?.join(' , ')
+                                                || `${state.ipInfo?.province || '未知'}-${state.ipInfo?.city || '未知'}`
                                             }}
                                         </span>
                                     </div>

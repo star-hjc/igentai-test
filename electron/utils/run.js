@@ -178,6 +178,7 @@ module.exports = async (code, device, runCallback, num) => {
         num: num || 1,
         pass,
         fail,
+        fpy: `${(pass / num) * 100}%`,
         caseName,
         time: dayjs().startOf('day').add(time || 0, 'millisecond').format('HH:mm:ss')
     })

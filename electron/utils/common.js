@@ -59,7 +59,7 @@ function rand (max = 100, min = 0) {
  * @param {Number} timeout 循环时间
  * @param {String} errMgs 错误消息
  */
-async function loopByTime (callback, timeout, errMgs = '') {
+async function loopByTime (callback, timeout, errCallback) {
     const start = new Date()
     let result
     while (new Date() - start <= timeout) {
@@ -67,7 +67,7 @@ async function loopByTime (callback, timeout, errMgs = '') {
         if (result) break
         await delay(100)
     }
-    if (!result && errMgs) throw new Error(errMgs)
+    if (!result && errCallback) await errCallback()
 }
 
 /**
@@ -76,27 +76,32 @@ async function loopByTime (callback, timeout, errMgs = '') {
  * @param {Number} num 循环次数
  * @param {String} errMgs 错误消息
  */
-async function loopByNum (callback, num, errMgs = '') {
+async function loopByNum (callback, num, errCallback) {
     let result
     for (let i = 0; i < num; i++) {
         result = await callback()
         if (result) break
         await delay(100)
     }
-    if (!result && errMgs) throw new Error(errMgs)
+    if (!result && errCallback) await errCallback()
 }
 
 /** 算报文 */
-function bw (num, lsb, size, binary = 16, length = 8) {
-    const result = parseInt(num, binary).toString(2).slice(-size).padStart(size, '0')
-    const byteArr = Array(length).fill().map(() => Array(length).fill(0))
+function bw (num, lsb, size, type = 0) {
+    if (![0, 1].includes(type)) throw new Error('算法模式错误，请确认是摩托罗拉（0）或因特尔（1）')
+    const result = parseInt(num, 16).toString(2).padStart(String(num).length * 4, 0).slice(-size).padStart(size, '0')
+    const byteArr = Array(8).fill().map(() => Array(8).fill(0))
     let x = 7 - parseInt(lsb % 8)
     let y = parseInt(lsb / 8)
     for (let i = 0; i < size; i++) {
-        if (y > length - 1 || y < 0) break
+        if (y > (8 - 1) || y < 0) break
         byteArr[y][x] = parseInt(result.charAt(size - i - 1))
         x -= 1
-        if (x < 0) { y -= 1; x = 7 }
+        if (x < 0) {
+            y = type === 0 ? y - 1 : y + 1
+            x = 7
+        }
     }
-    return byteArr.map(v => parseInt(v.slice(0, 4).join(''), 2).toString(16) + parseInt(v.slice(4, 8).join(''), 2).toString(16)).join('')
+    console.dir(byteArr)
+    return byteArr.map(v => parseInt(v.slice(0, 4).join(''), 2).toString(16) + parseInt(v.slice(4, 8).join(''), 2).toString(16)).join('').replace(/(.{2})(?!$)/g, '$1 ')
 }

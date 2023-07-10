@@ -34,6 +34,12 @@ export const prefixData = () => {
 export const variableData = () => {
     const data = [
         { label: 'adb', detail: 'ADB对象' },
+        { label: 'log', detail: 'log' },
+        { label: 'log.log', detail: '4级bug' },
+        { label: 'log.success', detail: '通过' },
+        { label: 'log.info', detail: '3级bug' },
+        { label: 'log.warning', detail: '2级bug' },
+        { label: 'log.danger', detail: '1级bug' },
         { label: 'rand', detail: '随机数' },
         { label: 'await', detail: '等待' },
         { label: 'async', detail: '异步标记' },

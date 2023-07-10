@@ -2,6 +2,7 @@
     <div class="screen-container">
         <div class="screen-tool">
             <el-button @click="getScreenshot({ ...state.device })" :loading="loading" type="primary">刷新屏幕</el-button>
+            <el-button @click="getInstrumentScreen({ ...state.device })" :loading="loading" type="primary">获取仪表</el-button>
             <el-select v-if="state.imgBase64s?.length > 1" v-model="imgIndex" placeholder="选择" @change="onSelectImg">
                 <el-option v-for="item, index in state.imgBase64s" :key="item.id" :label="`第${index + 1}张`"
                     :value="index" />
@@ -203,6 +204,23 @@ function onSelectNum (index) {
         state.imgBase64s.splice(0, state.imgBase64s.length - index)
         imgIndex.value = (state.imgBase64s.length || 1) - 1
     }
+}
+
+function getInstrumentScreen (device) {
+    contentBorderRef.value.style.top = '-99999px'
+    contentBorderRef.value.style.left = '-99999px'
+    loading.value = true
+    adb.getInstrumentScreen(device).then(data => {
+        imgBase64.value = data
+        if (state.imgBase64s?.length >= num.value) state.imgBase64s.shift()
+        const id = window.crypto.randomUUID()
+        state.imgBase64s.push({ id, data })
+        imgIndex.value = (state.imgBase64s.length || 1) - 1
+        loading.value = false
+        appApi.onRefreshScreenshot()
+    }).catch(() => {
+        loading.value = false
+    })
 }
 
 function getScreenshot (device) {

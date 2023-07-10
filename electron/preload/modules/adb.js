@@ -13,6 +13,7 @@ module.exports = {
     getScreenshot,
     getAtxVersion,
     startATXService,
+    getInstrumentScreen,
     getDevicePathFileInfo,
     getInitNotExistFile,
     installInitExistFile,
@@ -31,7 +32,7 @@ module.exports = {
 /** ADB ||------------ */
 
 function getDevices () {
-    return ipcRenderer.invoke('on-getDevicesADB-event')
+    return ipcRenderer.invoke('on-getDevices-event')
 }
 
 async function pushFile (device, localPath, toPath) {
@@ -58,6 +59,10 @@ async function setUiautomatorServe (device, type) {
 /** ADB ||------------ */
 async function getWiFiIP (device) {
     return ipcRenderer.invoke('on-getWiFiIP-event', device)
+}
+
+async function getInstrumentScreen (device) {
+    return ipcRenderer.invoke('on-getInstrumentScreen-event', device)
 }
 
 async function getPackagesList (device) {

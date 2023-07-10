@@ -1,6 +1,6 @@
 
 const { exec } = require('child_process')
-const Serial = require('./Serial.js')
+const serial = require('./Serial.js')
 
 module.exports = class ProcTask {
     constructor (device, proceNum = 10, inter = 5) {
@@ -17,11 +17,9 @@ module.exports = class ProcTask {
     }
 
     async runA72 (param = {}, callblack) {
-        this.serial = new Serial(param.path, param.baudRate)
-        callblack(await this.serial.getProce(this.num))
+        callblack(await serial.getProce(this.num, param))
         this.timeA72 = setInterval(async () => {
-            this.serial = new Serial(param.path, param.baudRate)
-            callblack(await this.serial.getProce(this.num))
+            callblack(await serial.getProce(this.num, param))
         }, this.inter * 1000)
     }
 
@@ -59,6 +57,12 @@ module.exports = class ProcTask {
                 return a
             }, {})
         } else {
+            const Mem = lines[1].split(',').map((v, i, arr) => {
+                const arrs = v.trim().split(/\s+/)
+                const newObj = {}
+                newObj['mem_' + arrs[1]] = arrs[0]
+                return newObj
+            }).reduce((a, b) => Object.assign(a, b), {})
             top = lines.splice(0, 4).join(',').replaceAll('\r\r', '').split(',').map((v, i, arr) => {
                 if (i === arr.length - 1) {
                     const arr = v.replaceAll(/%/g, '%:').split(/\s+/).map(a => a.split(':'))
@@ -72,6 +76,7 @@ module.exports = class ProcTask {
                 newObj[arrs[1]] = arrs[0]
                 return newObj
             }).reduce((a, b) => Object.assign(a, b), {})
+            top = { ...top, ...Mem }
         }
 
         if (other) {

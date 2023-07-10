@@ -1,6 +1,6 @@
 module.exports = (title = '', deviceName = '', data = {}, methods = {}) => {
     const baseHtml =
-    `
+        `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -45,6 +45,7 @@ module.exports = (title = '', deviceName = '', data = {}, methods = {}) => {
             <el-table-column prop="pass" label="成功"></el-table-column>
             <el-table-column prop="fail" label="失败"></el-table-column>
             <el-table-column prop="time" label="用时"></el-table-column>
+            <el-table-column prop="fpy" label="直通率"></el-table-column>
         </el-table>
         <div style="display: flex;justify-content: space-between;padding: 20px;">
             <span style="font-size: 1.5rem;font-weight: bold;">日志</span>
@@ -53,9 +54,9 @@ module.exports = (title = '', deviceName = '', data = {}, methods = {}) => {
             <el-table-column prop="lev" label="等级" width="180">
                 <template #default="scope">
                     <el-tag
-                    :type="scope.row.lev||'success'"
+                    :type="scope.row.lev||''"
                     disable-transitions
-                    >{{ scope.row.lev }}</el-tag>
+                    >{{ lev[scope.row.lev] || '3' }}</el-tag>
                 </template>
             </el-table-column>
             <el-table-column prop="time" label="时间"></el-table-column>
@@ -65,7 +66,8 @@ module.exports = (title = '', deviceName = '', data = {}, methods = {}) => {
     <script>
         const App = {
             data() {
-                return ${JSON.stringify(data)}
+                return{lev:{success:'成功',info:4,warning:2,danger:1},
+                    ... ${JSON.stringify(data)}}
             },
             methods: ${JSON.stringify(methods)},
         }

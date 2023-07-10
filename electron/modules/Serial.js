@@ -16,30 +16,94 @@ function writeFileSync (filePath, data, cover = false) {
         return false
     }
 }
+
+function delay (timeout = 1000) {
+    return new Promise(resolve => {
+        setTimeout(() => { resolve() }, timeout)
+    })
+}
+
 /**
  * ！！！ 存在并发问题
  * 2023-05-04 Star 书写
  */
 
-module.exports = class Serial {
-    constructor (path = 'COM15', baudRate = 115200) {
-        this.path = path
-        this.baudRate = baudRate
-        this.serialport = new SerialPort({ path, baudRate })
-        this.cls()
+class Serial {
+    constructor () {
+        this.SerialProtList = {}
     }
-    async cls () {
-        await this.shell('\x03')
+    getSerialProtList () {
+        return SerialPort.list()
     }
-    close () {
-        this.serialport.close()
+    setSerialProt (path, baudRate, options) {
+        try {
+            if (this.SerialProtList[path]) {
+                this.SerialProtList[path].baudRate = baudRate
+                this.SerialProtList[path].SerialPort.update({ baudRate, ...options }, (err) => {
+                    // eslint-disable-next-line no-console
+                    console.error(err, '修改波特率或其他参数错误')
+                })
+            } else {
+                this.SerialProtList[path] = {
+                    baudRate: baudRate,
+                    SerialPort: new SerialPort({ path, baudRate, ...options })
+                }
+            }
+            return this.SerialProtList[path].SerialPort
+        } catch (err) {
+            // eslint-disable-next-line no-console
+            console.error(err, '检测串口是否书写错误，或出现二次连接')
+        }
     }
-    async shell (command) {
+    async serial ({ path, baudRate, options }) {
+        const { SerialPort, baudRate: oldbaudRate } = this.SerialProtList?.[path] || {}
+        if (oldbaudRate === baudRate) return SerialPort
+        return this.setSerialProt(path, baudRate, { autoOpen: false, ...options })
+    }
+
+    async closeSync (SerialPort) {
+        return new Promise((resolve, reject) => {
+            SerialPort.close((err) => {
+                if (err) reject()
+                resolve(SerialPort)
+            })
+        }).catch(() => {})
+    }
+
+    async openSync (SerialPort) {
+        return new Promise(async (resolve, reject) => {
+            if (SerialPort.isOpen || SerialPort.opening) {
+                SerialPort.write(`\x03\nclear\n`, async (err) => {
+                    if (err) reject()
+                    await delay(2000)
+                    return resolve(SerialPort)
+                })
+                return
+            }
+            SerialPort.open((err) => {
+                if (err) reject()
+                resolve(SerialPort)
+            })
+        }).catch((err) => { console.log(err) })
+    }
+
+    async shell (command, serialOptions, callback) {
         command = Array.isArray(command) ? command.join(' ') : command
         let dataStr = ''
-        this.serialport.write(`${command}\n`)
+        const serial = await this.openSync(await this.serial(serialOptions))
+        if (!serial) return console.log('该串口无法使用...')
+        serial.write(`${command}\n`)
+        if (callback) {
+            serial.on('data', async (data, serial) => callback(String(data), serial))
+            return {
+                command: `${command}`,
+                data: true,
+                success: true,
+                message: 'ok'
+            }
+        }
         return new Promise((resolve, reject) => {
-            this.serialport.on('error', err => {
+            serial.on('error', err => {
                 writeFileSync(logPath, `${new Date().toLocaleString()}\ncommand:${command}\ndata:${err}\n\n`, true)
                 reject({
                     command: `${command}`,
@@ -48,11 +112,13 @@ module.exports = class Serial {
                     message: err
                 })
             })
-            this.serialport.on('data', async (data) => {
-                if (/^console:\/\s+(#|\$)\s+$/.test(String(data))) {
+            serial.on('data', async (data) => {
+                if (/.*\s*console:\/\s+[#\$]\s*$/.test(String(data))) {
                     const result = dataStr?.replace(/\^C\r*\n*/g, '')
-                        ?.replace(/\d*\|*console:\/\s+(#|\$)\s+/g, '')
+                        ?.replace(/.*\s*console:\/\s+[#\$]\s*/, '')
+                        ?.replace(/^clear\s+/, '')
                         ?.replace(command, '')?.trim()
+                    fs.appendFileSync('./tttttt.txt', '\n' + dataStr + '\n')
                     writeFileSync(logPath, `${new Date().toLocaleString()}\ncommand:${command}\ndata:${result}\n\n`, true)
                     resolve({
                         command: `${command}`,
@@ -60,58 +126,86 @@ module.exports = class Serial {
                         success: true,
                         message: 'ok'
                     })
-                    this.close()
+                    serial.close()
                 }
                 dataStr += String(data)
             })
         }).catch(res => { return res })
     }
-
-    async getProce (proceNum) {
-        const { data: output, success } = await this.shell(`COLUMNS=512 top -n 1 -m ${proceNum} -d 1`)
-        if (!success) return { top: {}, info: [] }
-        if (!output) return { top: {}, info: [] }
-        const lines = `${output}`.trim()
+    async getProce (proceNum, options = {}) {
+        const { data: output, success } = await this.shell(`COLUMNS=512 top -n 1 -m ${proceNum} -d 1`, options)
+        let top = {}
+        let info = []
+        if (!output || !success) return { top, info }
+        const lines = String(output).trim()
             .replace(/(.*?)(?=Tasks)/, '')
             .replaceAll(/\x1B\[([0-9]{0,2})m/g, '')
-            .replace(/(.*?)(?=COLUMNS=512 top).*/, '')
-            .replace('Tasks:', '')
             .replace('Mem:', '')
             .replace('Swap:', '')
             .split('\n')
-            .filter(v => v && v !== '\r' && v !== '\r\r')
-        const top = lines.splice(0, 4).join(',').replaceAll('\r\r', '').split(',').map((v, i, arr) => {
-            if (i === arr.length - 1) {
-                const arr = v.replaceAll(/%/g, '%:').split(/\s+/).map(a => a.split(':'))
-                return arr.reduce((a, b) => {
-                    a[b[1]] = b[0]
-                    return a
-                }, {})
-            }
-            const arrs = v.trim().split(/\s+/)
-            const newObj = {}
-            newObj[arrs[1]] = arrs[0]
-            return newObj
-        }).reduce((a, b) => Object.assign(a, b), {})
-        lines.splice(0, 1)
+            .map(v => v.trim())
+        const other = lines[0]?.indexOf('Tasks') === -1
+        if (other) {
+            top = lines[0]?.replaceAll('\r', '')?.split(/,\s+/).map(v => v.split(/\s+/)).reduce((a, b) => {
+                a[b[0]] = b[1]
+                return a
+            }, {})
+        } else {
+            top = lines.splice(3, 1).join(',').replaceAll('\r\r', '').split(',').map((v, i, arr) => {
+                if (i === arr.length - 1) {
+                    const arr = v.replaceAll(/%/g, '%:').split(/\s+/).map(a => a.split(':'))
+                    return arr.reduce((a, b) => {
+                        a[b[1]] = b[0]
+                        return a
+                    }, {})
+                }
+                const arrs = v.trim().split(/\s+/)
+                const newObj = {}
+                newObj[arrs[1]] = arrs[0]
+                return newObj
+            }).reduce((a, b) => Object.assign(a, b), {})
+            lines.splice(0, 3)
+        }
 
-        const info = lines.map(v => {
-            const process = v.trim().replace('\r\r', '').split(/\s+/)
-            return {
-                pid: parseInt(process[0], 10),
-                user: process[1],
-                pr: parseInt(process[2]),
-                ni: parseInt(process[3]),
-                virt: process[4],
-                res: process[5],
-                shr: process[6],
-                s: process[7],
-                cpu: parseFloat(process[8]),
-                mem: parseFloat(process[9]),
-                time: process[10],
-                cmd: process[11]
-            }
-        })
+        if (other) {
+            lines.splice(0, 4)
+            info = lines.map(v => {
+                const process = v.trim().replace('\r\r', '').split(/\s+/)
+                return {
+                    pid: process[0],
+                    pr: process[1],
+                    cpu: parseFloat(process[2]),
+                    s: process[3],
+                    thr: process[4],
+                    vss: process[5],
+                    rss: process[6],
+                    pcy: process[7],
+                    user: process[8],
+                    cmd: process[9]
+                }
+            })
+        } else {
+            lines.splice(0, 1)
+            info = lines.map(v => {
+                const process = v.trim().replace('\r\r', '').split(/\s+/)
+                return {
+                    pid: parseInt(process[0], 10),
+                    user: process[1],
+                    pr: process[2],
+                    ni: parseInt(process[3]),
+                    virt: process[4],
+                    res: process[5],
+                    shr: process[6],
+                    s: process[7],
+                    cpu: parseFloat(process[8]),
+                    mem: parseFloat(process[9]),
+                    time: process[10],
+                    cmd: process[11]
+                }
+            })
+        }
         return { top, info }
     }
 }
+
+module.exports = new Serial()

@@ -15,6 +15,7 @@ module.exports = {
     getWiFiIP,
     starSerialPortService,
     startATXService,
+    getInstrumentScreen,
     getScreenInfo,
     getPackagesList,
     getDevicePathFileInfo,
@@ -133,6 +134,21 @@ async function getScreenInfo (device) {
         }
     })
     return { width: width && Number(width), height: height && Number(height), DPI: DPI && Number(DPI) }
+}
+
+async function getInstrumentScreen (device) {
+    const { success } = await command(device, ['dumpsys', 'AutoService', 'Dashboard_Screenshots', '1'])
+    let base64Data = ''
+    if (success) {
+        await delay(5000)
+        const { data: fileList, success: lsSuccess } = await command(device, ['ls', '/cache/Screenshots/'])
+        if (lsSuccess) {
+            await command(device, ['base64', '/cache/Screenshots/' + fileList.split('\\n')?.[0]?.trim() || '']).then(({ data, success: getBas64 }) => {
+                if (getBas64)base64Data = data
+            })
+        }
+    }
+    return `data:image/png;base64,${base64Data}`
 }
 
 /** 获取所有安装包 */

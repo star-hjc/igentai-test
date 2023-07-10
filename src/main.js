@@ -2,7 +2,7 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
 import directives from './directives'
-import myCustomComponents from './components'
+import initComponents from './components'
 import './style/index.css'
 /** font字体 */
 import './style/font.css'
@@ -12,7 +12,7 @@ import 'element-plus/es/components/message-box/style/css'
 
 const app = createApp(App)
 /** 组件注册 */
-myCustomComponents.install(app)
+initComponents.install(app)
 
 /** 路由 - VueRouter */
 app.use(router)

@@ -1,4 +1,3 @@
-
 const { ipcMain } = require('electron')
 const adb = require('../utils/adb')
 const request = require('../utils/request')
@@ -20,6 +19,7 @@ module.exports = {
     getInitNotExistFile,
     installInitExistFile,
     tap,
+    getInstrumentScreen,
     longpress,
     swipe,
     multitouch,
@@ -36,7 +36,7 @@ module.exports = {
 
 /** 获取设备信息  */
 async function getDevices () {
-    ipcMain.handle('on-getDevicesADB-event', async (event) => {
+    ipcMain.handle('on-getDevices-event', async (...args) => {
         return await adb.getDevices()
     })
 }
@@ -52,6 +52,12 @@ async function killServer () {
 async function switchWiFiADB () {
     ipcMain.handle('on-switchWiFiADB-event', async (event, device, host) => {
         return await adb.switchWiFiADB(device, host)
+    })
+}
+
+async function getInstrumentScreen () {
+    ipcMain.handle('on-getInstrumentScreen-event', async (event, device) => {
+        return await adb.getInstrumentScreen(device)
     })
 }
 

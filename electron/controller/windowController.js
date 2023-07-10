@@ -1,8 +1,10 @@
 const path = require('path')
 const { createWorker } = require('tesseract.js')
-const querystring = require('querystring')
 const { ipcMain, BrowserWindow } = require('electron')
-const { loadURL, assetsPath } = require('../main/config')
+const { assetsPath } = require('../main/config')
+const createWindow = require('../main/createMainWindow')
+const Store = require('electron-store')
+const store = new Store()
 
 module.exports = {
     createRunCaseWindow,
@@ -17,9 +19,6 @@ module.exports = {
     ocr
 }
 
-let screenWin = null
-let uiNodeWin = null
-let logWin = null
 let worker = null
 
 async function initAddLanguage (lang = ['eng', 'rus', 'chi_sim', 'chi_tra', 'spa', 'ara', 'fas', 'deu', 'kor']) {
@@ -49,21 +48,10 @@ async function ocr () {
 function createWorkBenchesWindow () {
     ipcMain.handle('on-createWorkBenchesWindow-event', async (event, data = {}, option = {}) => {
         await initAddLanguage()
-        const workWin = new BrowserWindow({
-            autoHideMenuBar: true,
-            resizable: true,
-            webPreferences: {
-                preload: path.join(__dirname, '../preload/workBenchesPreload.js'),
-                nodeIntegration: true
-            },
-            ...option
-        })
-        workWin.on('close', async (event) => {
+        const preload = path.join(__dirname, '../preload/workBenchesPreload.js')
+        const workWin = createWindow({ data, preload, option, routerPath: 'work', isMax: true, type: 'WorkBenches' }, async () => {
             await worker.terminate()
         })
-        /** 最大化 */
-        workWin.maximize()
-        workWin.loadURL(`${loadURL}#/work?${querystring.stringify(data)}`)
         workWin.setTitle('工作台')
         workWin.webContents.openDevTools()
     })
@@ -71,19 +59,8 @@ function createWorkBenchesWindow () {
 
 function createCPUWindow () {
     ipcMain.handle('on-createCPUWindow-event', (event, data = {}, option = {}) => {
-        const workWin = new BrowserWindow({
-            autoHideMenuBar: true,
-            resizable: true,
-            webPreferences: {
-                preload: path.join(__dirname, '../preload/workBenchesPreload.js'),
-                nodeIntegration: true
-            },
-            ...option
-        })
-        /** 最大化 */
-        workWin.maximize()
-        workWin.loadURL(`${loadURL}#/cpu?${querystring.stringify(data)}`)
-        workWin.setTitle('监控')
+        const preload = path.join(__dirname, '../preload/workBenchesPreload.js')
+        createWindow({ data, preload, option, routerPath: 'cpu', isMax: true, type: 'CPU' })
     })
 }
 
@@ -91,46 +68,24 @@ function createCPUWindow () {
 function createRunCaseWindow () {
     ipcMain.handle('on-createRunCaseWindow-event', async (event, data = {}, option = {}) => {
         await initAddLanguage()
-        const runWin = new BrowserWindow({
-            autoHideMenuBar: true,
-            resizable: true,
-            width: 450,
-            height: 300,
-            webPreferences: {
-                preload: path.join(__dirname, '../preload/runCasePreload.js'),
-                nodeIntegration: true
-            },
-            ...option
-        })
-        runWin.on('close', async (event) => {
+        const preload = path.join(__dirname, '../preload/runCasePreload.js')
+        createWindow({ data, preload, option, routerPath: 'run', type: 'RunCase' }, async () => {
             await worker.terminate()
         })
-        runWin.loadURL(`${loadURL}#/run?${querystring.stringify(data)}`)
     })
 }
 
 /** 打开设备屏幕窗口 */
 function createGetScreenWindow () {
     ipcMain.handle('on-createGetScreenWindow-event', (event, data = {}, option = {}) => {
-        if (screenWin !== null) {
-            screenWin.focus()
+        const win = store.get('win').find(v => v.type === 'GetScreen')
+        if (win?.id) {
+            BrowserWindow.fromId(win.id).focus()
             return
         }
-        screenWin = new BrowserWindow({
-            autoHideMenuBar: true,
-            resizable: true,
-            width: 960,
-            height: 640,
-            webPreferences: {
-                preload: path.join(__dirname, '../preload/screenPreload.js'),
-                nodeIntegration: true
-            },
-            ...option
-        })
-        screenWin.loadURL(`${loadURL}#/screen?${querystring.stringify(data)}`)
-        // screenWin.webContents.openDevTools()
-        screenWin.on('closed', () => {
-            screenWin = null
+        const preload = path.join(__dirname, '../preload/screenPreload.js')
+        createWindow({
+            data, preload, option, routerPath: 'screen', type: 'GetScreen'
         })
         return true
     })
@@ -139,25 +94,21 @@ function createGetScreenWindow () {
 /** 打开设备屏幕窗口 */
 function createUiNodeWindow () {
     ipcMain.handle('on-createUiNodeWindow-event', (event, data = {}, option = {}) => {
-        if (uiNodeWin !== null) {
-            uiNodeWin.focus()
+        const win = store.get('win').find(v => v.type === 'UiNode')
+        if (win?.id) {
+            BrowserWindow.fromId(win.id).focus()
             return
         }
-        uiNodeWin = new BrowserWindow({
-            autoHideMenuBar: true,
-            resizable: true,
-            width: 960,
-            height: 740,
-            webPreferences: {
-                preload: path.join(__dirname, '../preload/screenPreload.js'),
-                nodeIntegration: true
+        const preload = path.join(__dirname, '../preload/screenPreload.js')
+        createWindow({
+            data,
+            preload,
+            option: {
+                width: 960,
+                height: 740
             },
-            ...option
-        })
-        uiNodeWin.loadURL(`${loadURL}#/node?${querystring.stringify(data)}`)
-        // uiNodeWin.webContents.openDevTools()
-        uiNodeWin.on('closed', () => {
-            uiNodeWin = null
+            routerPath: 'node',
+            type: 'UiNode'
         })
         return true
     })
@@ -166,25 +117,21 @@ function createUiNodeWindow () {
 /** 打开设备屏幕窗口 */
 function createLogWindow () {
     ipcMain.handle('on-createLogWindow-event', (event, data = {}, option = {}) => {
-        if (logWin !== null) {
-            logWin.focus()
+        const win = store.get('win').find(v => v.type === 'Log')
+        if (win?.id) {
+            BrowserWindow.fromId(win.id).focus()
             return
         }
-        logWin = new BrowserWindow({
-            autoHideMenuBar: true,
-            resizable: true,
-            width: 960,
-            height: 740,
-            webPreferences: {
-                preload: path.join(__dirname, '../preload/screenPreload.js'),
-                nodeIntegration: true
+        const preload = path.join(__dirname, '../preload/screenPreload.js')
+        createWindow({
+            data,
+            preload,
+            option: {
+                width: 960,
+                height: 740
             },
-            ...option
-        })
-        logWin.loadURL(`${loadURL}#/log?${querystring.stringify(data)}`)
-        // uiNodeWin.webContents.openDevTools()
-        logWin.on('closed', () => {
-            logWin = null
+            routerPath: 'log',
+            type: 'Log'
         })
         return true
     })
@@ -199,16 +146,24 @@ function getAppInfo () {
 
 function onNodeClick () {
     ipcMain.handle('on-onNodeClick-event', (event, data = {}) => {
-        if (!screenWin) return
-        screenWin.focus()
-        screenWin.webContents.send('call-onNodeClick-event', data)
+        const win = store.get('win').find(v => v.type === 'GetScreen')
+        if (win?.id) {
+            const webContents = BrowserWindow.fromId(win.id)
+            webContents.focus()
+            webContents.send('call-onNodeClick-event', data)
+            return
+        }
     })
 }
 
 function onRefreshScreenshot () {
     ipcMain.handle('on-onRefreshScreenshot-event', (event, data = {}) => {
-        if (!uiNodeWin) return
-        uiNodeWin.focus()
-        uiNodeWin.webContents.send('call-onRefreshScreenshot-event', data)
+        const win = store.get('win').find(v => v.type === 'UiNode')
+        if (win?.id) {
+            const webContents = BrowserWindow.fromId(win.id)
+            webContents.focus()
+            webContents.send('call-onRefreshScreenshot-event', data)
+            return
+        }
     })
 }

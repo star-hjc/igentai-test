@@ -45,7 +45,7 @@ const objectSplit = (data, keys) => {
 }
 
 appApi.ipcRenderer.on('call-cpu-event', (event, data) => {
-    const [, obj] = objectSplit(data.top, ['cpu', 'user', 'nice', 'sys', 'idle', 'iow', 'irq', 'sirq', 'host', 'User', 'System', 'IOW', 'IRQ'])
+    const [, obj] = objectSplit(data.top, ['cpu', 'user', 'nice', 'sys', 'idle', 'iow', 'irq', 'sirq', 'host', 'User', 'System', 'IOW', 'IRQ', 'mem_buffers', 'mem_free', 'mem_total', 'mem_used'])
     const arr = Object.entries(obj).map(v => { return [v[0], parseFloat(v[1])] })
     for (const [key, value] of arr) {
         const index = state.series.findIndex(v => v.name === key)

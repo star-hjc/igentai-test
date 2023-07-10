@@ -164,7 +164,7 @@ function getLocalIPv4 () {
 /** 获取本机网络根ip信息 */
 function getIpInfo () {
     ipcMain.handle('on-getIpInfo-event', async (event) => {
-        return (await request.get('https://www.cz88.net/api/cz88/ip/base?ip='))?.data
+        return (await request.get('https://www.cz88.net/api/cz88/ip/base?ip='))?.data || ''
     })
 }
 

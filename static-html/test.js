@@ -159,7 +159,7 @@ const baseHtml =
                     <el-tag
                     :type="scope.row.lev||'success'"
                     disable-transitions
-                    >{{ scope.row.lev }}</el-tag>
+                    >{{ [scope.row.lev] || 4 }}</el-tag>
                 </template>
             </el-table-column>
             <el-table-column prop="time" label="时间"></el-table-column>
