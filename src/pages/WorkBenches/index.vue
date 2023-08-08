@@ -48,7 +48,7 @@
                         命令列表
                     </div>
                     <el-scrollbar>
-                        <ApiMenu :activeName="activeName" />
+                        <ApiMenu :activeName="activeName" :device="state.query.id" />
                     </el-scrollbar>
                 </el-aside>
                 <el-main ref="mainRef">

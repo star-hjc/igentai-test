@@ -22,7 +22,11 @@
                         </el-select>
                     </div>
                 </div>
-                <el-button @click="insert('keyevent')">插入</el-button>
+                <div style="display: flex;flex-direction: column;justify-content: space-around; align-items: center;">
+                    <el-button @click="insert('keyevent')">插入</el-button>
+                    <el-button style="margin: 5px 0 0 0;" @click="run(state.keyevent.value)">运行</el-button>
+                </div>
+
             </el-menu-item>
             <el-menu-item index="1-2">
                 <div class="left-container">
@@ -174,6 +178,9 @@ const props = defineProps({
     activeName: {
         type: String,
         required: true
+    },
+    device: {
+        type: String
     }
 })
 const state = reactive({
@@ -192,6 +199,10 @@ const state = reactive({
 onMounted(() => {
 
 })
+
+function run (keyCode) {
+    adb.keyevent({ id: props.device }, keyCode)
+}
 
 function insert (type = '') {
     if (props.activeName === 'codemirror') {

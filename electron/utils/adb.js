@@ -26,6 +26,7 @@ module.exports = {
     installInitExistFile,
     pushFile,
     tap,
+    text,
     swipe,
     multitouch,
     input,
@@ -272,6 +273,10 @@ async function input (device, content) {
     const data = await command(device, ['am', 'broadcast', '-a', 'ADB_INPUT_TEXT', '--es', 'msg', content])
     await command(device, ['settings', 'put', 'secure', 'default_input_method', keyName.trim()])
     return data
+}
+
+async function text (device, content) {
+    return command(device, ['input', 'text', `${content}`])
 }
 
 /** 文本输入事件  */

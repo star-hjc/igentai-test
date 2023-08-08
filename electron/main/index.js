@@ -20,3 +20,5 @@ app.on('window-all-closed', function (event) {
     if (process.platform !== 'darwin') app.quit()
 })
 
+console.log('process.versions.modules', process.versions.modules)
+console.log('process.versions.node', process.versions.node)

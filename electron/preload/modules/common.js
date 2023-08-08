@@ -38,8 +38,8 @@ function openBrowser (url) {
     ipcRenderer.invoke('on-openBrowser-event', url)
 }
 
-function readdirCase (notTypes) {
-    return ipcRenderer.invoke('on-readdirCase-event', notTypes)
+function readdirCase (notTypes, userDefBasePath) {
+    return ipcRenderer.invoke('on-readdirCase-event', notTypes, userDefBasePath)
 }
 
 function readdirLog () {

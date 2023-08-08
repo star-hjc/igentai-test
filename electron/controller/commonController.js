@@ -77,8 +77,8 @@ function openBrowser () {
 
 /** 读取脚本文件 */
 function readdirCase () {
-    ipcMain.handle('on-readdirCase-event', (event, notTypes) => {
-        const basePath = path.join(assetsPath, 'case')
+    ipcMain.handle('on-readdirCase-event', (event, notTypes, userDefBasePath) => {
+        const basePath = userDefBasePath || path.join(assetsPath, 'case')
         return caseMap(readdirAllSync(basePath, notTypes))
     })
 }

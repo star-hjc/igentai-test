@@ -43,6 +43,7 @@ export const variableData = () => {
         { label: 'rand', detail: '随机数' },
         { label: 'await', detail: '等待' },
         { label: 'async', detail: '异步标记' },
+        { label: 'delay', detail: '休眠 delay(time)', other: `()` },
         { label: 'for', detail: 'loop', other: ` (let i = 0; i < bound; i++) {\n\n}\n` },
         { label: 'for', detail: 'in loop', other: ` (let name in collection) {\n\n}\n` },
         { label: 'for', detail: 'of loop', other: ` (let name of collection) {\n\n}\n` },

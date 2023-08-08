@@ -24,6 +24,7 @@ module.exports = {
     swipe,
     multitouch,
     input,
+    text,
     clearText,
     setText,
     startApp,
@@ -202,6 +203,12 @@ async function getRunAppisActivity () {
 async function input () {
     ipcMain.handle('on-input-event', async (event, device, content) => {
         return await adb.input(device, content)
+    })
+}
+
+async function text () {
+    ipcMain.handle('on-text-event', async (event, device, content) => {
+        return await adb.text(device, content)
     })
 }
 

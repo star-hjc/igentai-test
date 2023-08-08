@@ -172,7 +172,7 @@ module.exports = async (code, device, runCallback, num) => {
         }
     }
     time = new Date() - time
-    const caseName = device.filePath.split('\\')?.at(-1)?.replace('.case', '') || '未知'
+    const caseName = device.title || '未知'
     device.caseName = caseName
     tableData.push({
         num: num || 1,

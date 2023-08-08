@@ -9,7 +9,7 @@
     "serve": "concurrently -k \"npm run appview\" \"npm run app\"",
     "preview": "vite preview",
     "build": "vite build  && electron-builder",
-    "b":"electron-builder"
+    "b": "electron-builder"
   },
   "dependencies": {
     "@codemirror/autocomplete": "^6.6.0",
@@ -23,6 +23,7 @@
     "dexie": "^3.2.4",
     "echarts": "^5.4.2",
     "electron-log": "^4.4.8",
+    "electron-rebuild": "^3.2.9",
     "electron-store": "^8.1.0",
     "element-plus": "^2.3.4",
     "jimp": "^0.22.8",

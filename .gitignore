@@ -14,6 +14,7 @@ electron/assets/case/*
 electron/assets/log/*
 dist-ssr
 *.local
+*.traineddata
 
 # Editor directories and files
 

@@ -22,6 +22,7 @@ module.exports = {
     swipe,
     multitouch,
     input,
+    text,
     setText,
     clearText,
     keyevent,
@@ -137,6 +138,10 @@ async function keyevent (device, keycode) {
 /** 文本输入事件  */
 async function input (device, content) {
     return await ipcRenderer.invoke('on-input-event', device, content)
+}
+
+async function text (device, content) {
+    return await ipcRenderer.invoke('on-text-event', device, content)
 }
 
 /** 文本输入事件  */
