@@ -21,11 +21,10 @@ contextBridge.exposeInMainWorld('viewApi', {
     ...view
 })
 
-;(async () => {
-    const assetsPath = await common.getAssetsPath()
+common.getAssetsPath().then((assetsPath) => {
     log.transports.console.format = '{y}-{m}-{d} {h}:{i}:{s} {text}'
     log.transports.file.resolvePath = () => path.join(assetsPath, 'log/main.log')
     Object.assign(console, log.functions)
     log.catchErrors()
-})()
+})
 

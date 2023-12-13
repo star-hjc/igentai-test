@@ -154,9 +154,9 @@ module.exports = async (code, device, runCallback, num) => {
                 const data = await adb.setUiautomatorServe(1)
                 if (!['Successfully started', 'Already started'].includes(data)) {
                     // eslint-disable-next-line no-console
-                    console.log(data)
-                    // eslint-disable-next-line no-console
                     console.warn('u2服务开启失败...')
+                    // eslint-disable-next-line no-console
+                    await adb.startATXService()
                 }
             }
             // eslint-disable-next-line no-eval

@@ -23,7 +23,6 @@
     "dexie": "^3.2.4",
     "echarts": "^5.4.2",
     "electron-log": "^4.4.8",
-    "electron-rebuild": "^3.2.9",
     "electron-store": "^8.1.0",
     "element-plus": "^2.3.4",
     "jimp": "^0.22.8",
@@ -44,8 +43,8 @@
     "eslint": "^8.39.0",
     "eslint-plugin-vue": "^9.11.0",
     "nodemon": "^2.0.22",
-    "sass": "^1.62.1",
-    "sass-loader": "^13.2.2",
+      "sass": "^1.62.1",
+      "sass-loader": "^13.2.2",
     "unplugin-auto-import": "^0.15.3",
     "unplugin-vue-components": "^0.24.1",
     "vite": "^4.3.2"
